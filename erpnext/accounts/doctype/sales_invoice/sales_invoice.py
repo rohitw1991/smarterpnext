@@ -18,6 +18,7 @@ from erpnext.controllers.recurring_document import *
 
 from erpnext.controllers.selling_controller import SellingController
 from tools.tools_management.custom_methods import get_merchandise_item_details, get_item_details
+from erpnext.accounts.accounts_custom_methods import add_data_in_work_order_assignment
 
 form_grid_templates = {
 	"entries": "templates/form_grid/item_grid.html"
@@ -609,6 +610,10 @@ class SalesInvoice(SellingController):
 				if d.tailoring_item_code and d.tailoring_size and d.width:
 					d.fabric_qty = frappe.db.get_value('Size Item',{'parent':d.tailoring_item_code,'size':d.tailoring_size,'width':d.width},'fabric_qty')
 		return True
+
+	def add_data(self):
+		add_data_in_work_order_assignment(self)
+		return "Done"
 
 @frappe.whitelist()
 def get_bank_cash_account(mode_of_payment):
