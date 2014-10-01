@@ -187,14 +187,13 @@ class Item(WebsiteGenerator):
 	def cant_change(self):
 		if not self.get("__islocal"):
 			vals = frappe.db.get_value("Item", self.name,
-				["has_serial_no", "is_stock_item", "valuation_method", "has_batch_no"], as_dict=True)
+				["has_serial_no", "is_stock_item", "valuation_method"], as_dict=True)
 
 			if vals and ((self.is_stock_item == "No" and vals.is_stock_item == "Yes") or
 				vals.has_serial_no != self.has_serial_no or
-				vals.has_batch_no != self.has_batch_no or
 				cstr(vals.valuation_method) != cstr(self.valuation_method)):
 					if self.check_if_sle_exists() == "exists":
-						frappe.throw(_("As there are existing stock transactions for this item, you can not change the values of 'Has Serial No', 'Has Batch No', 'Is Stock Item' and 'Valuation Method'"))
+						frappe.throw(_("As there are existing stock transactions for this item, you can not change the values of 'Has Serial No', 'Is Stock Item' and 'Valuation Method'"))
 
 	def validate_item_type_for_reorder(self):
 		if self.re_order_level or len(self.get("item_reorder", {"material_request_type": "Purchase"})):
@@ -272,6 +271,37 @@ class Item(WebsiteGenerator):
 					row = self.append("item_website_specifications")
 					row.label = label
 					row.description = desc
+
+	def get_details(self):
+		if self.get("__islocal"):
+			size_details= frappe.db.sql("""select name from `tabSize`""",as_list=1)
+			width_details= frappe.db.sql("""select name from `tabWidth`""",as_list=1)
+			self.set('size_item', [])
+			for size in size_details:
+				for width in width_details:
+					si = self.append('size_item', {})
+					si.size=size[0]
+					si.width=width[0]
+
+	def get_measurement_details(self, template):
+		self.set('measurement_item', [])
+		args = frappe.db.sql("""select * from `tabMeasurement Item`
+			where parent='%s'"""%(template),as_dict=1)
+		for data in args:
+			mi = self.append('measurement_item', {})
+			mi.parameter = data.parameter
+			mi.abbreviation = data.abbreviation
+			mi.image_view = data.image_view
+			mi.value = data.value
+			mi.default_value = data.default_value
+		return "Done"
+
+	def get_style_details(self, style_name):
+		for d in self.get('style_item'):
+			if d.style == style_name:
+				d.abbreviation = frappe.db.get_value('Style', style_name, 'abbreviation')
+				d.default_value = frappe.db.get_value('Style', style_name, 'default_value')
+		return "Done"
 
 def validate_end_of_life(item_code, end_of_life=None, verbose=1):
 	if not end_of_life:

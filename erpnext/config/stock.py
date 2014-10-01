@@ -13,6 +13,16 @@ def get_data():
 				},
 				{
 					"type": "doctype",
+					"name": "Material In",
+					"description": _("Material In."),
+				},
+				{
+					"type": "doctype",
+					"name": "Material Out",
+					"description": _("Material Out."),
+				},
+				{
+					"type": "doctype",
 					"name": "Stock Entry",
 					"description": _("Record item movement."),
 				},
@@ -25,11 +35,6 @@ def get_data():
 					"type": "doctype",
 					"name": "Purchase Receipt",
 					"description": _("Goods received from Suppliers."),
-				},
-				{
-					"type": "doctype",
-					"name": "Installation Note",
-					"description": _("Installation record for a Serial No.")
 				},
 				{
 					"type": "doctype",
@@ -61,6 +66,11 @@ def get_data():
 					"type": "doctype",
 					"name": "Stock Reconciliation",
 					"description": _("Upload stock balance via csv.")
+				},
+				{
+					"type": "doctype",
+					"name": "Installation Note",
+					"description": _("Installation record for a Serial No.")
 				},
 				{
 					"type": "doctype",
@@ -171,12 +181,6 @@ def get_data():
 					"label": _("Stock Analytics"),
 					"icon": "icon-bar-chart"
 				},
-				{
-					"type": "report",
-					"is_query_report": True,
-					"name": "Warehouse-Wise Stock Balance",
-					"doctype": "Warehouse"
-				},
 			]
 		},
 		{
@@ -227,6 +231,12 @@ def get_data():
 					"is_query_report": True,
 					"name": "Batch-Wise Balance History",
 					"doctype": "Batch"
+				},
+				{
+					"type": "report",
+					"is_query_report": True,
+					"name": "Warehouse-Wise Stock Balance",
+					"doctype": "Warehouse"
 				},
 				{
 					"type": "report",

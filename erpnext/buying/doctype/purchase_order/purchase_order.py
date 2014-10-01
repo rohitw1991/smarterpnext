@@ -162,8 +162,6 @@ class PurchaseOrder(BuyingController):
 		msgprint(_("Status of {0} {1} is now {2}").format(self.doctype, self.name, status))
 
 	def on_submit(self):
-		super(PurchaseOrder, self).on_submit()
-
 		purchase_controller = frappe.get_doc("Purchase Common")
 
 		self.update_prevdoc_status()
@@ -240,11 +238,6 @@ def make_purchase_receipt(source_name, target_doc=None):
 
 @frappe.whitelist()
 def make_purchase_invoice(source_name, target_doc=None):
-	def postprocess(source, target):
-		set_missing_values(source, target)
-		#Get the advance paid Journal Vouchers in Purchase Invoice Advance
-		target.get_advances()
-
 	def update_item(obj, target, source_parent):
 		target.amount = flt(obj.amount) - flt(obj.billed_amt)
 		target.base_amount = target.amount * flt(source_parent.conversion_rate)
@@ -270,6 +263,6 @@ def make_purchase_invoice(source_name, target_doc=None):
 			"doctype": "Purchase Taxes and Charges",
 			"add_if_empty": True
 		}
-	}, target_doc, postprocess)
+	}, target_doc, set_missing_values)
 
 	return doc

@@ -19,7 +19,7 @@ cur_frm.cscript.refresh = function(doc) {
 	cur_frm.cscript.edit_prices_button();
 
 	if (!doc.__islocal && doc.is_stock_item == 'Yes') {
-		cur_frm.toggle_enable(['has_serial_no', 'is_stock_item', 'valuation_method', 'has_batch_no'],
+		cur_frm.toggle_enable(['has_serial_no', 'is_stock_item', 'valuation_method'],
 			(doc.__onload && doc.__onload.sle_exists=="exists") ? false : true);
 	}
 
@@ -47,7 +47,7 @@ cur_frm.cscript.make_dashboard = function() {
 }
 
 cur_frm.cscript.edit_prices_button = function() {
-	cur_frm.add_custom_button(__("Add / Edit Prices"), function() {
+	cur_frm.add_custom_button("Add / Edit Prices", function() {
 		frappe.set_route("Report", "Item Price", {"item_code": cur_frm.doc.name});
 	}, "icon-money");
 }
@@ -186,3 +186,40 @@ cur_frm.cscript.image = function() {
 		msgprint(__("You may need to update: {0}", [frappe.meta.get_docfield(cur_frm.doc.doctype, "description_html").label]));
 	}
 }
+//Rohit
+cur_frm.cscript.image = function(doc, cdt, cdn) {
+var d = locals[cdt][cdn]
+d.image_view = '<table style="width: 100%; table-layout: fixed;"><tr><td><img src="'+d.image+'" width="100px"></td></tr></table>'
+refresh_field("measurement_item");
+}
+cur_frm.cscript.add_image = function(doc, cdt, cdn) {
+var d = locals[cdt][cdn]
+d.image_viewer = '<table style="width: 100%; table-layout: fixed;"><tr><td ><img src="'+d.add_image+'" width="100px"></td></tr></table>'
+refresh_field("style_item");
+}
+cur_frm.cscript.measurement_template = function(doc, cdt, cdn){
+get_server_fields('get_measurement_details',doc.measurement_template,'',doc ,cdt, cdn,1, function(){
+refresh_field('measurement_item')
+})
+}
+cur_frm.cscript.style = function(doc, cdt, cdn){
+var	d = locals[cdt][cdn]
+get_server_fields('get_style_details',d.style,'',doc ,cdt, cdn,1, function(){
+refresh_field('style_item')
+})
+}
+cur_frm.cscript.onload= function(doc, cdt, cdn) {
+return get_server_fields('get_details','', '', doc, cdt, cdn, 1,function(){
+refresh_field('size_item')
+});
+};
+
+
+//for Slide Show
+
+
+{% include 'stock/custom_items.js' %} 
+
+cur_frm.script_manager.make(erpnext.stock.CustomItem); 
+
+

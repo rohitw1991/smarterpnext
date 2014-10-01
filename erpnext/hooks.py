@@ -4,12 +4,12 @@ app_publisher = "Web Notes Technologies Pvt. Ltd. and Contributors"
 app_description = "Open Source Enterprise Resource Planning for Small and Midsized Organizations"
 app_icon = "icon-th"
 app_color = "#e74c3c"
-app_version = "4.5.1"
+app_version = "4.3.0"
 
 error_report_email = "support@erpnext.com"
 
-app_include_js = "assets/js/erpnext.min.js"
-app_include_css = "assets/css/erpnext.css"
+app_include_js = ["assets/js/erpnext.min.js","assets/js/chart.js","assets/js/bjqs-1.3.js","assets/js/bjqs-1.3.min.js"]
+app_include_css = ["assets/css/erpnext.css","assets/css/bjqs.css","assets/css/demo.css"]
 web_include_js = "assets/js/erpnext-web.min.js"
 
 after_install = "erpnext.setup.install.after_install"
@@ -47,20 +47,43 @@ doc_events = {
 		"on_update": "erpnext.home.make_comment_feed"
 	},
 	"Stock Entry": {
-		"on_submit": "erpnext.stock.doctype.material_request.material_request.update_completed_qty",
-		"on_cancel": "erpnext.stock.doctype.material_request.material_request.update_completed_qty"
+		"on_submit": ["erpnext.stock.doctype.material_request.material_request.update_completed_qty","erpnext.stock.stock_custom_methods.update_status"],
+		"on_cancel": ["erpnext.stock.doctype.material_request.material_request.update_completed_qty", "erpnext.stock.stock_custom_methods.cancel_status"]
 	},
 	"User": {
 		"validate": "erpnext.hr.doctype.employee.employee.validate_employee_role",
 		"on_update": "erpnext.hr.doctype.employee.employee.update_user_permissions"
-	}
+	},
+	"User": {
+		"validate": [
+		"erpnext.hr.doctype.employee.employee.validate_employee_role",
+		"erpnext.setup.doctype.site_master.site_master.validate_validity"
+		],
+		"on_update":[ 
+		"erpnext.hr.doctype.employee.employee.update_user_permissions",
+		"erpnext.setup.doctype.site_master.site_master.update_users"
+		],
+	},
+	"Branch": {
+		"validate" : "tools.tools_management.custom_methods.branch_validation"
+	},
+	"Sales Invoice": {
+		"validate"  : "tools.tools_management.custom_methods.merge_tailoring_items", 
+		"on_submit" : ["tools.tools_management.custom_methods.sales_invoice_on_submit_methods","erpnext.accounts.accounts_custom_methods.create_production_process","erpnext.accounts.accounts_custom_methods.validate_sales_invoice"],
+		"on_cancel" : ["tools.tools_management.custom_methods.delete_project_aginst_si", "erpnext.accounts.accounts_custom_methods.delete_production_process"]
+	},
 }
 
 scheduler_events = {
 	"all": [
 		"erpnext.support.doctype.support_ticket.get_support_mails.get_support_mails",
 		"erpnext.hr.doctype.job_applicant.get_job_applications.get_job_applications",
-		"erpnext.selling.doctype.lead.get_leads.get_leads"
+		"erpnext.selling.doctype.lead.get_leads.get_leads",
+		"erpnext.setup.doctype.site_master.site_master.create_support",
+		"erpnext.setup.doctype.site_master.site_master.create_feedback",
+		"erpnext.setup.doctype.site_master.site_master.assign_support",
+		"erpnext.setup.doctype.site_master.site_master.disable_user",
+		"erpnext.setup.doctype.site_master.site_master.add_validity",
 	],
 	"daily": [
 		"erpnext.controllers.recurring_document.create_recurring_documents",

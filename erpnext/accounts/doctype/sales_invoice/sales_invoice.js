@@ -399,8 +399,189 @@ cur_frm.cscript.on_submit = function(doc, cdt, cdn) {
 	})
 }
 
+cur_frm.cscript.is_recurring = function(doc, dt, dn) {
+	// set default values for recurring invoices
+	if(doc.is_recurring) {
+		var owner_email = doc.owner=="Administrator"
+			? frappe.user_info("Administrator").email
+			: doc.owner;
+
+		doc.notification_email_address = $.map([cstr(owner_email),
+			cstr(doc.contact_email)], function(v) { return v || null; }).join(", ");
+		doc.repeat_on_day_of_month = frappe.datetime.str_to_obj(doc.posting_date).getDate();
+	}
+
+	refresh_many(["notification_email_address", "repeat_on_day_of_month"]);
+}
+
+cur_frm.cscript.from_date = function(doc, dt, dn) {
+	// set to_date
+	if(doc.from_date) {
+		var recurring_type_map = {'Monthly': 1, 'Quarterly': 3, 'Half-yearly': 6,
+			'Yearly': 12};
+
+		var months = recurring_type_map[doc.recurring_type];
+		if(months) {
+			var to_date = frappe.datetime.add_months(doc.from_date,
+				months);
+			doc.to_date = frappe.datetime.add_days(to_date, -1);
+			refresh_field('to_date');
+		}
+	}
+}
+
 cur_frm.cscript.send_sms = function() {
 	frappe.require("assets/erpnext/js/sms_manager.js");
 	var sms_man = new SMSManager(cur_frm.doc);
 }
+//Rohit
 
+cur_frm.cscript.validate = function(doc, cdt, cdn){
+get_server_fields('add_data','','',doc, cdt, cdn, 1, function(){
+	refresh_field('work_order_distribution')
+})	
+setTimeout(function(){
+refresh_field(['entries','net_total_export','grand_total_export','outstanding_amount','rounded_total_export','in_words_export']);
+},1000)
+
+}
+//for tailoring products
+cur_frm.cscript.tailoring_item_code = function(doc, cdt, cdn){
+var d = locals[cdt][cdn]
+get_server_fields('get_details',d.tailoring_item_code,'',doc, cdt, cdn, 1 , function(doc, cdt, cdn){
+refresh_field('sales_invoice_items_one')
+})
+}
+cur_frm.cscript.tailoring_qty = function(doc, cdt, cdn){
+cur_frm.cscript.calculate_tailoring_amount(doc, cdt, cdn);
+}	
+cur_frm.cscript.tailoring_rate = function(doc, cdt, cdn){
+cur_frm.cscript.calculate_tailoring_amount(doc, cdt, cdn);
+}
+cur_frm.cscript.tailoring_discount_percentage = function(doc, cdt, cdn){
+cur_frm.cscript.calculate_tailoring_amount(doc, cdt, cdn);	
+}
+cur_frm.cscript.calculate_tailoring_amount = function(doc, cdt, cdn){
+var d = locals[cdt][cdn]
+if(d.tailoring_discount_percentage == 100.0)
+{
+d.tailoring_amount = 0	
+}
+else
+{
+if(d.tailoring_discount_percentage)
+{
+d.tailoring_amount = flt(d.tailoring_rate * (1.0 - (flt(d.tailoring_discount_percentage) / 100.0))*d.tailoring_qty)
+}
+else{
+d.tailoring_amount = flt(flt(d.tailoring_rate) *flt(d.tailoring_qty))
+}
+}
+refresh_field('sales_invoice_items_one')
+cur_frm.cscript.calculate_net_total(doc, cdt, cdn)
+}
+//for merchandise products
+cur_frm.cscript.merchandise_item_code = function(doc, cdt, cdn){
+var d = locals[cdt][cdn]
+get_server_fields('get_merchandise_details',d.merchandise_item_code,'',doc, cdt, cdn, 1 , function(doc, cdt, cdn){
+refresh_field('merchandise_item')
+})
+}
+cur_frm.cscript.merchandise_qty = function(doc, cdt, cdn){
+cur_frm.cscript.calculate_merchandise_amount(doc, cdt, cdn);
+}
+cur_frm.cscript.merchandise_rate = function(doc, cdt, cdn){
+cur_frm.cscript.calculate_merchandise_amount(doc, cdt, cdn);
+}
+cur_frm.cscript.merchandise_discount_percentage = function(doc, cdt, cdn){
+cur_frm.cscript.calculate_merchandise_amount(doc, cdt, cdn);
+}
+cur_frm.cscript.calculate_merchandise_amount = function(doc, cdt, cdn){
+var d = locals[cdt][cdn]
+if(d.merchandise_discount_percentage == 100.0)
+{
+d.merchandise_amount = 0
+}
+else
+{
+if(d.merchandise_discount_percentage)
+{
+d.merchandise_amount = flt(d.merchandise_rate * (1.0 - (d.merchandise_discount_percentage / 100.0))*d.merchandise_qty)
+}
+else{
+d.merchandise_amount = flt(flt(d.merchandise_rate) *flt(d.merchandise_qty))
+}
+}
+refresh_field('merchandise_item')
+cur_frm.cscript.calculate_net_total(doc, cdt, cdn)
+}
+cur_frm.cscript.sales_invoice_items_one_remove = function(doc, cdt, cdn){
+cur_frm.cscript.calculate_net_total(doc, cdt, cdn)
+}
+cur_frm.cscript.merchandise_item_remove = function(doc, cdt, cdn){
+cur_frm.cscript.calculate_net_total(doc, cdt, cdn)
+}
+cur_frm.cscript.calculate_net_total = function(doc, cdt, cdn){
+if (doc){
+var net_total = 0.0
+var cl=doc.sales_invoice_items_one || [ ]
+for(i=0 ;i<cl.length;i++){
+net_total += parseFloat(cl[i].tailoring_amount)
+}
+var al = doc.merchandise_item || [ ]
+for(i=0 ;i<al.length;i++){
+net_total += parseFloat(al[i].merchandise_amount)
+}
+doc.net_total_export = net_total
+refresh_field('net_total_export')
+}
+}
+
+cur_frm.fields_dict['sales_invoice_items_one'].grid.get_field('tailoring_item_code').get_query = function(doc) {
+	return{
+		filters: {
+			'item_category': 'Tailoring'
+		}
+	}
+}
+
+cur_frm.fields_dict['merchandise_item'].grid.get_field('merchandise_item_code').get_query = function(doc) {
+	return{
+		filters: {
+			'item_category': 'Merchandise'
+		}
+	}
+}
+
+cur_frm.fields_dict['sales_invoice_items_one'].grid.get_field('fabric_code').get_query = function(doc) {
+	return{
+		filters: {
+			'item_category': 'Fabric'
+		}
+	}
+}
+
+cur_frm.cscript.tailoring_size = function(doc, cdt, cdn){
+	cur_frm.cscript.set_qty(doc, cdt, cdn)
+}
+
+cur_frm.cscript.width = function(doc, cdt, cdn){
+	cur_frm.cscript.set_qty(doc, cdt, cdn)	
+}
+
+cur_frm.cscript.set_qty = function(doc, cdt, cdn){
+	var d = locals[cdt][cdn]
+	get_server_fields('get_size_details',d.idx,'',doc,cdt,cdn,1,function(){
+		refresh_field('sales_invoice_items_one')
+	})
+}
+
+cur_frm.fields_dict['work_order_distribution'].grid.get_field('tailor_work_order').get_query = function(doc, cdt, cdn) {
+	var d = locals[cdt][cdn]
+	return{
+		filters: {
+			'sales_invoice_no': null,
+			'item_code': d.tailoring_item_code
+		}
+	}
+}

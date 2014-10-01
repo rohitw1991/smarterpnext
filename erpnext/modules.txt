@@ -10,3 +10,4 @@ Stock
 Support
 Utilities
 Contacts
+Dashboard

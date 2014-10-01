@@ -45,7 +45,7 @@
    "oldfieldname": "company_name", 
    "oldfieldtype": "Data", 
    "permlevel": 0, 
-   "reqd": 0, 
+   "reqd": 1, 
    "search_index": 0
   }, 
   {
@@ -55,7 +55,7 @@
    "oldfieldname": "email_id", 
    "oldfieldtype": "Data", 
    "permlevel": 0, 
-   "reqd": 0, 
+   "reqd": 1, 
    "search_index": 1
   }, 
   {
@@ -368,7 +368,7 @@
  ], 
  "icon": "icon-user", 
  "idx": 1, 
- "modified": "2014-08-12 05:22:18.801092", 
+ "modified": "2014-09-11 08:37:26.833692", 
  "modified_by": "Administrator", 
  "module": "Selling", 
  "name": "Lead", 

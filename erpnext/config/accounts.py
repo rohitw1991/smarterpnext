@@ -61,11 +61,6 @@ def get_data():
 					"name": "Period Closing Voucher",
 					"description": _("Close Balance Sheet and book Profit or Loss.")
 				},
-				{
-					"type": "doctype",
-					"name": "Payment Tool",
-					"description": _("Create Payment Entries against Orders or Invoices.")
-				},
 			]
 		},
 		{
