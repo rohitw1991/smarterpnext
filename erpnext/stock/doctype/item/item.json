@@ -68,15 +68,6 @@
    "reqd": 1
   }, 
   {
-   "fieldname": "item_category", 
-   "fieldtype": "Select", 
-   "label": "Item Category ", 
-   "options": "\nFabric\nMerchandise\nTailoring", 
-   "permlevel": 0, 
-   "precision": "", 
-   "reqd": 0
-  }, 
-  {
    "description": "Unit of measurement of this item (e.g. Kg, Unit, No, Pair).", 
    "fieldname": "stock_uom", 
    "fieldtype": "Link", 
@@ -833,7 +824,7 @@
  "icon": "icon-tag", 
  "idx": 1, 
  "max_attachments": 10, 
- "modified": "2014-09-26 18:47:26.355852", 
+ "modified": "2014-10-04 14:37:58.250720", 
  "modified_by": "Administrator", 
  "module": "Stock", 
  "name": "Item", 

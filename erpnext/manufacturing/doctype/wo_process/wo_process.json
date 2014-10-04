@@ -216,6 +216,15 @@
    "label": "Completion Date", 
    "permlevel": 0, 
    "precision": ""
+  }, 
+  {
+   "fieldname": "trials", 
+   "fieldtype": "Link", 
+   "label": "Trials", 
+   "options": "Trials Master", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 0
   }
  ], 
  "hide_heading": 0, 
@@ -225,7 +234,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-10-01 12:56:15.730986", 
+ "modified": "2014-10-04 16:47:31.570378", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "WO Process", 
