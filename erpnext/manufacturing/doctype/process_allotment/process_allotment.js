@@ -1,3 +1,6 @@
+cur_frm.add_fetch('raw_material_item_code', 'item_name', 'raw_material_item_name')
+cur_frm.add_fetch('raw_material_item_code', 'stock_uom', 'uom')
+
 cur_frm.fields_dict['sales_invoice_no'].get_query = function(doc) {
 	return {
 		filters: {

@@ -25,7 +25,8 @@ class WorkManagement(Document):
 		return frappe.db.sql("select * from `tabProduction Dashboard Details` where %s order by sales_invoice_no"%(cond),as_dict=1)
 
 	def create_invoice_bundle(self, invoice_detail, si):
-		color = {'Completed':'green','Pending':'red'}
+		color = {'Completed':'green','Pending':'red', 'Trial':'yellow'}
+		value = '<h style="color:red">Pending</h>'
 		si.sales_invoice = invoice_detail.sales_invoice_no
 		si.article_code = invoice_detail.article_code
 		si.article_qty = invoice_detail.article_qty
@@ -35,10 +36,12 @@ class WorkManagement(Document):
 		si.actual_qty = invoice_detail.fabric_qty
 		si.fabric_code = invoice_detail.fabric_code
 		si.size = invoice_detail.size
-		si.process_status ='<h style="color:%s">%s</h>'%(color.get(invoice_detail.process_status), invoice_detail.process_status)
+		if invoice_detail.status == 'Completed':
+			value = '<h style="color:%s">%s</h>'%(color.get(invoice_detail.status), invoice_detail.status)
+		elif cint(invoice_detail.trial_no) > 0:
+			value = '<h style="color:%s">Ready For %s %s</h>'%(color.get(invoice_detail.status), invoice_detail.status, invoice_detail.trial_no)
+		si.process_status = value
 		si.cut_order_status ='<h style="color:%s">%s</h>'%(color.get(invoice_detail.cut_order_status), invoice_detail.cut_order_status)
-		si.work_order_status ='<h style="color:%s">%s</h>'%(color.get(invoice_detail.work_order_status), invoice_detail.work_order_status)
-		si.raw_material_status = '<h style="color:%s">%s</h>'%(color.get(invoice_detail.rm_status), invoice_detail.rm_status)
 
 	def save_data(self, args):
 		for d in self.get('production_details'):

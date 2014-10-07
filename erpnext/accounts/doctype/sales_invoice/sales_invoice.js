@@ -399,49 +399,15 @@ cur_frm.cscript.on_submit = function(doc, cdt, cdn) {
 	})
 }
 
-cur_frm.cscript.is_recurring = function(doc, dt, dn) {
-	// set default values for recurring invoices
-	if(doc.is_recurring) {
-		var owner_email = doc.owner=="Administrator"
-			? frappe.user_info("Administrator").email
-			: doc.owner;
-
-		doc.notification_email_address = $.map([cstr(owner_email),
-			cstr(doc.contact_email)], function(v) { return v || null; }).join(", ");
-		doc.repeat_on_day_of_month = frappe.datetime.str_to_obj(doc.posting_date).getDate();
-	}
-
-	refresh_many(["notification_email_address", "repeat_on_day_of_month"]);
-}
-
-cur_frm.cscript.from_date = function(doc, dt, dn) {
-	// set to_date
-	if(doc.from_date) {
-		var recurring_type_map = {'Monthly': 1, 'Quarterly': 3, 'Half-yearly': 6,
-			'Yearly': 12};
-
-		var months = recurring_type_map[doc.recurring_type];
-		if(months) {
-			var to_date = frappe.datetime.add_months(doc.from_date,
-				months);
-			doc.to_date = frappe.datetime.add_days(to_date, -1);
-			refresh_field('to_date');
-		}
-	}
-}
-
 cur_frm.cscript.send_sms = function() {
 	frappe.require("assets/erpnext/js/sms_manager.js");
 	var sms_man = new SMSManager(cur_frm.doc);
 }
-//Rohit
 
-cur_frm.cscript.validate = function(doc, cdt, cdn){
-get_server_fields('add_data','','',doc, cdt, cdn, 1, function(){
-	refresh_field('work_order_distribution')
-})	
+//Rohit
+cur_frm.cscript.validate = function(doc, cdt, cdn){	
 setTimeout(function(){
-refresh_field(['entries','net_total_export','grand_total_export','outstanding_amount','rounded_total_export','in_words_export']);
+refresh_field(['entries','net_total_export','grand_total_export','outstanding_amount','rounded_total_export','in_words_export','work_order_distribution']);
 },1000)
 
 }
@@ -540,7 +506,7 @@ refresh_field('net_total_export')
 cur_frm.fields_dict['sales_invoice_items_one'].grid.get_field('tailoring_item_code').get_query = function(doc) {
 	return{
 		filters: {
-			'item_category': 'Tailoring'
+			'item_group': 'Tailoring'
 		}
 	}
 }
@@ -548,7 +514,7 @@ cur_frm.fields_dict['sales_invoice_items_one'].grid.get_field('tailoring_item_co
 cur_frm.fields_dict['merchandise_item'].grid.get_field('merchandise_item_code').get_query = function(doc) {
 	return{
 		filters: {
-			'item_category': 'Merchandise'
+			'item_group': 'Merchandise'
 		}
 	}
 }
@@ -556,7 +522,7 @@ cur_frm.fields_dict['merchandise_item'].grid.get_field('merchandise_item_code').
 cur_frm.fields_dict['sales_invoice_items_one'].grid.get_field('fabric_code').get_query = function(doc) {
 	return{
 		filters: {
-			'item_category': 'Fabric'
+			'item_group': 'Fabric'
 		}
 	}
 }
@@ -580,7 +546,7 @@ cur_frm.fields_dict['work_order_distribution'].grid.get_field('tailor_work_order
 	var d = locals[cdt][cdn]
 	return{
 		filters: {
-			'sales_invoice_no': null,
+			'sales_invoice_no': null || doc.name,
 			'item_code': d.tailoring_item_code
 		}
 	}

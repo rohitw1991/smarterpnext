@@ -48,6 +48,31 @@
    "options": "Work Order", 
    "permlevel": 0, 
    "precision": ""
+  }, 
+  {
+   "fieldname": "tailor_fabric", 
+   "fieldtype": "Link", 
+   "hidden": 1, 
+   "label": "Tailor Fabric", 
+   "options": "Item", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "tailor_fabric_qty", 
+   "fieldtype": "Int", 
+   "hidden": 1, 
+   "label": "Tailor Fabric Qty", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "tailor_warehouse", 
+   "fieldtype": "Link", 
+   "label": "Tailor Warehouse", 
+   "options": "Warehouse", 
+   "permlevel": 0, 
+   "precision": ""
   }
  ], 
  "hide_heading": 0, 
@@ -57,7 +82,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-10-01 19:14:53.432618", 
+ "modified": "2014-10-06 00:08:24.083202", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Work Order Distribution", 

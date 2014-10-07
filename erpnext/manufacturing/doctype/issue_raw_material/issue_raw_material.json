@@ -12,16 +12,16 @@
    "fieldname": "select", 
    "fieldtype": "Check", 
    "in_list_view": 1, 
-   "label": "Select ", 
+   "label": "Select", 
    "permlevel": 0, 
    "precision": ""
   }, 
   {
-   "fieldname": "trial_no", 
+   "fieldname": "issue_trial_no", 
    "fieldtype": "Select", 
    "in_list_view": 1, 
    "label": "Trial No", 
-   "options": "\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n41\n42\n43\n44\n45\n46\n47\n48\n49\n50", 
+   "options": "\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n41\n42\n43\n44\n45\n46\n47\n48\n49\n50", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -64,6 +64,14 @@
    "reqd": 0, 
    "search_index": 0, 
    "set_only_once": 0
+  }, 
+  {
+   "fieldname": "raw_sub_group", 
+   "fieldtype": "Link", 
+   "label": "Raw Sub Group", 
+   "options": "Sub Groups", 
+   "permlevel": 0, 
+   "precision": ""
   }, 
   {
    "fieldname": "uom", 
@@ -118,7 +126,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-10-04 18:24:42.843149", 
+ "modified": "2014-10-06 19:50:35.309759", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Issue Raw Material", 

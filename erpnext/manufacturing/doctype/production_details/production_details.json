@@ -156,6 +156,7 @@
   {
    "fieldname": "stock_entry", 
    "fieldtype": "Link", 
+   "hidden": 1, 
    "label": "Stock Entry", 
    "options": "Stock Entry", 
    "permlevel": 0, 
@@ -164,6 +165,7 @@
   {
    "fieldname": "work_order", 
    "fieldtype": "Link", 
+   "hidden": 1, 
    "label": "Work Order", 
    "options": "Work Order", 
    "permlevel": 0, 
@@ -180,7 +182,7 @@
    "fieldname": "process_status", 
    "fieldtype": "Data", 
    "in_list_view": 1, 
-   "label": "Process Status", 
+   "label": "Status", 
    "options": "", 
    "permlevel": 0, 
    "precision": "", 
@@ -211,7 +213,7 @@
    "allow_on_submit": 0, 
    "fieldname": "work_order_status", 
    "fieldtype": "Data", 
-   "hidden": 0, 
+   "hidden": 1, 
    "ignore_user_permissions": 0, 
    "in_filter": 0, 
    "in_list_view": 1, 
@@ -230,11 +232,55 @@
   {
    "fieldname": "raw_material_status", 
    "fieldtype": "Data", 
-   "hidden": 0, 
+   "hidden": 1, 
    "label": "Raw Material Status", 
    "permlevel": 0, 
    "precision": "", 
    "read_only": 1
+  }, 
+  {
+   "fieldname": "trial_item_code", 
+   "fieldtype": "Link", 
+   "hidden": 1, 
+   "label": "Trial Item Code", 
+   "options": "Item", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "trial_item_serial_no", 
+   "fieldtype": "Link", 
+   "hidden": 1, 
+   "label": "Trial Item Serial No", 
+   "options": "Serial No", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "section_break_23", 
+   "fieldtype": "Section Break", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "material_out", 
+   "fieldtype": "Button", 
+   "label": "Material Out", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "column_break_25", 
+   "fieldtype": "Column Break", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "material_in", 
+   "fieldtype": "Button", 
+   "label": "Material In", 
+   "permlevel": 0, 
+   "precision": ""
   }
  ], 
  "hide_heading": 0, 
@@ -244,7 +290,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-09-22 20:40:21.056614", 
+ "modified": "2014-10-07 16:24:59.031691", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Production Details", 

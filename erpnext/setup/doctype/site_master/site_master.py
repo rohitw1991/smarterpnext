@@ -136,8 +136,9 @@ def validate_validity(doc, method):
 	frappe.errprint(get_url())
 	frappe.errprint("validate validity")
 	if doc.get("__islocal") and get_url()!='http://smarttailor':
+		res =''
 		frappe.errprint("is local and not smarttailor")
-	 	res = frappe.db.sql("select name from `tabUser` where name='Administrator' and no_of_users >0")
+	 	# res = frappe.db.sql("select name from `tabUser` where name='Administrator' and no_of_users >0")
 	 	frappe.errprint(res)
 	 	if  res:
 	 			frappe.errprint("in res if")
@@ -158,20 +159,20 @@ def validate_validity(doc, method):
 
 	elif(get_url()!='http://smarttailor'):
 		frappe.errprint("updating existing user not smarttailor")
-		if doc.add_validity:
-			frappe.errprint("updating existing user not smarttailor")
-			res1 = frappe.db.sql("select validity from `tabUser Validity` where user_name>0 and name=%s",doc.add_validity)
-			frappe.errprint(res1)
-			if res1:
-				frappe.errprint("else res1 ")
-				frappe.errprint("update user validity")
-				from frappe.utils import nowdate,add_months,cint
-				doc.add_validity=''
-				frappe.errprint("user validity")
-				frappe.errprint(doc.add_validity)
-				frappe.errprint("user validity1")
-				doc.validity_start_date=nowdate()
-				doc.validity_end_date=add_months(nowdate(),cint(res1[0][0]))
+		# if doc.add_validity:
+		# 	frappe.errprint("updating existing user not smarttailor")
+		# 	res1 = frappe.db.sql("select validity from `tabUser Validity` where user_name>0 and name=%s",doc.add_validity)
+		# 	frappe.errprint(res1)
+		# 	if res1:
+		# 		frappe.errprint("else res1 ")
+		# 		frappe.errprint("update user validity")
+		# 		from frappe.utils import nowdate,add_months,cint
+		# 		doc.add_validity=''
+		# 		frappe.errprint("user validity")
+		# 		frappe.errprint(doc.add_validity)
+		# 		frappe.errprint("user validity1")
+		# 		doc.validity_start_date=nowdate()
+		# 		doc.validity_end_date=add_months(nowdate(),cint(res1[0][0]))
 
 
 def update_users(doc, method):

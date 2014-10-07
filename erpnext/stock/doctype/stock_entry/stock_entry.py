@@ -79,21 +79,21 @@ class StockEntry(StockController):
 			frappe.throw(_("Purpose must be one of {0}").format(comma_or(valid_purposes)))
 
 	def set_transfer_qty(self):
-		frappe.errprint("in the set_transfer_qty")
+		# frappe.errprint("in the set_transfer_qty")
 		for item in self.get("mtn_details"):
-			frappe.errprint(item.qty)
+			# frappe.errprint(item.qty)
 			if not flt(item.qty):
 				frappe.throw(_("Row {0}: Qty is mandatory").format(item.idx))
 
 			item.transfer_qty = flt(item.qty * item.conversion_factor, self.precision("transfer_qty", item))
 
 	def validate_item(self):
-		frappe.errprint("in validate items")
+		# frappe.errprint("in validate items")
 		stock_items = self.get_stock_items()
-		frappe.errprint(stock_items)
+		# frappe.errprint(stock_items)
 		serialized_items = self.get_serialized_items()
 		for item in self.get("mtn_details"):
-			frappe.errprint(item.item_code)
+			# frappe.errprint(item.item_code)
 			if item.item_code not in stock_items:
 				frappe.throw(_("{0} is not a stock Item").format(item.item_code))
 			if not item.stock_uom:

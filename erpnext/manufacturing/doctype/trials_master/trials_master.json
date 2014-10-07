@@ -53,9 +53,10 @@
    "fieldname": "process", 
    "fieldtype": "Link", 
    "label": "Process", 
-   "options": "Process", 
+   "options": "Process Allotment", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 0
   }, 
   {
    "fieldname": "column_break_3", 
@@ -73,8 +74,9 @@
   }, 
   {
    "fieldname": "item_name", 
-   "fieldtype": "Data", 
+   "fieldtype": "Read Only", 
    "label": "Item Name", 
+   "options": "item_code.item_name", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -113,6 +115,14 @@
    "precision": ""
   }, 
   {
+   "fieldname": "remove_raw_material", 
+   "fieldtype": "Button", 
+   "label": "Issue Raw Material", 
+   "options": "make_stock_entry", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "amended_from", 
    "fieldtype": "Link", 
    "label": "Amended From", 
@@ -130,7 +140,7 @@
  "is_submittable": 1, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-10-04 16:18:39.767927", 
+ "modified": "2014-10-07 00:19:45.969156", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Trials Master", 

@@ -50,8 +50,37 @@
    "set_only_once": 0
   }, 
   {
+   "fieldname": "serial_no", 
+   "fieldtype": "Link", 
+   "label": "Serial No", 
+   "options": "Serial No", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "add", 
+   "fieldtype": "Button", 
+   "label": "Add", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "serials_data", 
+   "fieldtype": "Text", 
+   "label": "Serial", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "column_break_3", 
    "fieldtype": "Column Break", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "finished_good_qty", 
+   "fieldtype": "Int", 
+   "label": "Finished Good Qty", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -66,6 +95,7 @@
   {
    "fieldname": "section_break_6", 
    "fieldtype": "Section Break", 
+   "label": "Process", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -92,8 +122,17 @@
   {
    "fieldname": "issue_raw_material", 
    "fieldtype": "Table", 
+   "hidden": 0, 
    "label": "Issue Raw Material", 
    "options": "Issue Raw Material", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "make_stock_entry", 
+   "fieldtype": "Button", 
+   "label": "Issue Raw Material", 
+   "options": "make_stock_entry", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -122,11 +161,11 @@
    "description": "To Create New Finished good and Issue Raw Material", 
    "fieldname": "stock_entry", 
    "fieldtype": "Link", 
-   "label": "Stock Entry", 
+   "label": "Finished Stock Entry", 
    "options": "Stock Entry", 
    "permlevel": 0, 
    "precision": "", 
-   "read_only": 0
+   "read_only": 1
   }, 
   {
    "fieldname": "amended_from", 
@@ -146,7 +185,7 @@
  "is_submittable": 1, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-10-04 18:11:59.171679", 
+ "modified": "2014-10-07 14:54:10.474598", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Process Allotment", 

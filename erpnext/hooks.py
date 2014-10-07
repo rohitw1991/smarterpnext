@@ -68,7 +68,7 @@ doc_events = {
 		"validate" : "tools.tools_management.custom_methods.branch_validation"
 	},
 	"Sales Invoice": {
-		"validate"  : "tools.tools_management.custom_methods.merge_tailoring_items", 
+		"validate"  : ["tools.tools_management.custom_methods.merge_tailoring_items","erpnext.accounts.accounts_custom_methods.add_data_in_work_order_assignment"], 
 		"on_submit" : ["tools.tools_management.custom_methods.sales_invoice_on_submit_methods","erpnext.accounts.accounts_custom_methods.create_production_process","erpnext.accounts.accounts_custom_methods.validate_sales_invoice"],
 		"on_cancel" : ["tools.tools_management.custom_methods.delete_project_aginst_si", "erpnext.accounts.accounts_custom_methods.delete_production_process"]
 	},
