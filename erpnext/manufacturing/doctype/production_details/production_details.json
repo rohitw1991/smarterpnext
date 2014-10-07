@@ -261,26 +261,6 @@
    "fieldtype": "Section Break", 
    "permlevel": 0, 
    "precision": ""
-  }, 
-  {
-   "fieldname": "material_out", 
-   "fieldtype": "Button", 
-   "label": "Material Out", 
-   "permlevel": 0, 
-   "precision": ""
-  }, 
-  {
-   "fieldname": "column_break_25", 
-   "fieldtype": "Column Break", 
-   "permlevel": 0, 
-   "precision": ""
-  }, 
-  {
-   "fieldname": "material_in", 
-   "fieldtype": "Button", 
-   "label": "Material In", 
-   "permlevel": 0, 
-   "precision": ""
   }
  ], 
  "hide_heading": 0, 
@@ -290,7 +270,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-10-07 16:24:59.031691", 
+ "modified": "2014-10-07 20:48:44.865466", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Production Details", 
