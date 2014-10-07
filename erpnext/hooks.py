@@ -25,6 +25,8 @@ before_tests = "erpnext.setup.utils.before_tests"
 
 website_generators = ["Item Group", "Item", "Sales Partner"]
 
+fixtures = ['Custom Field']
+
 standard_queries = "Customer:erpnext.selling.doctype.customer.customer.get_customer_list"
 
 permission_query_conditions = {
