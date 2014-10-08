@@ -50,6 +50,15 @@
    "precision": ""
   }, 
   {
+   "fieldname": "trials", 
+   "fieldtype": "Link", 
+   "hidden": 0, 
+   "label": "Trials", 
+   "options": "Trials", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "tailor_fabric", 
    "fieldtype": "Link", 
    "hidden": 1, 
@@ -82,7 +91,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-10-06 00:08:24.083202", 
+ "modified": "2014-10-08 00:44:48.050818", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Work Order Distribution", 
