@@ -18,10 +18,11 @@ class TrialsMaster(Document):
 	def create_finished_food(self):
 		for d in self.get('trials_transaction'):
 			self.check_status(d)
-			if d.trial_product and d.trial_good_serial_no and d.status=='Completed' and d.status!='Completed':
+			if d.trial_product and d.trial_good_serial_no and d.status=='Completed' and d.good_status!='Completed':
 				self.validate_serial(d)
 				name = self.create_finished_goods(d)
 				d.stock_entry_ref = name
+				d.good_status = 'Completed'
 
 	def check_status(self, args):
 		if args.status == 'Pending' and args.good_status == 'Completed':
@@ -36,21 +37,28 @@ class TrialsMaster(Document):
 	def create_finished_goods(self, args):
 		ste = frappe.new_doc('Stock Entry')
 		ste.purpose = 'Manufacture/Repack'
+		ste.refer_doctype_name = self.name
 		ste.save(ignore_permissions=True)
 		self.make_child_entry(args, ste.name)
-		ste = frappe.get('Stock Entry',ste.name)
+		ste = frappe.get_doc('Stock Entry',ste.name)
 		ste.submit()
 		self.make_gs_entry(args)
 		return ste.name
 
 	def make_child_entry(self, args, name):
+		frappe.errprint(["wsef",args.trial_product])
 		ste = frappe.new_doc('Stock Entry Detail')
 		ste.t_warehouse = 'Finished Goods - I'
 		ste.item_code = args.trial_product
 		ste.serial_no = args.trial_good_serial_no
+		ste.uom = frappe.db.get_value('Item', ste.item_code, 'stock_uom')
+		ste.stock_uom = frappe.db.get_value('Item', ste.item_code, 'stock_uom')
 		ste.qty = 1
 		ste.parent = name
 		ste.conversion_factor = 1
+		ste.parenttype = 'Stock Entry'
+		ste.incoming_rate = 1.00
+		ste.parentfield = 'mtn_details'
 		ste.expense_account = 'Stock Adjustment - I'
 		ste.cost_center = 'Main - I'
 		ste.transfer_qty = 1

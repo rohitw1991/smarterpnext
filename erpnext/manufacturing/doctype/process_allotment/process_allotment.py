@@ -117,7 +117,6 @@ class ProcessAllotment(Document):
 
 	def make_stock_entry(self):
 		if self.get('issue_raw_material'):
-			frappe.errprint("debug step 1")
 			create_se(self.get('issue_raw_material'))
 
 	def make_stock_entry_for_finished_goods(self):
@@ -125,9 +124,9 @@ class ProcessAllotment(Document):
 		ste.purpose = 'Manufacture/Repack'
 		ste.save(ignore_permissions=True)
 		self.make_child_entry(ste.name)
-		ste = frappe.get('Stock Entry',ste.name)
+		ste = frappe.get_doc('Stock Entry',ste.name)
 		ste.submit()
-		self.make_gs_entry(args)
+		self.make_gs_entry()
 		return ste.name
 
 	def make_child_entry(self, name):
@@ -138,6 +137,11 @@ class ProcessAllotment(Document):
 		ste.qty = self.finished_good_qty
 		ste.parent = name
 		ste.conversion_factor = 1
+		ste.parenttype = 'Stock Entry'
+		ste.uom = frappe.db.get_value('Item', ste.item_code, 'stock_uom')
+		ste.stock_uom = frappe.db.get_value('Item', ste.item_code, 'stock_uom')
+		ste.incoming_rate = 1.00
+		ste.parentfield = 'mtn_details'
 		ste.expense_account = 'Stock Adjustment - I'
 		ste.cost_center = 'Main - I'
 		ste.transfer_qty = self.finished_good_qty
@@ -147,13 +151,13 @@ class ProcessAllotment(Document):
 	def make_gs_entry(self):
 		if self.serials_data:
 			parent = frappe.db.get_value('Production Dashboard Details',{'sales_invoice_no':self.sales_invoice_no,'article_code':self.item,'process_allotment':self.name},'name')
-			sn = cstr(serials_data).splitlines()
+			sn = cstr(self.serials_data).splitlines()
 			for s in sn:
 				if not frappe.db.get_value('Production Status Detail',{'item_code':self.item, 'serial_no':s[0]},'name'):
 					if parent:
 						pd = frappe.new_doc('Production Status Detail')
 						pd.item_code = self.item
-						pd.serial_no = s[0]
+						pd.serial_no = s
 						pd.status = 'Ready'
 						pd.parent = parent
 						pd.save(ignore_permissions = True)
@@ -162,7 +166,6 @@ class ProcessAllotment(Document):
 		return "Done"
 
 def create_se(raw_material):
-	frappe.errprint([nowdate(), nowtime()])
 	se = frappe.new_doc('Stock Entry')
 	se.naming_series = 'STE-'
 	se.purpose = 'Material Issue'

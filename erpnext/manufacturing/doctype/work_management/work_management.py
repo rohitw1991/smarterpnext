@@ -25,7 +25,7 @@ class WorkManagement(Document):
 		return frappe.db.sql("select * from `tabProduction Dashboard Details` where %s order by sales_invoice_no"%(cond),as_dict=1)
 
 	def create_invoice_bundle(self, invoice_detail, si):
-		color = {'Completed':'green','Pending':'red', 'Trial':'yellow'}
+		color = {'Completed':'green','Pending':'red', 'Trial':'#1F8C83'}
 		value = '<h style="color:red">Pending</h>'
 		si.sales_invoice = invoice_detail.sales_invoice_no
 		si.article_code = invoice_detail.article_code

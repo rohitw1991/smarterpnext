@@ -19,7 +19,7 @@ def change_stock_entry_status(doc, status):
 
 def cancel_status(doc, method):
 	change_stock_entry_status(doc, 'Pending')
-	set_to_null(doc)
+	# set_to_null(doc)
 
 def set_to_null(self):
 	frappe.db.sql(""" update `tabProduction Dashboard Details` 

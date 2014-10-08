@@ -54,7 +54,7 @@
   {
    "fieldname": "create_cut_order", 
    "fieldtype": "Button", 
-   "hidden": 0, 
+   "hidden": 1, 
    "label": "Create Cut Order", 
    "permlevel": 0, 
    "precision": ""
@@ -68,6 +68,7 @@
   {
    "fieldname": "material_out", 
    "fieldtype": "Button", 
+   "hidden": 1, 
    "label": "Material Out", 
    "permlevel": 0, 
    "precision": ""
@@ -81,6 +82,7 @@
   {
    "fieldname": "material_in", 
    "fieldtype": "Button", 
+   "hidden": 1, 
    "label": "Material In", 
    "permlevel": 0, 
    "precision": ""
@@ -93,7 +95,7 @@
  "is_submittable": 0, 
  "issingle": 1, 
  "istable": 0, 
- "modified": "2014-10-07 20:50:08.259780", 
+ "modified": "2014-10-08 14:48:15.261217", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Work Management", 

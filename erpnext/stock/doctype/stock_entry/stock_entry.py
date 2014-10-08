@@ -134,9 +134,6 @@ class StockEntry(StockController):
 				d.s_warehouse = self.from_warehouse
 				d.t_warehouse = self.to_warehouse
 
-			frappe.errprint("d.t_warehouse")
-			frappe.errprint(d.s_warehouse)	
-
 			if not (d.s_warehouse or d.t_warehouse):
 				frappe.throw(_("Atleast one warehouse is mandatory"))
 

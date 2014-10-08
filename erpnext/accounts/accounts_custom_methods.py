@@ -23,6 +23,8 @@ def create_work_order(doc, data):
 	wo = frappe.new_doc('Work Order')
  	# wo.sales_invoice_no = doc.name
  	wo.item_code = data.tailoring_item_code
+ 	wo.customer = doc.customer
+ 	wo.customer_name = frappe.db.get_value('Customer',wo.customer,'customer_name')
  	wo.branch = data.tailoring_warehouse
  	wo.save(ignore_permissions=True)
  	
@@ -83,6 +85,7 @@ def assign_process(data, name):
  		if process:
  			for s in process:
  				pr = frappe.new_doc('WO Process')
+ 				pr.idx = frappe.db.get_value('Process Item', {'parent':data.tailoring_item,'process_name':s.process_name},'idx')
  				pr.process = s.process_name
  				pr.task_details = '-'
  				pr.parent = name
@@ -129,6 +132,8 @@ def make_trial_transaction(data, args, trial):
 	s = frappe.new_doc('Trials Transaction')
 	s.trial_no = trial.trial_no
 	s.trial_date = trial.trial_date
+	s.work_order = data.tailor_work_order
+	s.status= 'Pending'
 	s.parent = args.get('parent')
 	s.parenttype = args.get('parenttype')
 	s.parentfield = 'trials_transaction'
@@ -145,10 +150,10 @@ def make_raw_material_entry(data, args):
 	return "Done"
 
 def retrieve_fabric_raw_material(data, args):
-	return frappe.db.sql("""select '', name, '' from `tabItem` 
+	return frappe.db.sql("""select '', name as raw_item_code, '' from `tabItem` 
 	where name = '%s' union  
 	select raw_trial_no, raw_item_code, raw_item_sub_group 
-	from `tabRaw Material Item` where parent = '%s'"""%(args.get('Item'),args.get('Item')), as_dict=1)
+	from `tabRaw Material Item` where parent = '%s'"""%(args.get('item'),args.get('item')), as_dict=1)
 
 def make_entry(raw_material, args):
 	for d in raw_material:
@@ -265,7 +270,7 @@ def make_schedule_for_trials(doc, args):
 		s.item_code = args.tailoring_item_code
 		s.item_name = args.tailoring_item_name
 		s.save(ignore_permissions=True)
-		schedules_date(s.name, s.item_name)
+		schedules_date(s.name, s.item_code)
 		return s.name
 
 def schedules_date(parent, item):
@@ -275,6 +280,7 @@ def schedules_date(parent, item):
 			d = frappe.new_doc('Trial Dates')
 			d.process = t.process_name
 			d.trial_no = t.trial_no
+			d.idx = t.trial_no
 			d.parent = parent
 			d.parenttype = 'Trials'
 			d.parentfield = 'trial_dates'
