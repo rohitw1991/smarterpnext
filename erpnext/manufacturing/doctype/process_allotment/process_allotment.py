@@ -166,6 +166,7 @@ class ProcessAllotment(Document):
 		return "Done"
 
 def create_se(raw_material):
+	count = 0
 	se = frappe.new_doc('Stock Entry')
 	se.naming_series = 'STE-'
 	se.purpose = 'Material Issue'
@@ -174,9 +175,8 @@ def create_se(raw_material):
 	se.company = frappe.db.get_value("Global Defaults", None, 'default_company')
 	se.fiscal_year = frappe.db.get_value("Global Defaults", None, 'current_fiscal_year')
 	se.save()
-	
 	for item in raw_material:
-		if cint(item.select) == 1:
+		if cint(item.selected) == 1 and item.status!='Completed':
 			sed = frappe.new_doc('Stock Entry Detail')
 			sed.s_warehouse = get_warehouse()
 			sed.parentfield = 'mtn_details'
@@ -193,6 +193,15 @@ def create_se(raw_material):
 			sed.serial_no = item.serial_no
 			sed.parent = se.name
 			sed.save()
+			frappe.db.sql("update `tabIssue Raw Material` set status = 'Completed', selected=1 where name = '%s'"%(item.name))
+			frappe.db.sql("commit")
+			count += 1
+	if count == 0:
+		frappe.db.sql("delete from `tabStock Entry` where name = '%s'"%se.name)
+		frappe.db.sql("update tabSeries set current = current-1 where name = 'STE-'")
+		frappe.db.sql("commit")
+	else:
+		frappe.msgprint("Material Issue Stock Entry %s has been created for above items"%se.name)
 
 def get_warehouse():
 	return "Finished Goods - I"

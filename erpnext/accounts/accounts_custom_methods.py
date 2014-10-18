@@ -30,6 +30,7 @@ def create_work_order(doc, data):
  	
  	create_work_order_style(data, wo.name)
  	create_work_order_measurement(data, wo.name)
+ 	create_process_wise_warehouse_detail(data, wo.name)
  	return wo.name
 
 def create_work_order_style(data, wo_name):
@@ -66,6 +67,19 @@ def create_work_order_measurement(data, wo_name):
 		 			style_parm.append(s.parameter)
 	return True
 
+def create_process_wise_warehouse_detail(data, wo_name):
+	if wo_name:
+		for proc_wh in frappe.db.sql("""select process_name, warehouse from `tabProcess Item`  
+			where parent = '%s'"""%data.tailoring_item_code,as_list=1, debug=1):
+			mi = frappe.new_doc('Process Wise Warehouse Detail')
+ 			mi.process = proc_wh[0]
+ 			mi.warehouse = proc_wh[1]
+ 			mi.parent = wo_name
+ 			mi.parentfield = 'process_wise_warehouse_detail'
+ 			mi.parenttype = 'Work Order'
+ 			mi.save(ignore_permissions =True)
+ 			
+
 def create_process_allotment(data):
  	pa = frappe.new_doc('Process Allotment')
  	pa.sales_invoice_no = data.parent
@@ -84,13 +98,12 @@ def assign_process(data, name):
  			"""%(data.tailoring_item),as_dict = 1)
  		if process:
  			for s in process:
- 				pr = frappe.new_doc('WO Process')
- 				pr.idx = frappe.db.get_value('Process Item', {'parent':data.tailoring_item,'process_name':s.process_name},'idx')
- 				pr.process = s.process_name
- 				pr.task_details = '-'
+ 				pr = frappe.new_doc('Process Allotment Log')
+ 				pr.priority = frappe.db.get_value('Process Item', {'parent':data.tailoring_item,'process_name':s.process_name},'idx')
+ 				pr.process_log = s.process_name
  				pr.parent = name
  				pr.parenttype = 'Process Allotment'
- 				pr.parentfield = 'wo_process'
+ 				pr.parentfield = 'process_allotment_log'
  				
  				if data.trials:
  					trials = frappe.db.sql("select * from `tabTrial Dates` where process='%s' and parent='%s' order by trial_no"%(s.process_name,data.trials),as_dict=1)
@@ -108,7 +121,7 @@ def assign_process(data, name):
 	 						make_raw_material_entry(data, dict_data)
 	 						frappe.db.sql("update `tabTrials Master` set process='%s' where name='%s'"%(name, trials_name))
 	 			if trials_name:
- 					pr.trials = trials_name 				
+ 					pr.trials_log = trials_name 				
  				pr.save(ignore_permissions=True)
  				
  				if frappe.db.get_value('Process Item',{'parent':data.tailoring_item,'process_name':s.process_name,'trial_no':'0','actual_fabric':1},'name'):
@@ -249,19 +262,27 @@ def add_data_in_work_order_assignment(doc, method):
 	if not doc.get('work_order_distribution'):
 		doc.set('work_order_distribution',[])
 	for d in doc.get('sales_invoice_items_one'):
-		if not frappe.db.get_value('Work Order Distribution',{'tailoring_item':d.tailoring_item_code,'parent':d.parent},'name'):
-			e = doc.append('work_order_distribution', {})
-			e.tailoring_item = d.tailoring_item_code
-			e.tailor_item_name = d.tailoring_item_name
-			e.tailor_qty = d.tailoring_qty
-			e.tailor_fabric= d.fabric_code
-			e.tailor_fabric_qty = d.fabric_qty
-			e.tailor_warehouse = d.tailoring_warehouse
-			if not e.tailor_work_order:
-				e.tailor_work_order = create_work_order(doc, d)
-			if not e.trials:
-				e.trials = make_schedule_for_trials(doc, d)
+		if cint(d.check_split_qty)==1:
+			split_qty = eval(d.split_qty_dict)
+			for s in split_qty:
+				make_order(doc,d, s)
+		else:
+			make_order(doc, d, d.tailoring_qty)
 	validate_work_order_assignment(doc)
+	return "Done"
+
+def make_order(doc, d, qty):
+	e = doc.append('work_order_distribution', {})
+	e.tailoring_item = d.tailoring_item_code
+	e.tailor_item_name = d.tailoring_item_name
+	e.tailor_qty = qty
+	e.tailor_fabric= d.fabric_code
+	e.tailor_fabric_qty = d.fabric_qty
+	e.tailor_warehouse = d.tailoring_warehouse
+	if not e.tailor_work_order:
+		e.tailor_work_order = create_work_order(doc, d)
+	if not e.trials:
+		e.trials = make_schedule_for_trials(doc, d)
 	return "Done"
 
 def make_schedule_for_trials(doc, args):
@@ -298,5 +319,6 @@ def check_work_order_assignment(doc, item_code, qty):
 	for d in doc.get('work_order_distribution'):
 		if d.tailoring_item == item_code:
 			count += cint(d.tailor_qty)
+	frappe.errprint([qty, count])
 	if cint(qty) !=  count:
 		frappe.throw(_("Qty should be equal"))

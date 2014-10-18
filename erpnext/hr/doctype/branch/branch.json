@@ -20,7 +20,7 @@
  ], 
  "icon": "icon-code-fork", 
  "idx": 1, 
- "modified": "2014-09-16 15:15:32.982603", 
+ "modified": "2014-10-10 19:07:57.708332", 
  "modified_by": "Administrator", 
  "module": "HR", 
  "name": "Branch", 
@@ -41,7 +41,7 @@
   }, 
   {
    "amend": 0, 
-   "apply_user_permissions": 0, 
+   "apply_user_permissions": 1, 
    "cancel": 0, 
    "create": 0, 
    "delete": 0, 
@@ -53,7 +53,7 @@
    "read": 1, 
    "report": 0, 
    "role": "Material User", 
-   "set_user_permissions": 0, 
+   "set_user_permissions": 1, 
    "submit": 0, 
    "write": 0
   }, 

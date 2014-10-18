@@ -51,7 +51,7 @@
    "print_hide": 0, 
    "read_only": 0, 
    "report_hide": 0, 
-   "reqd": 1, 
+   "reqd": 0, 
    "search_index": 0
   }, 
   {
@@ -577,7 +577,7 @@
  "is_submittable": 1, 
  "issingle": 0, 
  "max_attachments": 0, 
- "modified": "2014-10-01 12:42:48.081947", 
+ "modified": "2014-10-17 13:55:46.035176", 
  "modified_by": "Administrator", 
  "module": "Stock", 
  "name": "Stock Entry", 
@@ -595,6 +595,7 @@
    "read": 1, 
    "report": 1, 
    "role": "Material User", 
+   "set_user_permissions": 1, 
    "submit": 1, 
    "write": 1
   }, 

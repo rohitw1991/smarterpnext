@@ -177,6 +177,14 @@
    "set_only_once": 0
   }, 
   {
+   "fieldname": "process_wise_warehouse_detail", 
+   "fieldtype": "Table", 
+   "label": "Process Wise Warehouse Detail", 
+   "options": "Process Wise Warehouse Detail", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "allow_on_submit": 0, 
    "fieldname": "amended_from", 
    "fieldtype": "Link", 
@@ -204,7 +212,7 @@
  "is_submittable": 1, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-10-08 12:28:47.576444", 
+ "modified": "2014-10-14 15:51:45.524411", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Work Order", 

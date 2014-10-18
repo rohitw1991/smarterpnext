@@ -551,3 +551,144 @@ cur_frm.fields_dict['work_order_distribution'].grid.get_field('tailor_work_order
 		}
 	}
 }
+
+cur_frm.cscript.split_qty = function(doc, cdt, cdn){
+	var d = locals[cdt][cdn]
+	if (parseInt(d.check_split_qty)==1){
+		cur_frm.cscript.split_quantity(doc, cdt, cdn, d)
+	}
+	else{
+		alert("Click on Check Split Qty")
+	}
+}
+
+
+cur_frm.cscript.split_quantity = function(doc, cdt, cdn, d){
+	var dialog = new frappe.ui.Dialog({
+			title:__(' Styles'),
+			fields: [
+			{fieldtype:'Int', fieldname:'qty', label:__('Qty'), reqd:false,
+					description: __("")},
+					{fieldtype:'Button', fieldname:'add_qty', label:__('Add'), reqd:false,
+					description: __("")},
+				{fieldtype:'HTML', fieldname:'styles_name', label:__('Styles'), reqd:false,
+					description: __("")},
+					{fieldtype:'Button', fieldname:'create_new', label:__('Ok') }
+			]
+		})
+	var fd = dialog.fields_dict;
+	var split_qty_array = []
+	var j=0;
+	$('#myGrid').remove()
+	this.div = $('<div id="myGrid" style="width:100%;height:200px;margin:10px;overflow-y:scroll"><table class="table table-bordered" style="background-color: #f9f9f9;height:10px" id="mytable">\
+		<tr ><td style="display:none">SR</td><td>Item</td><td>Qty</td><td>Remove</td></tr></table></div>').appendTo($(fd.styles_name.wrapper))
+
+	var me =this;
+	$(fd.add_qty.input).click(function(){
+		j =j+1;
+		me.table = $(me.div).find('#mytable').append('<tr><td class="sr" style="display:none">'+j+'</td><td style="background-color:#FFF">'+d.tailoring_item_code+'</td><td style="background-color:#FFF">'+fd.qty.last_value+'</td><td>&nbsp;<button  class="remove">X</button></td></tr>')
+		split_qty_array[j-1] = fd.qty.last_value
+		$(me.table).find('.remove').click(function(){
+			$(this).parent().parent().remove()
+			sr_no = $(this).parent().parent().find('.sr').html()
+			split_qty_array.splice(sr_no-1, 1)
+		})
+	})
+
+	$(fd.create_new.input).click(function(){
+		sum = 0.00
+		for(k=0;k<split_qty_array.length;k++){
+			if(split_qty_array[k])
+			{
+				sum += parseFloat(split_qty_array[k])
+			}
+		}
+		if(sum != parseFloat(d.tailoring_qty)){
+			alert("Split quantities should be equal to Product Quantity")
+		}
+		else{
+			d.split_qty_dict = JSON.stringify(split_qty_array)
+			refresh_field('sales_invoice_items_one')
+			dialog.hide()
+		}
+	})
+	
+	dialog.show();
+}
+
+// cur_frm.script_manager.make(erpnext.account.CustomJs);
+var fabric_detail = {}
+
+cur_frm.cscript.reserve_fabric = function(doc, cdt, cdn){
+	var e =locals[cdt][cdn]
+	console.log(e)
+	var image_data;
+	var dialog = new frappe.ui.Dialog({
+			title:__(e.field_name+' Styles'),
+			fields: [
+				{fieldtype:'HTML', fieldname:'styles_name', label:__('Styles'), reqd:false,
+					description: __("")},
+					{fieldtype:'Button', fieldname:'create_new', label:__('Ok') }
+			]
+		})
+	var fd = dialog.fields_dict;
+
+        // $(fd.styles_name.wrapper).append('<div id="style">Welcome</div>')
+        return frappe.call({
+			type: "GET",
+			method: "tools.tools_management.custom_methods.get_warehouse_wise_stock_balance",
+			args: {
+				"item": e.fabric_code,
+				"qty": e.fabric_qty
+			},
+			callback: function(r) {
+				console.log([r.message])
+				if(r.message) {
+					
+					var result_set = r.message;
+					this.table = $("<table class='table table-bordered'>\
+                       <thead><tr></tr></thead>\
+                       <tbody></tbody>\
+                       </table>").appendTo($(fd.styles_name.wrapper))
+
+					columns =[['','10'],['Warehouse','40'],['Qty','40']]
+					var me = this;
+					$.each(columns, 
+                       function(i, col) {                  
+                       $("<th>").html(col[0]).css("width", col[1]+"%")
+                               .appendTo(me.table.find("thead tr"));
+                  }	);
+					
+					$.each(result_set, function(i, d) {
+						console.log(d)
+						var row = $("<tr>").appendTo(me.table.find("tbody"));
+                       $("<td>").html('<input type="radio" name="sp" value="'+d[0]+'">')
+                       		   .attr("style", d[0])
+                               .attr("image", d[1])
+                               .appendTo(row)
+                               .click(function() {
+                                      if(fabric_detail[d[1]]){
+                                      	fabric_detail[d[1]].push([e.fabric_code, e.fabric_qty, e.tailoring_item_code])
+                                      }
+                                      else{
+                                      	fabric_detail[d[1]] = []
+                                       	fabric_detail[d[1]].push([e.fabric_code, e.fabric_qty, e.tailoring_item_code])
+                                       }
+                               });
+                     
+                       $("<td>").html(d[1]).appendTo(row);
+                       $("<td>").html(d[0]).appendTo(row);                    
+               });
+					
+					dialog.show();
+					$(fd.create_new.input).click(function() {
+						doc.fabric_details = JSON.stringify(fabric_detail)					
+						refresh_field('fabric_details')
+						e.reservation_status = 'Reserved';
+						refresh_field('reservation_status', e.name, 'sales_invoice_items_one')	
+						dialog.hide()
+					})
+				}
+			}
+		})	
+}

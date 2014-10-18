@@ -11,7 +11,8 @@ cur_frm.cscript.sales_invoice_no = function(doc, cdt, cdn){
 }
 
 cur_frm.cscript.search = function(doc, cdt, cdn){
-	console.log(doc.sales_invoice_no)
+	var s =document.getElementById('view');
+	s.src = 'http://localhost:9777/desk#Form/Sales Invoice/SINV-00039';
 	cur_frm.cscript.sales_invoice_no(doc, cdt, cdn)
 }
 
@@ -23,6 +24,7 @@ cur_frm.cscript.select = function(doc, cdt, cdn){
 }
 
 cur_frm.cscript.refresh = function(doc, cdt, cdn){
+
 	get_server_fields('clear_data','','',doc, cdt,cdn,1,function(){
 		refresh_field('production_details')
 	})

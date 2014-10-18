@@ -9,7 +9,7 @@
  "document_type": "", 
  "fields": [
   {
-   "fieldname": "select", 
+   "fieldname": "selected", 
    "fieldtype": "Check", 
    "in_list_view": 1, 
    "label": "Select", 
@@ -117,6 +117,14 @@
    "label": "Qty", 
    "permlevel": 0, 
    "precision": ""
+  }, 
+  {
+   "fieldname": "status", 
+   "fieldtype": "Select", 
+   "label": "Status", 
+   "options": "\nCompleted\n\n", 
+   "permlevel": 0, 
+   "precision": ""
   }
  ], 
  "hide_heading": 0, 
@@ -126,7 +134,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-10-06 19:50:35.309759", 
+ "modified": "2014-10-10 21:38:35.200677", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Issue Raw Material", 

@@ -86,6 +86,12 @@
    "label": "Material In", 
    "permlevel": 0, 
    "precision": ""
+  }, 
+  {
+   "fieldname": "section_break_10", 
+   "fieldtype": "Section Break", 
+   "permlevel": 0, 
+   "precision": ""
   }
  ], 
  "hide_heading": 0, 
@@ -95,7 +101,7 @@
  "is_submittable": 0, 
  "issingle": 1, 
  "istable": 0, 
- "modified": "2014-10-08 14:48:15.261217", 
+ "modified": "2014-10-15 11:47:49.428960", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Work Management", 

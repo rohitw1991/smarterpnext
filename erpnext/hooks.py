@@ -49,8 +49,8 @@ doc_events = {
 		"on_update": "erpnext.home.make_comment_feed"
 	},
 	"Stock Entry": {
-		"on_submit": ["erpnext.stock.doctype.material_request.material_request.update_completed_qty","erpnext.stock.stock_custom_methods.update_status"],
-		"on_cancel": ["erpnext.stock.doctype.material_request.material_request.update_completed_qty", "erpnext.stock.stock_custom_methods.cancel_status"]
+		"on_submit": ["erpnext.stock.doctype.material_request.material_request.update_completed_qty","erpnext.stock.stock_custom_methods.update_status","erpnext.stock.stock_custom_methods.stock_out_entry"],
+		"on_cancel": "erpnext.stock.doctype.material_request.material_request.update_completed_qty"
 	},
 	"User": {
 		"validate": "erpnext.hr.doctype.employee.employee.validate_employee_role",
@@ -67,9 +67,11 @@ doc_events = {
 		],
 	},
 	"Branch": {
-		"validate" : "tools.tools_management.custom_methods.branch_validation"
+		"validate" : ["tools.tools_management.custom_methods.branch_validation","tools.tools_management.custom_methods.branches_creation"]
+
 	},
 	"Sales Invoice": {
+		"on_update" : ["tools.tools_management.custom_methods.update_work_order","tools.tools_management.custom_methods.create_se_or_mr"],
 		"validate"  : ["tools.tools_management.custom_methods.merge_tailoring_items","erpnext.accounts.accounts_custom_methods.add_data_in_work_order_assignment"], 
 		"on_submit" : ["tools.tools_management.custom_methods.sales_invoice_on_submit_methods","erpnext.accounts.accounts_custom_methods.create_production_process","erpnext.accounts.accounts_custom_methods.validate_sales_invoice"],
 		"on_cancel" : ["tools.tools_management.custom_methods.delete_project_aginst_si", "erpnext.accounts.accounts_custom_methods.delete_production_process"]

@@ -27,11 +27,54 @@ def set_to_null(self):
 				where sales_invoice_no='%s' and article_code='%s' 
 				and work_order='%s'"""%(self.sales_invoice_no, self.item_code, self.name))
 
+def stock_out_entry(doc, method):
+	if doc.purpose_type == 'Material Out':
+		in_entry  = make_stock_entry_for_in(doc)
+	pass
+
+def make_stock_entry_for_in(doc):
+	branch_list = {}
+	for s in doc.get('mtn_details'):
+		if branch_list and branch_list.get(s.target_branch):
+			make_stock_entry_for_child(s, branch_list[s.target_branch])
+		else:
+			name = make_stock_entry(doc, s.target_branch)
+			make_stock_entry_for_child(s, name)
+		branch_list.setdefault(s.target_branch, name)
+	return name
+
+def make_stock_entry(doc, target_branch):
+	se = frappe.new_doc('Stock Entry')
+	se.purpose_type = 'Material In'
+	se.purpose = 'Material Receipt'
+	se.stock_in = doc.name
+	se.branch = target_branch
+	se.save(ignore_permissions=True)
+	return se.name
+
+def make_stock_entry_for_child(s, name):
+	sed = frappe.new_doc('Stock Entry Detail')
+	sed.item_code = s.item_code
+	sed.t_warehouse = frappe.db.get_value('Branches', s.target_branch, 'warehouse')
+	sed.source_warehouse = s.s_warehouse
+	sed.item_name = s.item_name
+	sed.description = s.description
+	sed.qty = s.qty
+	sed.conversion_factor = s.conversion_factor
+	sed.uom = s.uom
+	sed.incoming_rate = s.incoming_rate
+	sed.serial_no = s.serial_no
+	sed.batch_no = s.batch_no
+	sed.expense_account = s.expense_account
+	sed.cost_center = s.cost_center
+	sed.transfer_qty = s.transfer_qty
+	sed.parenttype = s.parenttype
+	sed.parentfield = s.parentfield
+	sed.parent = name
+	sed.save(ignore_permissions=True)
+	return "Done"
 
 @frappe.whitelist()
 def get_details(item_name):
 	return frappe.db.sql("""select file_url,attached_to_name from `tabFile Data` 
 		where attached_to_name ='%s'"""%(item_name),as_list=1)
-	
-
-

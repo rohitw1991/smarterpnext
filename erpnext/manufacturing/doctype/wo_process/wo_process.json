@@ -213,6 +213,14 @@
    "permlevel": 0, 
    "precision": "", 
    "read_only": 0
+  }, 
+  {
+   "fieldname": "warehouse", 
+   "fieldtype": "Link", 
+   "label": "Warehouse", 
+   "options": "Warehouse", 
+   "permlevel": 0, 
+   "precision": ""
   }
  ], 
  "hide_heading": 0, 
@@ -222,7 +230,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-10-06 15:57:32.048348", 
+ "modified": "2014-10-10 16:00:53.971078", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "WO Process", 
