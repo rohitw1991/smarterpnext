@@ -10,6 +10,13 @@
  "document_type": "", 
  "fields": [
   {
+   "fieldname": "product_details", 
+   "fieldtype": "Section Break", 
+   "label": "Product Details", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "allow_on_submit": 0, 
    "fieldname": "sales_invoice_no", 
    "fieldtype": "Link", 
@@ -52,6 +59,7 @@
   {
    "fieldname": "serial_no", 
    "fieldtype": "Link", 
+   "hidden": 1, 
    "label": "Serial No", 
    "options": "Serial No", 
    "permlevel": 0, 
@@ -60,6 +68,7 @@
   {
    "fieldname": "add", 
    "fieldtype": "Button", 
+   "hidden": 1, 
    "label": "Add", 
    "permlevel": 0, 
    "precision": ""
@@ -78,9 +87,115 @@
    "precision": ""
   }, 
   {
+   "fieldname": "process_status", 
+   "fieldtype": "Select", 
+   "label": "Process Status", 
+   "options": "\nOpen\nReopen\nClosed", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "process", 
+   "fieldtype": "Link", 
+   "label": "Process", 
+   "options": "Process", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "finished_good_qty", 
    "fieldtype": "Int", 
    "label": "Finished Good Qty", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
+   "fieldname": "skip_process", 
+   "fieldtype": "Check", 
+   "label": "Skip Process", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "section_break_11", 
+   "fieldtype": "Section Break", 
+   "label": "Tailor Details", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "process_tailor", 
+   "fieldtype": "Link", 
+   "label": "Process Tailor", 
+   "options": "Employee", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "start_date", 
+   "fieldtype": "Date", 
+   "label": "Start Date", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "end_date", 
+   "fieldtype": "Date", 
+   "label": "End Date", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "assigned", 
+   "fieldtype": "Button", 
+   "label": "Assigned", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "column_break_16", 
+   "fieldtype": "Column Break", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "status", 
+   "fieldtype": "Select", 
+   "label": "Status", 
+   "options": "\nPending\nAssigned\nReassigned\nCompleted", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "process_task", 
+   "fieldtype": "Link", 
+   "label": "Process Task", 
+   "options": "Task", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "work_order", 
+   "fieldtype": "Link", 
+   "label": "Work Order", 
+   "options": "Work Order", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
+   "fieldname": "section_break_19", 
+   "fieldtype": "Section Break", 
+   "label": "Trials Details", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "trials_transaction", 
+   "fieldtype": "Table", 
+   "label": "Trials Transaction", 
+   "options": "Trials Transaction", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -95,7 +210,7 @@
    "allow_on_submit": 0, 
    "fieldname": "wo_process", 
    "fieldtype": "Table", 
-   "hidden": 0, 
+   "hidden": 1, 
    "ignore_user_permissions": 0, 
    "in_filter": 0, 
    "in_list_view": 0, 
@@ -133,15 +248,6 @@
    "fieldtype": "Section Break", 
    "permlevel": 0, 
    "precision": ""
-  }, 
-  {
-   "fieldname": "work_order", 
-   "fieldtype": "Link", 
-   "label": "Work Order", 
-   "options": "Work Order", 
-   "permlevel": 0, 
-   "precision": "", 
-   "read_only": 1
   }, 
   {
    "fieldname": "column_break_7", 
@@ -183,7 +289,7 @@
  "is_submittable": 1, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-10-13 15:59:54.087396", 
+ "modified": "2014-10-22 13:05:44.151513", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Process Allotment", 

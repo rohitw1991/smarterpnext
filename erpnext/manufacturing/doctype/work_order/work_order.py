@@ -5,8 +5,15 @@ from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
 from frappe.utils import cstr, flt, getdate, comma_and
+from erpnext.accounts.accounts_custom_methods import generate_serial_no
 
 class WorkOrder(Document):
+	def validate(self):
+		self.make_serial_no
+
+	def make_serial_no(self):
+		if not self.serial_no_data:
+			generate_serial_no(self.item_code,self.item_qty)
 
 	def get_details(self, template):
 		self.get_measurement_details(template)

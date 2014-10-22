@@ -9,22 +9,21 @@ from frappe.utils import add_days, cint, cstr, date_diff, rounded, flt, getdate,
 from frappe import _
 from frappe.model.db_query import DatabaseQuery
 from frappe import msgprint, _, throw
+from frappe.model.naming import make_autoname
 
 def create_production_process(doc, method):
 	for d in doc.get('work_order_distribution'):
-		# work_order = d.tailoring_work_order if d.tailoring_work_order else create_work_order(d)
 		process_allotment = create_process_allotment(d)
-		# stock_entry = create_stock_entry(d)
 		if process_allotment:
 			create_dashboard(process_allotment,d,doc)
-			# frappe.db.sql("update `tabSales Invoice Item` set work_order='%s', stock_entry='%s' ,process_allotment='%s' where name='%s'"%(work_order,stock_entry,process_allotment,d.name))
 
-def create_work_order(doc, data):
+def create_work_order(doc, data, serial_no):
 	wo = frappe.new_doc('Work Order')
- 	# wo.sales_invoice_no = doc.name
  	wo.item_code = data.tailoring_item_code
  	wo.customer = doc.customer
  	wo.customer_name = frappe.db.get_value('Customer',wo.customer,'customer_name')
+ 	wo.item_qty = data.tailoring_qty
+ 	wo.serial_no_data = serial_no
  	wo.branch = data.tailoring_warehouse
  	wo.save(ignore_permissions=True)
  	
@@ -81,55 +80,50 @@ def create_process_wise_warehouse_detail(data, wo_name):
  			
 
 def create_process_allotment(data):
- 	pa = frappe.new_doc('Process Allotment')
- 	pa.sales_invoice_no = data.parent
- 	pa.item = data.tailoring_item
- 	pa.branch = data.tailor_warehouse
- 	pa.finished_good_qty = data.tailor_qty
- 	pa.work_order = data.tailor_work_order
- 	pa.save(ignore_permissions=True)
- 	
- 	assign_process(data, pa.name)
+	process = frappe.db.sql(""" select distinct process_name from `tabProcess Item` where parent = '%s' order by idx asc
+		"""%(data.tailoring_item),as_dict = 1)
+	if process:
+		for s in process:
+			pa = frappe.new_doc('Process Allotment')
+		 	pa.sales_invoice_no = data.parent
+		 	pa.process = s.process_name
+		 	pa.status = 'Pending'
+		 	pa.item = data.tailoring_item
+		 	pa.branch = frappe.db.get_value('Process Wise Warehouse Detail',{'parent':data.tailor_work_order,'process':pa.process}, 'warehouse')
+		 	pa.serials_data = data.serial_no_data
+		 	pa.finished_good_qty = data.tailor_qty
+		 	create_material_issue(data, pa)
+		 	create_trials(data, pa)
+		 	pa.save(ignore_permissions=True)
  	return pa.name
 
-def assign_process(data, name):
+def create_material_issue(data, obj):
  	if data.tailoring_item:
- 		process = frappe.db.sql(""" select distinct process_name from `tabProcess Item` where parent = '%s' order by idx asc
- 			"""%(data.tailoring_item),as_dict = 1)
- 		if process:
- 			for s in process:
- 				pr = frappe.new_doc('Process Allotment Log')
- 				pr.priority = frappe.db.get_value('Process Item', {'parent':data.tailoring_item,'process_name':s.process_name},'idx')
- 				pr.process_log = s.process_name
- 				pr.parent = name
- 				pr.parenttype = 'Process Allotment'
- 				pr.parentfield = 'process_allotment_log'
- 				
- 				if data.trials:
- 					trials = frappe.db.sql("select * from `tabTrial Dates` where process='%s' and parent='%s' order by trial_no"%(s.process_name,data.trials),as_dict=1)
-	 				trials_name = ''
-	 				if trials:
-	 					for trial in trials:
-	 						trials_name =frappe.db.get_value('Trials Master',{'sales_invoice_no':data.parent,'process':name,'item_code':data.tailoring_item},'name')
-	 						if not trials_name:
-	 							trials_name = make_trial(data,data.tailoring_item, name)
-	 						if frappe.db.get_value('Process Item',{'parent':data.tailoring_item,'process_name':s.process_name,'trial_no':trial.trial_no,'actual_fabric':1},'name'):
-	 							dict_data = {'parent':trials_name, 'trial_no':trial.trial_no,'process_name':s.process_name,'item':data.tailor_fabric,'parenttype':'Trials Master','type':'invoice'}
-	 						else:
-	 							dict_data = {'parent':trials_name, 'trial_no':trial.trial_no,'process_name':s.process_name,'item':data.tailoring_item,'parenttype':'Trials Master','type':'item'}
-	 						make_trial_transaction(data, dict_data, trial)
-	 						make_raw_material_entry(data, dict_data)
-	 						frappe.db.sql("update `tabTrials Master` set process='%s' where name='%s'"%(name, trials_name))
-	 			if trials_name:
- 					pr.trials_log = trials_name 				
- 				pr.save(ignore_permissions=True)
- 				
- 				if frappe.db.get_value('Process Item',{'parent':data.tailoring_item,'process_name':s.process_name,'trial_no':'0','actual_fabric':1},'name'):
- 					dict_data = {'parent':trials_name, 'trial_no':'0','process_name':s.process_name,'item':data.tailor_fabric,'parenttype':'Process Allotment','type':'invoice'}
- 				else:
- 					dict_data = {'parent':name, 'trial_no':'0','process_name':s.process_name,'item':data.tailoring_item,'parenttype':'Process Allotment','type':'item'}
- 				make_raw_material_entry(data, dict_data)
+ 		rm = frappe.db.sql("select * from `tabRaw Material Item` where parent='%s' and raw_process='%s'"%(data.tailoring_item, obj.process),as_dict=1)
+ 		if rm:
+ 			for s in rm:
+ 				d = obj.append('issue_raw_material',{})
+ 				d.raw_material_item_code = s.raw_item_code
+ 				d.raw_material_item_name = frappe.db.get_value('Item',s.raw_item_code,'item_name')
+ 				d.raw_sub_group = s.raw_item_sub_group or frappe.db.get_value('Item',s.raw_item_code,'item_sub_group')
+ 				d.uom = frappe.db.get_value('Item',s.raw_item_code,'stock_uom')
  	return True
+
+def create_trials(data, obj):
+ 	if data.trials:
+ 		trials = frappe.db.sql("select * from `tabTrial Dates` where parent='%s' and process='%s'"%(data.trials, obj.process), as_dict=1)
+ 		if trials:
+ 			for trial in trials:
+ 				s = obj.append('trials_transaction',{})
+				s.trial_no = trial.idx
+				s.trial_date = trial.trial_date
+				s.work_order = data.tailor_work_order
+				s.status= 'Pending'
+				# s.parent = args.get('parent')
+				# s.parenttype = args.get('parenttype')
+				# s.parentfield = 'trials_transaction'
+				# s.save(ignore_permissions=True)
+	return "Done"
 
 def make_trial(data, item_code, parent):
 	s= frappe.new_doc('Trials Master')
@@ -272,40 +266,46 @@ def add_data_in_work_order_assignment(doc, method):
 	return "Done"
 
 def make_order(doc, d, qty):
-	e = doc.append('work_order_distribution', {})
-	e.tailoring_item = d.tailoring_item_code
-	e.tailor_item_name = d.tailoring_item_name
-	e.tailor_qty = qty
-	e.tailor_fabric= d.fabric_code
-	e.tailor_fabric_qty = d.fabric_qty
-	e.tailor_warehouse = d.tailoring_warehouse
-	if not e.tailor_work_order:
-		e.tailor_work_order = create_work_order(doc, d)
-	if not e.trials:
-		e.trials = make_schedule_for_trials(doc, d)
+	if not frappe.db.get_value('Work Order Distribution', {'refer_doc':d.name},'refer_doc'):
+		e = doc.append('work_order_distribution', {})
+		e.tailoring_item = d.tailoring_item_code
+		e.tailor_item_name = d.tailoring_item_name
+		e.tailor_qty = qty
+		e.serial_no_data = generate_serial_no(d.tailoring_item_code, qty)
+		e.tailor_fabric= d.fabric_code
+		e.refer_doc = d.name
+		e.tailor_fabric_qty = d.fabric_qty
+		e.tailor_warehouse = d.tailoring_warehouse
+		if not e.tailor_work_order:
+			e.tailor_work_order = create_work_order(doc, d, e.serial_no_data)
+		if not e.trials:
+			e.trials = make_schedule_for_trials(doc, d, e.tailor_work_order)
 	return "Done"
 
-def make_schedule_for_trials(doc, args):
-	if cint(frappe.db.get_value('Process Item',{'parent':args.tailoring_item_code,'trial_no':1},'trial_no')) > 0:
-		s =frappe.new_doc('Trials')
-		s.item_code = args.tailoring_item_code
-		s.item_name = args.tailoring_item_name
-		s.save(ignore_permissions=True)
-		schedules_date(s.name, s.item_code)
-		return s.name
+def make_schedule_for_trials(doc, args, work_order):
+	s =frappe.new_doc('Trials')
+	s.item_code = args.tailoring_item_code
+	s.item_name = args.tailoring_item_name
+	s.work_order = work_order
+	s.save(ignore_permissions=True)
+	schedules_date(s.name, s.item_code)
+	return s.name
 
 def schedules_date(parent, item):
-	trials = frappe.db.sql("select process_name, trial_no from `tabProcess Item` where parent='%s' and ifnull(trial_no,0)>0 order by trial_no"%(item), as_dict=1)
+	trials = frappe.db.sql("select branch_dict from `tabProcess Item` where parent='%s' order by idx"%(item), as_dict=1)
 	if trials:
 		for t in trials:
-			d = frappe.new_doc('Trial Dates')
-			d.process = t.process_name
-			d.trial_no = t.trial_no
-			d.idx = t.trial_no
-			d.parent = parent
-			d.parenttype = 'Trials'
-			d.parentfield = 'trial_dates'
-			d.save(ignore_permissions=True)
+			if t.branch_dict:
+				branch_dict = eval(t.branch_dict)
+				for s in range(0, len(branch_dict)):
+					d = frappe.new_doc('Trial Dates')
+					d.process = branch_dict.get(cstr(s)).get('process')
+					d.trial_no = branch_dict.get(cstr(s)).get('trial')
+					d.idx = cstr(s + 1)
+					d.parent = parent
+					d.parenttype = 'Trials'
+					d.parentfield = 'trial_dates'
+					d.save(ignore_permissions=True)
 	return "Done"
 
 def validate_work_order_assignment(doc):
@@ -322,3 +322,21 @@ def check_work_order_assignment(doc, item_code, qty):
 	frappe.errprint([qty, count])
 	if cint(qty) !=  count:
 		frappe.throw(_("Qty should be equal"))
+
+def create_serial_no(doc, method):
+	for d in doc.get('work_order_distribution'):
+		if not d.serial_no_data:
+			d.serial_no_data = generate_serial_no(d.tailoring_item, d.tailor_qty)
+
+def generate_serial_no(item_code, qty):
+	serial_no =''
+	while cint(qty) > 0:
+		sn =frappe.new_doc('Serial No')
+		sn.name = make_autoname(frappe.db.get_value('Item', item_code,'serial_no_series') or 'SN.######') 
+		sn.serial_no = sn.name
+		sn.item_code = item_code
+		sn.status = 'Available'
+		sn.save(ignore_permissions=True)
+		serial_no += '\n' + sn.name 
+		qty = qty -1
+	return serial_no

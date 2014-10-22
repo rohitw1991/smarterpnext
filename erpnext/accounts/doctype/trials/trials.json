@@ -29,6 +29,26 @@
    "precision": ""
   }, 
   {
+   "fieldname": "column_break_3", 
+   "fieldtype": "Column Break", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "work_order", 
+   "fieldtype": "Data", 
+   "label": "Work Order", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 0
+  }, 
+  {
+   "fieldname": "section_break_5", 
+   "fieldtype": "Section Break", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "allow_on_submit": 0, 
    "fieldname": "trial_dates", 
    "fieldtype": "Table", 
@@ -56,7 +76,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-09-30 18:58:06.292985", 
+ "modified": "2014-10-22 16:15:01.604830", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Trials", 

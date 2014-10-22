@@ -71,8 +71,8 @@ doc_events = {
 
 	},
 	"Sales Invoice": {
-		"on_update" : ["tools.tools_management.custom_methods.update_work_order","tools.tools_management.custom_methods.create_se_or_mr"],
-		"validate"  : ["tools.tools_management.custom_methods.merge_tailoring_items","erpnext.accounts.accounts_custom_methods.add_data_in_work_order_assignment"], 
+		"on_update" : ["tools.tools_management.custom_methods.update_work_order"],#"tools.tools_management.custom_methods.create_se_or_mr"],
+		"validate"  : ["tools.tools_management.custom_methods.merge_tailoring_items","erpnext.accounts.accounts_custom_methods.add_data_in_work_order_assignment", "erpnext.accounts.accounts_custom_methods.create_serial_no"], 
 		"on_submit" : ["tools.tools_management.custom_methods.sales_invoice_on_submit_methods","erpnext.accounts.accounts_custom_methods.create_production_process","erpnext.accounts.accounts_custom_methods.validate_sales_invoice"],
 		"on_cancel" : ["tools.tools_management.custom_methods.delete_project_aginst_si", "erpnext.accounts.accounts_custom_methods.delete_production_process"]
 	},

@@ -562,8 +562,8 @@ cur_frm.cscript.split_qty = function(doc, cdt, cdn){
 	}
 }
 
-
 cur_frm.cscript.split_quantity = function(doc, cdt, cdn, d){
+	var me =this;
 	var dialog = new frappe.ui.Dialog({
 			title:__(' Styles'),
 			fields: [
@@ -579,39 +579,51 @@ cur_frm.cscript.split_quantity = function(doc, cdt, cdn, d){
 	var fd = dialog.fields_dict;
 	var split_qty_array = []
 	var j=0;
-	$('#myGrid').remove()
 	this.div = $('<div id="myGrid" style="width:100%;height:200px;margin:10px;overflow-y:scroll"><table class="table table-bordered" style="background-color: #f9f9f9;height:10px" id="mytable">\
 		<tr ><td style="display:none">SR</td><td>Item</td><td>Qty</td><td>Remove</td></tr></table></div>').appendTo($(fd.styles_name.wrapper))
 
-	var me =this;
-	$(fd.add_qty.input).click(function(){
-		j =j+1;
-		me.table = $(me.div).find('#mytable').append('<tr><td class="sr" style="display:none">'+j+'</td><td style="background-color:#FFF">'+d.tailoring_item_code+'</td><td style="background-color:#FFF">'+fd.qty.last_value+'</td><td>&nbsp;<button  class="remove">X</button></td></tr>')
-		split_qty_array[j-1] = fd.qty.last_value
-		$(me.table).find('.remove').click(function(){
-			$(this).parent().parent().remove()
-			sr_no = $(this).parent().parent().find('.sr').html()
-			split_qty_array.splice(sr_no-1, 1)
-		})
-	})
-
-	$(fd.create_new.input).click(function(){
-		sum = 0.00
-		for(k=0;k<split_qty_array.length;k++){
-			if(split_qty_array[k])
+	if(d.split_qty_dict){
+		$(fd.add_qty.input).hide()
+		$(fd.create_new.input).hide()
+		split_qty_dict = JSON.parse(d.split_qty_dict)
+		for(k=0;k<split_qty_dict.length;k++){
+			if(split_qty_dict[k])
 			{
-				sum += parseFloat(split_qty_array[k])
+				me.table = $(this.div).find('#mytable').append('<tr><td class="sr" style="display:none">'+j+'</td><td style="background-color:#FFF">'+d.tailoring_item_code+'</td><td style="background-color:#FFF">'+split_qty_dict[k]+'</td><td>&nbsp;<button  class="remove">X</button></td></tr>')
 			}
 		}
-		if(sum != parseFloat(d.tailoring_qty)){
-			alert("Split quantities should be equal to Product Quantity")
-		}
-		else{
-			d.split_qty_dict = JSON.stringify(split_qty_array)
-			refresh_field('sales_invoice_items_one')
-			dialog.hide()
-		}
-	})
+	}
+	else{
+		$('#myGrid').find('.mytable_tr').remove()
+		$(fd.add_qty.input).click(function(){
+			j =j+1;
+			me.table = $(me.div).find('#mytable').append('<tr class="mytable_tr"><td class="sr" style="display:none">'+j+'</td><td style="background-color:#FFF">'+d.tailoring_item_code+'</td><td style="background-color:#FFF">'+fd.qty.last_value+'</td><td>&nbsp;<button  class="remove">X</button></td></tr>')
+			split_qty_array[j-1] = fd.qty.last_value
+			$(me.table).find('.remove').click(function(){
+				$(this).parent().parent().remove()
+				sr_no = $(this).parent().parent().find('.sr').html()
+				split_qty_array.splice(sr_no-1, 1)
+			})
+		})
+
+		$(fd.create_new.input).click(function(){
+			sum = 0.00
+			for(k=0;k<split_qty_array.length;k++){
+				if(split_qty_array[k])
+				{
+					sum += parseFloat(split_qty_array[k])
+				}
+			}
+			if(sum != parseFloat(d.tailoring_qty)){
+				alert("Split quantities should be equal to Product Quantity")
+			}
+			else{
+				d.split_qty_dict = JSON.stringify(split_qty_array)
+				refresh_field('sales_invoice_items_one')
+				dialog.hide()
+			}
+		})
+	}
 	
 	dialog.show();
 }
