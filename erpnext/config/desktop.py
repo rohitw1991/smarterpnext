@@ -70,5 +70,11 @@ def get_data():
 			"label": _("Dashboard"),
 			"link": "Form/Work Management",
 			"type": "view"
+		},
+		"Admin Module":{
+			"color": "#e67e22",
+			"icon": "icon-play",
+			"label": _("Admin Module"),
+			"type": "module"
 		}
 	}

@@ -221,9 +221,6 @@ cur_frm.cscript.item_group =function(doc, cdt, cdn){
 		doc.has_serial_no = 'Yes'
 		refresh_field('has_serial_no')
 	}
-	// return get_server_fields('get_details','', '', doc, cdt, cdn, 1,function(){
-	// 		refresh_field('size_item')
-	// 	});
 }
 
 

@@ -86,7 +86,6 @@ def item_validate_methods(doc, method):
 	manage_price_list(doc)
 	make_sales_bom(doc)
 
-
 def manage_price_list(doc):
 	for d in doc.get('costing_item'):
 		update_price_list(d)
@@ -140,6 +139,54 @@ def delete_non_present_entry(parent, data):
 	frappe.db.sql("delete from `tabCustomer Rate` where parent not in %s and branch='%s' and size='%s'"%("('"+parent+"')", data.branch, data.size), debug=1)
 
 def make_sales_bom(doc):
-	doc.name
-	# parent = frappe.db.get_value('Sales Bom' {'new_item_code', })
-	# if cint(doc.is_clubbed_product) == 1 && 
+	if cint(doc.is_clubbed_product) == 1 and doc.is_stock_item == 'No':
+		validate_sales_bom(doc)
+		parent = frappe.db.get_value('Sales BOM', {'new_item_code': doc.name}, 'name')
+		if not parent:
+			sb = frappe.new_doc('Sales BOM')
+			sb.new_item_code = doc.name
+			for d in doc.get('sales_bom_item'):
+				make_sales_bom_item(sb, d)
+			sb.save(ignore_permissions = True)
+		elif cint(doc.is_clubbed_product) == 1 and parent:
+			update_sales_bom_item(parent, doc)
+		delete_unnecessay_records(doc)
+
+def make_sales_bom_item(obj, d):
+	sbi= obj.append('sales_bom_items', {})
+	sbi.item_code = d.item_code
+	sbi.qty = d.qty
+	return "Done"
+
+def update_sales_bom_item(parent, doc):
+	for d in doc.get('sales_bom_item'):
+		name = frappe.db.get_value('Sales BOM Item', {'item_code': d.item_code, 'parent': parent, 'parenttype':'Sales BOM'}, 'name')
+		if name:
+			frappe.db.sql("update `tabSales BOM Item` set qty=%s where name='%s'"%(d.qty, name))
+		else:
+			obj = frappe.get_doc('Sales BOM', parent)
+			make_sales_bom_item(obj, d)
+			obj.save()
+
+def validate_sales_bom(doc):
+	if not doc.get('sales_bom_item'):
+		frappe.throw('Mandatory Field: Sales Bom Item is mandatory')
+	check_duplicate_item_code(doc)
+
+def check_duplicate_item_code(doc):
+	item_code_list = []
+	for d in doc.get('sales_bom_item'):
+		if frappe.db.get_value('Item', d.item_code, 'is_stock_item') != 'Yes':
+			frappe.throw(_('Item Code "{0}"" at row {1} must be stock product').format(d.item_code, d.idx))
+		if d.item_code in item_code_list:
+			frappe.throw('Item Code can not be duplicate')
+		item_code_list.append(d.item_code)
+
+def delete_unnecessay_records(doc):
+	sales_bom_item_list = []
+	for s in doc.get('sales_bom_item'):
+		sales_bom_item_list.append(frappe.db.get_value('Sales BOM Item', {'item_code':s.item_code, 'parent': s.parent, 'parenttype': 'Sales BOM'}, 'name'))
+	bom_list =  "','".join(sales_bom_item_list)
+	if bom_list:
+		frappe.db.sql("""delete from `tabSales BOM Item` 
+			where parenttype not in('Item') and name not in %s"""%("('"+bom_list+"')"), debug=1)

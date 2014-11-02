@@ -193,6 +193,10 @@ erpnext.stock.CustomItem = frappe.ui.form.Controller.extend({
     price_list: function(doc, cdt, cdn){
         var s;
         new frappe.CustomerRate(doc, cdt, cdn)
+    },
+    is_clubbed_product : function(doc){
+        doc.has_serial_no = 'No'
+        refresh_field('has_serial_no')
     }
 })
 

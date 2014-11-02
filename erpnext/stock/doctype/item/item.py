@@ -21,6 +21,7 @@ class Item(WebsiteGenerator):
 	def onload(self):
 		super(Item, self).onload()
 		self.get("__onload").sle_exists = self.check_if_sle_exists()
+		self.get_size_details()
 
 	def autoname(self):
 		if frappe.db.get_default("item_naming_by")=="Naming Series":
@@ -50,6 +51,7 @@ class Item(WebsiteGenerator):
 		self.validate_barcode()
 		self.cant_change()
 		self.validate_item_type_for_reorder()
+		self.get_size_details()
 
 		if not self.get("__islocal"):
 			self.old_item_group = frappe.db.get_value(self.doctype, self.name, "item_group")
@@ -272,7 +274,7 @@ class Item(WebsiteGenerator):
 					row.label = label
 					row.description = desc
 
-	def get_details(self):
+	def get_size_details(self):
 		if self.get("__islocal"):
 			size_details= frappe.db.sql("""select name from `tabSize`""",as_list=1)
 			width_details= frappe.db.sql("""select name from `tabWidth`""",as_list=1)
