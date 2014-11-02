@@ -59,3 +59,44 @@ cur_frm.fields_dict.production_details.grid.get_field("work_order").get_query = 
 		}
 	}
 }
+
+cur_frm.cscript.process_allocation = function(doc, cdt, cdn){
+	d = locals[cdt][cdn]
+	this.div;
+	return frappe.call({
+		type :'Get',
+		method : 'erpnext.accounts.accounts_custom_methods.get_process_detail',
+		args:{
+			'name':d.process_allotment
+		},
+		callback : function(r){
+			var dialog = new frappe.ui.Dialog({
+			title:__('Process'),
+			fields: [
+				{fieldtype:'HTML', fieldname:'styles_name', label:__('Styles'), reqd:false,
+					description: __("")},
+					{fieldtype:'Button', fieldname:'ok', label:__('Ok') }
+			]
+		})
+		var fd = dialog.fields_dict;
+		$(this.div).find('myDiv').remove()
+		this.div = $('<div id="myDiv"><table class="table table-bordered" style="background-color: #D8D8D8;height:10px" id="mytable"><thead><tr><td>Process Name</td><td>Process</td><td>Trials</td><td>Status</td></tr></thead><tbody></tbody></table></div>').appendTo($(fd.styles_name.wrapper))
+		for(i=0;i<r.message.length;i++){
+			if(r.message[i].status != 'Pending')
+			{
+				this.table = $(this.div).find('#mytable').append('<tr style="background-color: #FFFFFF;"><td><a href="#Form/Process Allotment/'+r.message[i].process_data+'">'+r.message[i].process_data+'</a></td><td>'+r.message[i].process_name+'</td><td>'+r.message[i].trials+'</td><td>'+r.message[i].status+'</td></tr>')			
+			}
+			else{
+				this.table = $(this.div).find('#mytable').append('<tr style="background-color: #FFFFFF;"><td>'+r.message[i].process_data+'</td><td>'+r.message[i].process_name+'</td><td>'+r.message[i].trials+'</td><td>'+r.message[i].status+'</td></tr>')				
+			}
+			
+		}
+		dialog.show()
+
+		$(fd.ok.input).click(function(){
+			dialog.hide()
+		})
+		}
+
+	})
+}

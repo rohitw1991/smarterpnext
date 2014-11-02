@@ -552,18 +552,15 @@ cur_frm.fields_dict['work_order_distribution'].grid.get_field('tailor_work_order
 	}
 }
 
-cur_frm.cscript.split_qty = function(doc, cdt, cdn){
-	var d = locals[cdt][cdn]
-	if (parseInt(d.check_split_qty)==1){
-		cur_frm.cscript.split_quantity(doc, cdt, cdn, d)
-	}
-	else{
-		alert("Click on Check Split Qty")
-	}
-}
 
-cur_frm.cscript.split_quantity = function(doc, cdt, cdn, d){
+
+{% include 'stock/custom_items.js' %}
+$.extend(cur_frm.cscript, new erpnext.stock.SplitQty({frm: cur_frm}));
+
+
+/*cur_frm.cscript.split_quantity = function(doc, cdt, cdn, d){
 	var me =this;
+	console.log([cdt,cdn])
 	var dialog = new frappe.ui.Dialog({
 			title:__(' Styles'),
 			fields: [
@@ -626,7 +623,7 @@ cur_frm.cscript.split_quantity = function(doc, cdt, cdn, d){
 	}
 	
 	dialog.show();
-}
+}*/
 
 // cur_frm.script_manager.make(erpnext.account.CustomJs);
 var fabric_detail = {}

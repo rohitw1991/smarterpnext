@@ -23,7 +23,8 @@ class ProcessAllotment(Document):
 		return "Done"
 
 	def validate(self):
-		self.assign_task()
+		# self.assign_task()
+		self.update_process_status()
 
 	def assign_task(self):
 		for d in self.get('wo_process'):
@@ -36,13 +37,13 @@ class ProcessAllotment(Document):
 				if not assigned:
 					self.assigned_to_user(d)
 
-	def create_task(self, data):
+	def create_task(self):
 		tsk = frappe.new_doc('Task')
-		tsk.subject = data.task_details or 'Do process %s for item %s'%(data.process, frappe.db.get_value('Item',self.item,'item_name'))
+		tsk.subject = 'Do process %s for item %s'%(self.process, frappe.db.get_value('Item',self.item,'item_name'))
 		tsk.project = self.sales_invoice_no
-		tsk.exp_start_date = data.expected_start_date
-		tsk.exp_end_date = data.expected_end_date
-		tsk.process_name = data.process
+		tsk.exp_start_date = self.start_date
+		tsk.exp_end_date = self.end_date
+		tsk.process_name = self.process
 		tsk.item_code = self.item
 		tsk.sales_order_number = self.sales_invoice_no
 		tsk.save(ignore_permissions=True)
@@ -107,9 +108,13 @@ class ProcessAllotment(Document):
 					where sales_invoice_no='%s' and article_code='%s' 
 					"""%(self.name, self.sales_invoice_no, self.item))
 
-	def set_completion_date(self, index):
+	def on_status_trigger_method(self, args):
+		self.set_completion_date(args)
+		self.update_process_status(args)
+
+	def set_completion_date(self, args):
 		for d in self.get('wo_process'):
-			if cint(d.idx) == index and d.status == 'Completed':
+			if cint(d.idx) == cint(args.idx) and d.status == 'Completed':
 				d.completion_date = cstr(nowdate())
 			else:
 				d.completion_date = ''
@@ -164,6 +169,45 @@ class ProcessAllotment(Document):
 			if parent:
 				frappe.db.sql("update `tabProduction Dashboard Details` set status='Completed', trial_no=0 where name='%s'"%(parent))
 		return "Done"
+
+	def update_process_status(self, args=None):
+		self.update_parent_status()
+		self.update_child_status()
+
+	def update_parent_status(self):
+		if self.process_status_changes=='Yes':
+			cond = "a.parent=b.name and a.process_data='%s' and a.process_name='%s' and b.sales_invoice_no='%s'"%(self.name, self.process, self.sales_invoice_no)
+			frappe.db.sql("update `tabProcess Log` a, `tabProduction Dashboard Details` b set a.status='%s' where %s"%(self.process_status,cond))
+			if self.process_status=='Closed':
+				self.open_next_status(cond)
+			self.process_status_changes='No'
+		
+	def update_child_status(self):
+		for s in self.get('trials_transaction'):
+			if s.trial_change_status=='Yes':
+				cond = "a.parent=b.name and a.process_data='%s' and a.process_name='%s' and a.trials='%s' and b.sales_invoice_no='%s'"%(self.name, self.process, s.trial_no, self.sales_invoice_no)
+				frappe.db.sql("update `tabProcess Log` a, `tabProduction Dashboard Details` b set a.status='%s' where %s"%(s.status, cond))
+				if s.status=='Closed':
+					self.open_next_status(cond)
+				s.trial_change_status='No'
+
+	def open_next_status(self, cond):
+		name = frappe.db.sql("""select a.* from `tabProcess Log` a, `tabProduction Dashboard Details` b where %s """%(cond), as_dict=1)
+		if name:
+			for s in name:
+				frappe.db.sql("update `tabProcess Log` set status='Open' where idx=%s and parent='%s'"%(cint(s.idx)+1, s.parent))
+
+	def assign_task_to_employee(self):
+		emp = self.append('employee_details',{})
+		emp.employee = self.process_tailor
+		emp.employee_name = frappe.db.get_value('Employee', self.process_tailor, 'employee_name')
+		if self.emp_status=='Assigned':
+			self.task = self.create_task()
+		emp.task = self.task
+		emp.employee_status = self.emp_status
+		return "Done"
+
+
 
 def create_se(raw_material):
 	count = 0

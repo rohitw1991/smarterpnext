@@ -71,6 +71,13 @@
    "precision": ""
   }, 
   {
+   "fieldname": "process_allocation", 
+   "fieldtype": "Button", 
+   "label": "Process Allocation", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "column_break_5", 
    "fieldtype": "Column Break", 
    "permlevel": 0, 
@@ -136,7 +143,8 @@
    "fieldtype": "Small Text", 
    "label": "Serial No", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "read_only": 1
   }, 
   {
    "fieldname": "other_detais", 
@@ -147,11 +155,14 @@
   }, 
   {
    "fieldname": "process_allotment", 
-   "fieldtype": "Link", 
+   "fieldtype": "Data", 
    "label": "Process Allotment", 
-   "options": "Process Allotment", 
+   "no_copy": 1, 
+   "options": "", 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "print_hide": 1, 
+   "read_only": 1
   }, 
   {
    "fieldname": "stock_entry", 
@@ -270,7 +281,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-10-07 20:48:17.382264",
+ "modified": "2014-10-27 15:08:14.890435", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Production Details", 

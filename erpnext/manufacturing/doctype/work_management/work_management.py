@@ -14,15 +14,17 @@ class WorkManagement(Document):
 		sales_invoices = self.get_invoice(invoice_no)
 		if sales_invoices:
 			for si_no in sales_invoices:
-				si = self.append('production_details', {})
-				self.create_invoice_bundle(si_no, si)
+				branch = frappe.db.get_value('User',frappe.session.user,'branch')
+				if frappe.db.get_value('Process Log',{'branch':branch,'parent':si_no.name},'name'):
+					si = self.append('production_details', {})
+					self.create_invoice_bundle(si_no, si)
 		return "Done"
 
 	def get_invoice(self, invoice_no=None):
 		cond = "1=1"
 		if invoice_no:
 			cond = "sales_invoice_no='%s'"%(invoice_no)
-		return frappe.db.sql("select * from `tabProduction Dashboard Details` where %s order by sales_invoice_no"%(cond),as_dict=1)
+		return frappe.db.sql("select * from `tabProduction Dashboard Details` where %s order by sales_invoice_no desc"%(cond),as_dict=1, debug=1)
 
 	def create_invoice_bundle(self, invoice_detail, si):
 		color = {'Completed':'green','Pending':'red', 'Trial':'#1F8C83'}
@@ -32,9 +34,10 @@ class WorkManagement(Document):
 		si.article_qty = invoice_detail.article_qty
 		si.work_order = invoice_detail.work_order
 		si.stock_entry = invoice_detail.stock_entry
-		si.process_allotment = invoice_detail.process_allotment
+		si.process_allotment = invoice_detail.name
 		si.actual_qty = invoice_detail.fabric_qty
 		si.fabric_code = invoice_detail.fabric_code
+		si.serial_no = invoice_detail.serial_no
 		si.size = invoice_detail.size
 		if invoice_detail.status == 'Completed':
 			value = '<h style="color:%s">%s</h>'%(color.get(invoice_detail.status), invoice_detail.status)

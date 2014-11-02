@@ -8,7 +8,7 @@ app_version = "4.3.0"
 
 error_report_email = "support@erpnext.com"
 
-app_include_js = ["assets/js/erpnext.min.js","assets/js/chart.js","assets/js/bjqs-1.3.js","assets/js/bjqs-1.3.min.js"]
+app_include_js = ["assets/js/erpnext.min.js","assets/js/charts.js","assets/js/bjqs-1.3.js","assets/js/bjqs-1.3.min.js"]
 app_include_css = ["assets/css/erpnext.css","assets/css/bjqs.css","assets/css/demo.css"]
 web_include_js = "assets/js/erpnext-web.min.js"
 
@@ -49,7 +49,7 @@ doc_events = {
 		"on_update": "erpnext.home.make_comment_feed"
 	},
 	"Stock Entry": {
-		"on_submit": ["erpnext.stock.doctype.material_request.material_request.update_completed_qty","erpnext.stock.stock_custom_methods.update_status","erpnext.stock.stock_custom_methods.stock_out_entry"],
+		"on_submit": ["erpnext.stock.doctype.material_request.material_request.update_completed_qty","erpnext.stock.stock_custom_methods.update_status","erpnext.stock.stock_custom_methods.stock_out_entry","erpnext.stock.stock_custom_methods.in_stock_entry"],
 		"on_cancel": "erpnext.stock.doctype.material_request.material_request.update_completed_qty"
 	},
 	"User": {
@@ -76,6 +76,9 @@ doc_events = {
 		"on_submit" : ["tools.tools_management.custom_methods.sales_invoice_on_submit_methods","erpnext.accounts.accounts_custom_methods.create_production_process","erpnext.accounts.accounts_custom_methods.validate_sales_invoice"],
 		"on_cancel" : ["tools.tools_management.custom_methods.delete_project_aginst_si", "erpnext.accounts.accounts_custom_methods.delete_production_process"]
 	},
+	"Item":{
+		"validate": "erpnext.stock.stock_custom_methods.item_validate_methods"
+	}
 }
 
 scheduler_events = {

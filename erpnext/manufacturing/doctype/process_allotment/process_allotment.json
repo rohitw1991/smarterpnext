@@ -89,6 +89,7 @@
   {
    "fieldname": "process_status", 
    "fieldtype": "Select", 
+   "hidden": 0, 
    "label": "Process Status", 
    "options": "\nOpen\nReopen\nClosed", 
    "permlevel": 0, 
@@ -109,6 +110,24 @@
    "permlevel": 0, 
    "precision": "", 
    "read_only": 1
+  }, 
+  {
+   "fieldname": "branch", 
+   "fieldtype": "Link", 
+   "label": "Branch", 
+   "options": "Branch", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 0
+  }, 
+  {
+   "default": "No", 
+   "fieldname": "process_status_changes", 
+   "fieldtype": "Select", 
+   "label": "process_status_changes", 
+   "options": "\nYes\nNo", 
+   "permlevel": 0, 
+   "precision": ""
   }, 
   {
    "fieldname": "skip_process", 
@@ -160,7 +179,7 @@
    "precision": ""
   }, 
   {
-   "fieldname": "status", 
+   "fieldname": "emp_status", 
    "fieldtype": "Select", 
    "label": "Status", 
    "options": "\nPending\nAssigned\nReassigned\nCompleted", 
@@ -168,18 +187,33 @@
    "precision": ""
   }, 
   {
-   "fieldname": "process_task", 
+   "fieldname": "task", 
+   "fieldtype": "Data", 
+   "label": "Task", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
+   "fieldname": "process_work_order", 
    "fieldtype": "Link", 
-   "label": "Process Task", 
-   "options": "Task", 
+   "label": "Work Order", 
+   "options": "Work Order", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
+   "fieldname": "section_break_23", 
+   "fieldtype": "Section Break", 
    "permlevel": 0, 
    "precision": ""
   }, 
   {
-   "fieldname": "work_order", 
-   "fieldtype": "Link", 
-   "label": "Work Order", 
-   "options": "Work Order", 
+   "fieldname": "employee_details", 
+   "fieldtype": "Table", 
+   "label": "Employee Details", 
+   "options": "Employee Details", 
    "permlevel": 0, 
    "precision": "", 
    "read_only": 1
@@ -272,6 +306,13 @@
    "precision": ""
   }, 
   {
+   "fieldname": "process_no", 
+   "fieldtype": "Int", 
+   "label": "Process No", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "amended_from", 
    "fieldtype": "Link", 
    "label": "Amended From", 
@@ -286,10 +327,10 @@
  "hide_toolbar": 0, 
  "in_create": 0, 
  "in_dialog": 0, 
- "is_submittable": 1, 
+ "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-10-22 13:05:44.151513", 
+ "modified": "2014-10-28 16:38:01.962673", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Process Allotment", 
@@ -297,9 +338,9 @@
  "owner": "Administrator", 
  "permissions": [
   {
-   "amend": 1, 
+   "amend": 0, 
    "apply_user_permissions": 1, 
-   "cancel": 1, 
+   "cancel": 0, 
    "create": 1, 
    "delete": 1, 
    "email": 0, 
@@ -311,13 +352,13 @@
    "report": 0, 
    "role": "Manufacturing User", 
    "set_user_permissions": 1, 
-   "submit": 1, 
+   "submit": 0, 
    "write": 1
   }, 
   {
-   "amend": 1, 
+   "amend": 0, 
    "apply_user_permissions": 0, 
-   "cancel": 1, 
+   "cancel": 0, 
    "create": 1, 
    "delete": 1, 
    "email": 0, 
@@ -329,7 +370,20 @@
    "report": 0, 
    "role": "Sales User", 
    "set_user_permissions": 0, 
-   "submit": 1, 
+   "submit": 0, 
+   "write": 1
+  }, 
+  {
+   "amend": 0, 
+   "apply_user_permissions": 1, 
+   "cancel": 0, 
+   "create": 1, 
+   "delete": 1, 
+   "permlevel": 0, 
+   "read": 1, 
+   "role": "Manufacturing Manager", 
+   "set_user_permissions": 1, 
+   "submit": 0, 
    "write": 1
   }
  ], 

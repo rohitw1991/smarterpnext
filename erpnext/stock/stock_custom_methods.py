@@ -74,7 +74,72 @@ def make_stock_entry_for_child(s, name):
 	sed.save(ignore_permissions=True)
 	return "Done"
 
+def in_stock_entry(doc, method):
+	pass
+
 @frappe.whitelist()
 def get_details(item_name):
 	return frappe.db.sql("""select file_url,attached_to_name from `tabFile Data` 
 		where attached_to_name ='%s'"""%(item_name),as_list=1)
+
+def item_validate_methods(doc, method):
+	manage_price_list(doc)
+	make_sales_bom(doc)
+
+
+def manage_price_list(doc):
+	for d in doc.get('costing_item'):
+		update_price_list(d)
+
+def update_price_list(args):
+	data = args
+	args = eval(args.costing_dict)
+	parent_list = []
+	for s in range(0, len(args)):
+		parent = frappe.db.get_value('Item Price', {'item_code':data.get('parent'), 'price_list':args.get(str(s)).get('price_list')},'name')
+		if not parent:
+			parent = make_item_price(data.get('parent'), args.get(str(s)).get('price_list'))
+		parent_list.append(parent.encode('ascii', 'ignore'))
+		update_item_price(parent, data, args.get(str(s)).get('rate'))
+	delete_non_present_entry(parent_list, data)
+	return "Done"
+
+def make_item_price(item_code, price_list):
+	ip = frappe.new_doc('Item Price')
+	ip.price_list = price_list
+	ip.item_code = item_code
+	ip.item_name = frappe.db.get_value('Item Name', item_code, 'item_name')
+	ip.price_list_rate = 1.00
+	ip.currency = frappe.db.get_value('Price List', price_list, 'currency')  
+	ip.save(ignore_permissions=True)
+	return ip.name
+
+def update_item_price(parent,data, rate):
+	frappe.errprint(parent)
+	name = frappe.db.get_value('Customer Rate', {'parent':parent, 'branch': data.get('branch'), 'size': data.get('size')}, 'name')
+	item_price_dict = get_dict(parent, data, rate)
+	if not name:
+		name = frappe.get_doc(item_price_dict).insert()
+	elif name:
+		frappe.db.sql("update `tabCustomer Rate` set rate='%s' where name='%s'"%(rate, name))
+	return True
+
+def get_dict(parent, data, rate):
+	return {
+				"doctype": "Customer Rate",
+				"parent": parent,
+				"branch": data.get('branch'),
+				"parenttype": "Item Price",
+				'parentfield': "customer_rate",
+				"size":data.get('size'),
+				"rate": rate,
+			}
+
+def delete_non_present_entry(parent, data):
+	parent =  "','".join(parent)
+	frappe.db.sql("delete from `tabCustomer Rate` where parent not in %s and branch='%s' and size='%s'"%("('"+parent+"')", data.branch, data.size), debug=1)
+
+def make_sales_bom(doc):
+	doc.name
+	# parent = frappe.db.get_value('Sales Bom' {'new_item_code', })
+	# if cint(doc.is_clubbed_product) == 1 && 

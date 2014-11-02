@@ -29,6 +29,7 @@ cur_frm.cscript.refresh = function(doc) {
 	}
 
 	erpnext.item.toggle_reqd(cur_frm);
+	
 }
 
 erpnext.item.toggle_reqd = function(frm) {
@@ -175,17 +176,17 @@ cur_frm.cscript.copy_from_item_group = function(doc) {
 	});
 }
 
-cur_frm.cscript.image = function() {
-	refresh_field("image_view");
+// cur_frm.cscript.image = function() {
+// 	refresh_field("image_view");
 
-	if(!cur_frm.doc.image) return;
+// 	if(!cur_frm.doc.image) return;
 
-	if(!cur_frm.doc.description_html)
-		cur_frm.cscript.add_image(cur_frm.doc);
-	else {
-		msgprint(__("You may need to update: {0}", [frappe.meta.get_docfield(cur_frm.doc.doctype, "description_html").label]));
-	}
-}
+// 	if(!cur_frm.doc.description_html)
+// 		cur_frm.cscript.add_image(cur_frm.doc);
+// 	else {
+// 		msgprint(__("You may need to update: {0}", [frappe.meta.get_docfield(cur_frm.doc.doctype, "description_html").label]));
+// 	}
+// }
 //Rohit
 cur_frm.cscript.image = function(doc, cdt, cdn) {
 var d = locals[cdt][cdn]
@@ -208,18 +209,26 @@ get_server_fields('get_style_details',d.style,'',doc ,cdt, cdn,1, function(){
 refresh_field('style_item')
 })
 }
-cur_frm.cscript.onload= function(doc, cdt, cdn) {
-return get_server_fields('get_details','', '', doc, cdt, cdn, 1,function(){
-refresh_field('size_item')
-});
-};
+// cur_frm.cscript.onload= function(doc, cdt, cdn) {
+// 	alert("hii")
+// return get_server_fields('get_details','', '', doc, cdt, cdn, 1,function(){
+// refresh_field('size_item')
+// });
+// };
+
+cur_frm.cscript.item_group =function(doc, cdt, cdn){
+	if(doc.item_group == 'Tailoring'){
+		doc.has_serial_no = 'Yes'
+		refresh_field('has_serial_no')
+	}
+	// return get_server_fields('get_details','', '', doc, cdt, cdn, 1,function(){
+	// 		refresh_field('size_item')
+	// 	});
+}
 
 
 //for Slide Show
 
-
-{% include 'stock/custom_items.js' %} 
-
-cur_frm.script_manager.make(erpnext.stock.CustomItem); 
-
-
+cur_frm.add_fetch('default_branch', 'warehouse', 'default_warehouse')
+{% include 'stock/custom_items.js' %}
+cur_frm.script_manager.make(erpnext.stock.CustomItem);

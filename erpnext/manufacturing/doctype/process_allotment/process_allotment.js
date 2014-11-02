@@ -18,9 +18,11 @@ cur_frm.cscript.item = function(doc, cdt, cdn){
 
 cur_frm.cscript.status = function(doc, cdt, cdn){
 	var d = locals[cdt][cdn]
-	get_server_fields('set_completion_date',d.idx,'',doc, cdt, cdn, 1, function(){
-		refresh_field('wo_process')
-	})
+	d.trial_change_status='Yes'
+	refresh_field('trials_transaction')
+	// get_server_fields('on_status_trigger_method',d,'',doc, cdt, cdn, 1, function(){
+	// 	refresh_field('wo_process')
+	// })
 }
 
 cur_frm.fields_dict['serial_no'].get_query = function(doc) {
@@ -66,3 +68,22 @@ function check_serial_exist(sn_list, serial_no){
 	return msg
 }
 
+cur_frm.cscript.process_status= function(doc, cdt, cdn){
+	doc.process_status_changes = 'Yes'
+	refresh_field('process_status_changes')
+}
+
+cur_frm.cscript.emp_status= function(doc, cdt, cdn){
+	if (doc.emp_status=='Completed')
+	{
+		doc.process_status = 'Completed'	
+	}
+	refresh_field('process_status')
+}
+
+cur_frm.cscript.assigned= function(doc, cdt, cdn){
+	get_server_fields('assign_task_to_employee','','',doc, cdt, cdn,1, function(){
+		refresh_field('employee_details')	
+	})
+	
+}

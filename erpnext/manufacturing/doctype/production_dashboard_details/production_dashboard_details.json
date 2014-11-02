@@ -32,6 +32,7 @@
   {
    "fieldname": "serial_no", 
    "fieldtype": "Small Text", 
+   "hidden": 1, 
    "label": "Serial No", 
    "permlevel": 0, 
    "precision": ""
@@ -125,9 +126,9 @@
   }, 
   {
    "fieldname": "work_order", 
-   "fieldtype": "Link", 
+   "fieldtype": "Data", 
    "label": "Work Order", 
-   "options": "Work Order", 
+   "options": "", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -263,7 +264,7 @@
    "fieldname": "warehouse", 
    "fieldtype": "Link", 
    "label": "Warehouse", 
-   "options": "Warehouse", 
+   "options": "Branch", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -289,6 +290,14 @@
    "options": "Production Status Detail", 
    "permlevel": 0, 
    "precision": ""
+  }, 
+  {
+   "fieldname": "process_log", 
+   "fieldtype": "Table", 
+   "label": "Process Log", 
+   "options": "Process Log", 
+   "permlevel": 0, 
+   "precision": ""
   }
  ], 
  "hide_heading": 0, 
@@ -298,7 +307,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-10-20 19:34:34.516004", 
+ "modified": "2014-10-31 22:21:41.652585", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Production Dashboard Details", 
@@ -306,11 +315,12 @@
  "owner": "Administrator", 
  "permissions": [
   {
+   "create": 1, 
    "delete": 1, 
    "permlevel": 0, 
    "read": 1, 
    "role": "Guest", 
-   "write": 0
+   "write": 1
   }
  ], 
  "read_only": 0, 
