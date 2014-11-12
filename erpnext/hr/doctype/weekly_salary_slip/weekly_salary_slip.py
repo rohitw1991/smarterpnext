@@ -48,9 +48,54 @@ class WeeklySalarySlip(TransactionBase):
 
 
 	def pull_sal_struct(self, struct):
-		frappe.errprint("in the pull_sal_struct")
-		from erpnext.hr.doctype.salary_structure.salary_structure import make_salary_slip2
-		self.update(make_salary_slip2(struct, self).as_dict())
+		# frappe.errprint("in the pull_sal_struct")
+		# from erpnext.hr.doctype.salary_structure.salary_structure import make_salary_slip2
+		# self.update(make_salary_slip2(struct, self).as_dict())
+
+		
+		earnings_details, drawings_overtime_details = self.get_mapper_details()
+
+		mapper = {'wages': ['Wages', earnings_details[0].get('wages') if len(earnings_details) > 0 else 0.0 ], 
+		'extra_amt': ['Extra Charges', earnings_details[0].get('extra_amt') if len(earnings_details) > 0 else 0.0 ], 
+		'overtime': ['Overtime', drawings_overtime_details[0].get('overtime') if len(drawings_overtime_details) > 0 else 0.0]}
+
+		self.set('earning_details',[])
+		for types in mapper:
+			d = self.append('earning_details', {})
+			d.e_type =mapper.get(types)[0]
+			d.e_amount = mapper.get(types)[1]
+			d.e_modified_amount = mapper.get(types)[1]
+
+		mapper = {'drawings': ['Drawings', drawings_overtime_details[0].get('drawings') if len(drawings_overtime_details) > 0 else 0.0], 
+				'loan': ['Loan',0.0], 
+				'late_work':['Late Work', 0.0]}
+
+		self.set('deduction_details',[])
+		for types in mapper:
+			d = self.append('deduction_details', {})
+			d.d_type = mapper.get(types)[0]
+			d.d_modified_amount = mapper.get(types)[1]
+
+	def get_mapper_details(self):
+		earnings_details = frappe.db.sql("""select sum(tailor_wages) as wages , sum(ifnull(tailor_extra_amt,0)) as extra_amt , group_concat(ed.name) as name
+						from `tabEmployee Details` ed, `tabTime Log` tl
+							where employee_status = 'Completed' 
+								and tailor_task is not null 
+								and date(tl.to_time) < curdate()
+								and ed.tailor_task = tl.task
+								and tl.name = ed.time_log_name
+								and ifnull(ed.flag, 'No') != 'Yes'
+								and ed.employee = '%s'
+						"""%self.employee, as_dict=1)
+
+		drawings_overtime_details = frappe.db.sql("""select sum(dd.drawing_amount) as drawings, sum(dd.overtime) as overtime, group_concat(name) as name from `tabDaily Drawing` dd 
+				where dd.employee_id = '%(employee)s' 
+					and ifnull(dd.flag, 'No') != 'Yes'
+					and dd.date between STR_TO_DATE('%(from_date)s','%(format)s') 
+						and  STR_TO_DATE('%(to_date)s','%(format)s')"""%{'format': '%Y-%m-%d', 
+						'from_date': self.from_date, 'to_date': self.to_date, 'employee':self.employee},as_dict=1, debug=1)
+
+		return earnings_details, drawings_overtime_details
 
 	def pull_emp_details(self):
 		emp = frappe.db.get_value("Employee", self.employee,
@@ -211,6 +256,17 @@ class WeeklySalarySlip(TransactionBase):
 		if(self.email_check == 1):
 			self.send_mail_funct()
 
+		earnings_details, drawings_overtime_details = self.get_mapper_details()
+
+		if len(earnings_details) > 0:
+			for name in earnings_details[0].get('name').split(','):
+				frappe.db.sql("""update `tabEmployee Details` set flag = 'Yes' where name = '%s'"""%name)
+				frappe.db.sql("commit")
+
+		if len(drawings_overtime_details) > 0:
+			for name in drawings_overtime_details[0].get('name').split(','):
+				frappe.db.sql("""update `tabDaily Drawing` set flag = 'Yes' where name = '%s'"""%name)
+				frappe.db.sql("commit")
 
 	def send_mail_funct(self):
 		from frappe.utils.email_lib import sendmail

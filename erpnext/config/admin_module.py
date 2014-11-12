@@ -16,6 +16,7 @@ def get_data():
 				},
 				{
 					"type": "doctype",
+					"label":"Authentication Approval",
 					"name": "Admin Signature",
 					"description": _("Admin Signature"),
 				},
@@ -25,6 +26,14 @@ def get_data():
 					"label": _("Offer"),
 					"description": _("List of offer"),
 				},
+				{
+					"type":"page",
+					"name":"report-template",
+					"icon": "icon-sitemap",
+					"label": _("External Product Catalog"),
+					"link": "report-template",
+					"description": _("External Product Catalog"),
+				}
 			]
 		},
 		
@@ -45,7 +54,7 @@ def get_data():
 				{
 					"type": "doctype",
 					"name": "Measurement Template",
-					"description": _("Measurement Template"),
+					"description": _("Collection of Measurement Fields"),
 				},
 				{
 					"type": "doctype",
@@ -81,6 +90,7 @@ def get_data():
 				{
 					"type": "doctype",
 					"name": "Measurement",
+					"label" : _("Measurement Fields"),
 					"description": _("List of Measurement"),
 				},
 				{

@@ -12,7 +12,7 @@ erpnext.hr.EmployeeController = frappe.ui.form.Controller.extend({
 
 	onload: function(doc, dt, dn) {
 
-		// cur_frm.cscript.skill_onload(doc, dt, dn)
+		cur_frm.cscript.skill_onload(doc, dt, dn)
 	
 		if(this.frm.doc.__islocal) this.frm.set_value("employee_name", "");
 

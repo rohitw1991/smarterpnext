@@ -74,16 +74,33 @@ cur_frm.cscript.process_status= function(doc, cdt, cdn){
 }
 
 cur_frm.cscript.emp_status= function(doc, cdt, cdn){
+	doc.process_status = 'Open'
 	if (doc.emp_status=='Completed')
 	{
-		doc.process_status = 'Completed'	
+		doc.process_status = 'Closed'	
 	}
-	refresh_field('process_status')
+	doc.completed_time = ''
+	doc.from_time = ''
+	refresh_field(['process_status', 'completed_time', 'from_time'])
 }
 
 cur_frm.cscript.assigned= function(doc, cdt, cdn){
 	get_server_fields('assign_task_to_employee','','',doc, cdt, cdn,1, function(){
 		refresh_field('employee_details')	
+	})
+	
+}
+
+cur_frm.cscript.work_qty = function(doc, cdt, cdn){
+	get_server_fields('calculate_estimates_time','','',doc, cdt, cdn,1, function(){
+		refresh_field('estimated_time')	
+	})
+	
+}
+
+cur_frm.cscript.payment = function(doc, cdt, cdn){
+	get_server_fields('calculate_wages','','',doc, cdt, cdn,1, function(){
+		refresh_field('wages')	
 	})
 	
 }

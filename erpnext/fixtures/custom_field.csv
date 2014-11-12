@@ -18,25 +18,58 @@
 "Type:","Data (text)","Link","Select","Data","Select","Select","Text","Text","Data","Int","Check","Check","Check","Data","Text","Check","Data","Check","Check","Check","Check","Check","Check"
 "Info:","","Valid DocType","One of: Button, Check, Code, Column Break, Currency, Data, Date, Datetime, Dynamic Link, Float, HTML, Image, Int, Link, Long Text, Password, Percent, Read Only, Section Break, Select, Small Text, Table, Text, Text Editor, Time","","","One of: 1, 2, 3, 4, 5, 6","","","","Integer","0 or 1","0 or 1","0 or 1","","","0 or 1","","0 or 1","0 or 1","0 or 1","0 or 1","0 or 1","0 or 1"
 "Start entering data below this line"
-"","""Sales Invoice-authenticated""","Sales Invoice","Select","Authenticated","admin_authentication_note","","
-Yes
-No","","authenticated",0,0,1,0,"","",1,"",0,1,0,0,0,0
-"","""Sales Invoice-admin_authentication_note""","Sales Invoice","Small Text","Admin Authentication Note","delivery_date","","","","admin_authentication_note",0,0,1,0,"","",0,"",0,1,0,0,0,0
-"","""Item-more_details""","Item","Section Break","Size Details","add_image","","","","more_details",0,0,0,0,"","",0,"eval:!doc.__islocal",0,0,0,0,0,0
-"","""Item-is_clubbed_product""","Item","Check","Is Clubbed Product","is_stock_item","","","","is_clubbed_product",0,0,0,0,"","",0,"eval:doc.is_stock_item=='No'",0,0,0,0,0,0
+"","""Item-more_details""","Item","Section Break","Size Details","add_image","","","","more_details",0,0,0,0,"","",0,"eval:!doc.__islocal && doc.item_group == 'Tailoring'",0,0,0,0,0,0
+"","""Item-fabric_costing""","Item","Table","Fabric Costing","item_costing","","Fabric Costing","","fabric_costing",0,0,0,0,"","",0,"eval:doc.item_group=='Fabric'",0,0,0,0,0,0
 "","""Item-sales_bom_item""","Item","Table","Sales BOM Item","x","","Sales BOM Item","","sales_bom_item",0,0,0,0,"","",0,"eval:doc.is_clubbed_product==1",0,0,0,0,0,0
-"","""Item-default_branch""","Item","Link","Default Branch","is_stock_item","","Branch","","default_branch",0,0,0,0,"","",0,"eval:doc.is_stock_item=='Yes'",0,0,0,0,0,0
 "","""Item-x""","Item","Section Break","","weight_uom","","","","x",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Item-default_branch""","Item","Link","Default Branch","is_stock_item","","Branch","","default_branch",0,0,0,0,"","",0,"eval:doc.is_stock_item=='Yes'",0,0,0,0,0,0
+"","""Item-is_clubbed_product""","Item","Check","Is Clubbed Product","is_stock_item","","","","is_clubbed_product",0,0,0,0,"","",0,"eval:doc.is_stock_item=='No'",0,0,0,0,0,0
+"","""Item-raw_material_item""","Item","Table","Raw Material Item","matching","","Raw Material Item","","raw_material_item",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Item-matching""","Item","Check","Matching","raw_material","","","","matching",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Item-raw_material""","Item","Section Break","Raw Material","costing_item","","","","raw_material",0,0,0,0,"","",0,"eval:doc.item_group=='Tailoring' && !doc.__islocal",0,0,0,0,0,0
+"","""Item-costing_item""","Item","Table","Costing Item","process_item","","Costing Item","","costing_item",0,0,0,0,"","",0,"eval:!doc.__islocal && (doc.item_group=='Tailoring' || doc.item_group=='Merchandise')",0,0,0,0,0,0
+"","""Item-item_costing""","Item","Section Break","Item Costing","raw_material_item","","","","item_costing",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Item-size_for_merchandise""","Item","Link","Size","items_image","","Size","","size_for_merchandise",0,0,0,0,"","",0,"eval:doc.item_group=='Merchandise'",0,0,0,0,0,0
+"","""Event-branch""","Event","Link","Branch","ref_name","","Branch","","branch",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Material Request Item-from_warehouse""","Material Request Item","Link","From Warehouse","warehouse","","Warehouse","","from_warehouse",0,0,0,0,"","",1,"",0,0,0,0,0,0
+"","""Material Request Item-for_branch""","Material Request Item","Link","For Branch","uom","","Branches","","for_branch",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Material Request Item-from_branch""","Material Request Item","Link","From Branch","for_branch","","Branches","","from_branch",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Employee-skills_html""","Employee","HTML","Skills HTML","skills","","","Hello","skills_html",0,0,0,0,"","",1,"",0,0,0,0,0,0
+"","""Employee-employeeskills""","Employee","Table","EmployeeSkills","","","EmployeeSkill","","employeeskills",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Branch-drawing_acc""","Branch","Link","Default Drawing Account","cost_center","","Account","","drawing_acc",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Branch-cost_center""","Branch","Link","Cost Center","fax_no","","Cost Center","","cost_center",0,1,0,0,"","",0,"",0,0,0,0,0,0
+"","""Branch-fax_no""","Branch","Data","Fax No","mobile_no","2","","","fax_no",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Branch-mobile_no""","Branch","Data","Mobile No","phone_no_2","2","","","mobile_no",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Branch-phone_no_2""","Branch","Data","Phone No 2","phone_no_1","2","","","phone_no_2",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Branch-phone_no_1""","Branch","Data","Phone No 1","z","2","","","phone_no_1",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Branch-z""","Branch","Column Break","","country","2","","","z",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Branch-country""","Branch","Link","Country","pin_code","2","Country","","country",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Branch-pin_code""","Branch","Data","Pin Code","state","2","","","pin_code",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Branch-state""","Branch","Data","State","city","2","","","state",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Branch-city""","Branch","Data","City","address_3","2","","","city",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Branch-address_3""","Branch","Data","Address 3","address_2","2","","","address_3",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Branch-address_2""","Branch","Data","Address 2","address_1","2","","","address_2",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Branch-address_1""","Branch","Data","Address 1","address_details","2","","","address_1",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Branch-address_details""","Branch","Section Break","Address Details","holiday_list","2","","","address_details",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Branch-branch_manager""","Branch","Link","Branch Manager","payment_modes","2","User","","branch_manager",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Branch-payment_modes""","Branch","Link","Payment Modes","min_advance_payment","","Mode of Payment","","payment_modes",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Branch-min_advance_payment""","Branch","Currency","Min Advance Payment","y","2","","","min_advance_payment",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Branch-currency""","Branch","Link","Currency","y","","Currency","","currency",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Branch-y""","Branch","Column Break","","currency","","Currency","","y",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""User-ticker""","User","Button","Ticker","github_username","","","","ticker",0,0,0,0,"","",1,"",0,0,0,0,0,0
 "","""Sales Invoice-fabric_details""","Sales Invoice","Small Text","Fabric Details","sales_invoice_items_one","","","","fabric_details",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Sales Invoice-work_order_distribution""","Sales Invoice","Table","Work Order Distribution","merchandise_item","","Work Order Distribution","","work_order_distribution",0,0,0,0,"","",0,"eval:!doc.__islocal",1,1,0,0,0,0
 "","""Sales Invoice-merchandise_item""","Sales Invoice","Table","Merchandise Product","sales_invoice_items_one","","Merchandise Items","","merchandise_item",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Sales Invoice-sales_invoice_items_one""","Sales Invoice","Table","Tailoring Product","update_stock","","Sales Invoice Items","","sales_invoice_items_one",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Sales Invoice-delivery_date""","Sales Invoice","Date","Delivery Date","mode_of_payment","","","","delivery_date",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Item-item_costing""","Item","Section Break","Item Costing","raw_material_item","","","","item_costing",0,0,0,0,"","",0,"eval:!doc.__islocal && (doc.item_group=='Tailoring' || doc.item_group=='Merchandise')",0,0,0,0,0,0
-"","""Item-raw_material_item""","Item","Table","Raw Material Item","matching","","Raw Material Item","","raw_material_item",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Item-matching""","Item","Check","Matching","raw_material","","","","matching",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Item-raw_material""","Item","Section Break","Raw Material","costing_item","","","","raw_material",0,0,0,0,"","",0,"eval:doc.item_group=='Tailoring' && !doc.__islocal",0,0,0,0,0,0
-"","""Item-costing_item""","Item","Table","Costing Item","process_item","","Costing Item","","costing_item",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Sales Invoice-admin_authentication_note""","Sales Invoice","Small Text","Admin Authentication Note","authenticated","","","","admin_authentication_note",0,0,1,0,"","",0,"",0,1,0,0,0,0
+"","""Sales Invoice-authenticated""","Sales Invoice","Select","Authenticated","delivery_date","","
+Approved
+Rejected
+Remove","","authenticated",0,0,1,0,"","",0,"",0,1,0,0,0,0
+"","""Customer-body_measurements""","Customer","Table","Body Measurements","measurement_details","","Measurement Details","","body_measurements",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Customer-measurement_details""","Customer","Section Break","Measurement Details","anniversary_date","","","","measurement_details",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Purchase Invoice Item-invoice_branch""","Purchase Invoice Item","Link","Invoice Branch","description","","Branch","","invoice_branch",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Sales Invoice Item-sales_invoice_branch""","Sales Invoice Item","Link","Sales Invoice Branch","warehouse","","Branches","","sales_invoice_branch",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Item-process_item""","Item","Table","Process Item","style_item","","Process Item","","process_item",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Item-style_item""","Item","Table","Style Item","measurement_item","","Style Item","","style_item",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Item-measurement_item""","Item","Table","Measurement Item","s_","","Measurement Item","","measurement_item",0,0,0,0,"","",0,"",0,0,0,0,0,0
@@ -46,7 +79,8 @@ No","","authenticated",0,0,1,0,"","",1,"",0,1,0,0,0,0
 "","""Item-measurement_template""","Item","Link","Measurement Template","measurement_formula","","Measurement Template","","measurement_template",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Item-measurement_formula""","Item","Section Break","Measurement Formula","size_item","","","","measurement_formula",0,0,0,0,"","",0,"eval:doc.item_group=='Tailoring' && !doc.__islocal",0,0,0,0,0,0
 "","""Item-size_item""","Item","Table","Size Item","more_details","","Size Item","","size_item",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Item-items_image""","Item","Button","Items Images","barcode","","","","items_image",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Item-items_image""","Item","Button","Items Images","size_for_merchandise","","","","items_image",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Sales Invoice-delivery_date""","Sales Invoice","Date","Delivery Date","mode_of_payment","","","","delivery_date",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Item-item_category""","Item","Link","Item Category","item_sub_group","","Item Category","","item_category",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Item-item_sub_group""","Item","Link","Item Sub Group","item_group","","Sub Groups","","item_sub_group",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Item Price-customer_rate""","Item Price","Table","Customer Rate","customer_rate_details","","Customer Rate","","customer_rate",0,0,0,0,"","",0,"",0,0,0,0,0,0
@@ -69,7 +103,6 @@ Purchase Return","","purpose_type",0,0,0,0,"","Material Issue",0,"",0,0,0,0,0,0
 "","""Stock Entry Detail-target_branch""","Stock Entry Detail","Link","Target Branch","col_break1","","Branches","","target_branch",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Stock Entry Detail-source_warehouse""","Stock Entry Detail","Link","Source Warehouse","s_warehouse","","Warehouse","","source_warehouse",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""User-branch""","User","Link","Branch","time_zone","","Branch","","branch",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Material Request Item-from_warehouse""","Material Request Item","Link","From Warehouse","warehouse","","Warehouse","","from_warehouse",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Task-process_name""","Task","Data","Process Name","exp_end_date","","","","process_name",0,0,1,0,"","",0,"",0,0,0,0,0,0
 "","""Task-item_name""","Task","Data","Item Name","process_name","","","","item_name",0,0,1,0,"","",0,"",0,0,0,0,0,0
 "","""Company-registered_email_id""","Company","Data","Registered email id","address","","","","registered_email_id",0,0,0,0,"","",0,"",0,0,0,0,0,0
@@ -80,24 +113,6 @@ Left","","table_view",0,1,0,0,"","",0,"",0,0,0,0,0,0
 "","""Branch-branch_type""","Branch","Select","Branch Type","warehouse","","Showroom
 Production
 Warehouse","","branch_type",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Branch-y""","Branch","Column Break","","currency","","Currency","","y",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Branch-currency""","Branch","Link","Currency","y","","Currency","","currency",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Branch-min_advance_payment""","Branch","Currency","Min Advance Payment","y","2","","","min_advance_payment",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Branch-payment_modes""","Branch","Link","Payment Modes","min_advance_payment","","Mode of Payment","","payment_modes",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Branch-branch_manager""","Branch","Link","Branch Manager","payment_modes","2","User","","branch_manager",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Branch-address_details""","Branch","Section Break","Address Details","holiday_list","2","","","address_details",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Branch-address_1""","Branch","Data","Address 1","address_details","2","","","address_1",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Branch-address_2""","Branch","Data","Address 2","address_1","2","","","address_2",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Branch-address_3""","Branch","Data","Address 3","address_2","2","","","address_3",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Branch-city""","Branch","Data","City","address_3","2","","","city",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Branch-state""","Branch","Data","State","city","2","","","state",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Branch-pin_code""","Branch","Data","Pin Code","state","2","","","pin_code",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Branch-country""","Branch","Link","Country","pin_code","2","Country","","country",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Branch-z""","Branch","Column Break","","country","2","","","z",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Branch-phone_no_1""","Branch","Data","Phone No 1","z","2","","","phone_no_1",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Branch-phone_no_2""","Branch","Data","Phone No 2","phone_no_1","2","","","phone_no_2",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Branch-mobile_no""","Branch","Data","Mobile No","phone_no_2","2","","","mobile_no",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Branch-fax_no""","Branch","Data","Fax No","mobile_no","2","","","fax_no",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Company-company_profie""","Company","Section Break","Company Profie","website","","","","company_profie",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Company-business_owner_name""","Company","Data","Business owner name","company_profie","","","","business_owner_name",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Company-address_line_1""","Company","Data","Address line 1","business_owner_name","","","","address_line_1",0,0,0,0,"","",0,"",0,0,0,0,0,0
@@ -112,7 +127,6 @@ Warehouse","","branch_type",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Company-correspondence_email_id""","Company","Data","Correspondence Email Id","registered_email_id","","","","correspondence_email_id",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Branch-holiday_list""","Branch","Link","Holiday List","branch_manager","","Holiday List","","holiday_list",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Company-section""","Company","Section Break","","company_logo","","","","section",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Branch-cost_center""","Branch","Link","Cost Center","fax_no","","Cost Center","","cost_center",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Company-columbrk""","Company","Column Break","columbrk","country2","","","","columbrk",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Company-phone_number_1""","Company","Data","Phone number 1","columbrk","","","","phone_number_1",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Company-phone_number_2""","Company","Data","Phone number 2","phone_number_1","","","","phone_number_2",0,0,0,0,"","",0,"",0,0,0,0,0,0
@@ -127,10 +141,8 @@ Warehouse","","branch_type",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Task-item_code""","Task","Link","Item Code","process_name","","Item","","item_code",0,0,1,0,"","",0,"",0,0,0,0,0,0
 "","""Sales Invoice Item-tailoring_size""","Sales Invoice Item","Link","Tailoring Size","fabric_qty","","Size","","tailoring_size",0,0,1,0,"","",1,"",0,0,0,0,0,0
 "","""Employee-skills""","Employee","Section Break","Skills","profile_type","","","Check / Uncheck skills  to assign the Employee.","skills",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Employee-skills_html""","Employee","HTML","Skills HTML","skills","","","Hello","skills_html",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Employee-profile_type""","Employee","Select","Profile Type","date_of_retirement","","Tailoring
 Regular","","profile_type",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Employee-employeeskills""","Employee","Table","EmployeeSkills","","","EmployeeSkill","","employeeskills",0,0,0,0,"","",1,"",0,0,0,0,0,0
 "","""Sales Invoice Items-fabric_owner""","Sales Invoice Items","Select","Fabric Owner","trials","","Self
 Customer","","fabric_owner",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Sales Invoice Items-cut_fabric_status""","Sales Invoice Items","Select","Cut Fabric Status","fabric_owner","","Completed

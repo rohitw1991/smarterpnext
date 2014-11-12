@@ -4,22 +4,28 @@
 from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
+from frappe.utils import flt, cstr, nowdate, now, cint
 
 class AdminSignature(Document):
 	def get_invoices_list(self):
 		self.set('admin_note', [])
-		inv = frappe.db.sql(""" select name from `tabSales Invoice` where docstatus = 1
-			and ifnull(authenticated, 'No') = 'No'""", as_dict=1)
+		inv = frappe.db.sql(""" select name, authenticated from `tabSales Invoice` where docstatus = 1
+			and ifnull(authenticated, 'Rejected') = 'Rejected' """, as_dict=1)
 		if inv:
 			for s in inv:
 				ad = self.append('admin_note', {})
 				ad.sales_invoice = s.name
+				ad.status = s.authenticated
 		return "Done"
 
-	def authenticate_inv(self):
-		for s in self.get('admin_note'):
-			if s.sales_invoice and s.note:
-				frappe.db.sql(""" update `tabSales Invoice` set admin_authentication_note = '%s', authenticated='Yes'
-					where name ='%s'"""%(s.note, s.sales_invoice))
+	def processed_methods(self, invoice_no=None):
+		for d in self.get('admin_note'):
+			if invoice_no and invoice_no == d.sales_invoice and d.status and cint(d.select) == 1:
+				frappe.db.sql(""" update `tabSales Invoice` set admin_authentication_note = '%s', authenticated='%s'
+					where name ='%s'"""%(d.note, d.status, d.sales_invoice))
+				break
+			elif d.status and cint(d.select) == 1:
+				frappe.db.sql(""" update `tabSales Invoice` set admin_authentication_note = '%s', authenticated='%s'
+					where name ='%s'"""%(d.note, d.status, d.sales_invoice))
 		self.get_invoices_list()
-		return "Done"
+		return "Done"			

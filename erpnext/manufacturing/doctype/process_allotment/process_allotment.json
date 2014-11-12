@@ -74,6 +74,15 @@
    "precision": ""
   }, 
   {
+   "fieldname": "process_work_order", 
+   "fieldtype": "Link", 
+   "label": "Work Order", 
+   "options": "Work Order", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
    "fieldname": "serials_data", 
    "fieldtype": "Text", 
    "label": "Serial", 
@@ -124,6 +133,7 @@
    "default": "No", 
    "fieldname": "process_status_changes", 
    "fieldtype": "Select", 
+   "hidden": 1, 
    "label": "process_status_changes", 
    "options": "\nYes\nNo", 
    "permlevel": 0, 
@@ -152,6 +162,14 @@
    "precision": ""
   }, 
   {
+   "fieldname": "employee_name", 
+   "fieldtype": "Read Only", 
+   "label": "Employee Name", 
+   "options": "process_tailor.employee_name", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "start_date", 
    "fieldtype": "Date", 
    "label": "Start Date", 
@@ -166,9 +184,27 @@
    "precision": ""
   }, 
   {
+   "default": "No", 
+   "depends_on": "eval:doc.emp_status=='Completed'", 
+   "fieldname": "payment", 
+   "fieldtype": "Select", 
+   "label": "Payment", 
+   "options": "\nYes\nNo", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "depends_on": "eval:doc.payment=='Yes' && doc.emp_status=='Completed'", 
+   "fieldname": "wages", 
+   "fieldtype": "Currency", 
+   "label": "Wages", 
+   "permlevel": 0, 
+   "precision": "2"
+  }, 
+  {
    "fieldname": "assigned", 
    "fieldtype": "Button", 
-   "label": "Assigned", 
+   "label": "Add", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -187,6 +223,37 @@
    "precision": ""
   }, 
   {
+   "fieldname": "work_qty", 
+   "fieldtype": "Int", 
+   "label": "Qty", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "depends_on": "eval:doc.emp_status=='Assigned' || doc.emp_status=='Reassigned'", 
+   "fieldname": "estimated_time", 
+   "fieldtype": "Int", 
+   "label": "Estimated Time", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "depends_on": "eval:doc.emp_status=='Completed'", 
+   "fieldname": "from_time", 
+   "fieldtype": "Datetime", 
+   "label": "From Time", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "depends_on": "eval:doc.emp_status=='Completed'", 
+   "fieldname": "completed_time", 
+   "fieldtype": "Int", 
+   "label": "Completed Time", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "task", 
    "fieldtype": "Data", 
    "label": "Task", 
@@ -195,13 +262,23 @@
    "read_only": 1
   }, 
   {
-   "fieldname": "process_work_order", 
-   "fieldtype": "Link", 
-   "label": "Work Order", 
-   "options": "Work Order", 
+   "default": "No", 
+   "depends_on": "eval:doc.emp_status=='Completed'", 
+   "fieldname": "extra_charge", 
+   "fieldtype": "Select", 
+   "label": "Extra Charge", 
+   "options": "\nYes\nNo", 
    "permlevel": 0, 
-   "precision": "", 
-   "read_only": 1
+   "precision": ""
+  }, 
+  {
+   "default": "", 
+   "depends_on": "eval:doc.extra_charge=='Yes'&& doc.emp_status=='Completed'", 
+   "fieldname": "extra_charge_amount", 
+   "fieldtype": "Currency", 
+   "label": "Extra Charge Amount", 
+   "permlevel": 0, 
+   "precision": "2"
   }, 
   {
    "fieldname": "section_break_23", 
@@ -216,7 +293,7 @@
    "options": "Employee Details", 
    "permlevel": 0, 
    "precision": "", 
-   "read_only": 1
+   "read_only": 0
   }, 
   {
    "fieldname": "section_break_19", 
@@ -330,7 +407,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-10-28 16:38:01.962673", 
+ "modified": "2014-11-09 19:54:40.544857", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Process Allotment", 

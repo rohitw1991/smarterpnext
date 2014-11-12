@@ -33,8 +33,34 @@ class SalarySlip(TransactionBase):
 		return struct and struct[0][0] or ''
 
 	def pull_sal_struct(self, struct):
-		from erpnext.hr.doctype.salary_structure.salary_structure import make_salary_slip2
-		self.update(make_salary_slip2(struct, self).as_dict())
+		from erpnext.hr.doctype.salary_structure.salary_structure import make_salary_slip
+		self.update(make_salary_slip(struct, self).as_dict())
+
+		m = frappe.get_doc('Salary Manager').get_month_details(self.fiscal_year, self.month)
+
+		drawings_overtime_details = frappe.db.sql("""select sum(dd.drawing_amount) as drawings, sum(dd.overtime) as overtime, group_concat(name) as name from `tabDaily Drawing` dd 
+				where dd.employee_id = '%(employee)s' 
+					and ifnull(dd.flag, 'No') != 'Yes'
+					and dd.date between STR_TO_DATE('%(from_date)s','%(format)s') 
+						and  STR_TO_DATE('%(to_date)s','%(format)s')"""%{'format': '%Y-%m-%d', 
+						'from_date': m['month_start_date'], 'to_date': m['month_end_date'], 'employee':self.employee},as_dict=1)
+
+		self.deduction = drawings_overtime_details
+
+		mapper = {'overtime': ['Overtime', drawings_overtime_details[0].get('overtime') if len(drawings_overtime_details) > 0 else 0.0]}
+
+		for types in mapper:
+			d = self.append('earning_details', {})
+			d.e_type =mapper.get(types)[0]
+			d.e_amount = mapper.get(types)[1]
+			d.e_modified_amount = mapper.get(types)[1]
+
+		mapper = {'drawings': ['Drawing', drawings_overtime_details[0].get('drawings') if len(drawings_overtime_details) > 0 else 0.0]}
+
+		for types in mapper:
+			d = self.append('deduction_details', {})
+			d.d_type = mapper.get(types)[0]
+			d.d_modified_amount = mapper.get(types)[1]
 
 	def pull_emp_details(self):
 		emp = frappe.db.get_value("Employee", self.employee,

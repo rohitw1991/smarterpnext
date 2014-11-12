@@ -32,7 +32,7 @@
   {
    "fieldname": "serial_no", 
    "fieldtype": "Small Text", 
-   "hidden": 1, 
+   "hidden": 0, 
    "label": "Serial No", 
    "permlevel": 0, 
    "precision": ""
@@ -298,6 +298,14 @@
    "options": "Process Log", 
    "permlevel": 0, 
    "precision": ""
+  }, 
+  {
+   "fieldname": "issue_raw_material", 
+   "fieldtype": "Table", 
+   "label": "Issue Raw Material", 
+   "options": "Issue Raw Material", 
+   "permlevel": 0, 
+   "precision": ""
   }
  ], 
  "hide_heading": 0, 
@@ -307,7 +315,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-10-31 22:21:41.652585", 
+ "modified": "2014-11-11 00:21:26.782631", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Production Dashboard Details", 

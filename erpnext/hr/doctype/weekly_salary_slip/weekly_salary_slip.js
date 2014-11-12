@@ -6,12 +6,18 @@ cur_frm.cscript.from_date= function(doc, cdt, cdn) {
 	console.log(doc.to_date);
 	if (doc.from_date && doc.to_date)
 	{
-		var arg = {'month_start_date':doc.from_date, 'month_end_date':doc.to_date}
-		get_server_fields('get_week_details',JSON.stringify(arg),doc.to_date,doc, cdt, cdn, 1 , function(r){
+		if(doc.salary_type == 'Weekly' && frappe.datetime.get_diff(doc.to_date, doc.from_date) <= 8){
+			var arg = {'month_start_date':doc.from_date, 'month_end_date':doc.to_date}
+			get_server_fields('get_week_details',JSON.stringify(arg),doc.to_date,doc, cdt, cdn, 1 , function(r){
 
-		refresh_field('total_days_in_month')	
-		// console.log(r);
-     });
+			refresh_field('total_days_in_month')	
+			// console.log(r);
+			});
+		}
+		else{
+			msgprint("Dates not is same week")
+		}
+     
 	}
 };
 
@@ -20,11 +26,16 @@ cur_frm.cscript.to_date= function(doc, cdt, cdn) {
 	// console.log(d.to_date);
 	if (doc.from_date && doc.to_date)
 	{
-		var arg = {'from_date':doc.from_date, 'to_date':doc.to_date}
-		get_server_fields('get_week_details',JSON.stringify(arg),doc.to_date,doc, cdt, cdn, 1 , function(r){
-		console.log(r.total_days_in_month)	
-		refresh_field('total_days_in_month');
-     });
+		if(doc.salary_type == 'Weekly' && frappe.datetime.get_diff(doc.to_date, doc.from_date) <= 8){
+			var arg = {'month_start_date':doc.from_date, 'month_end_date':doc.to_date}
+			get_server_fields('get_week_details',JSON.stringify(arg),doc.to_date,doc, cdt, cdn, 1 , function(r){
+				console.log(r.total_days_in_month)	
+				refresh_field('total_days_in_month');
+			});
+		}
+		else{
+			msgprint("Dates not is same week")
+		}
 	}
 };
 
@@ -51,6 +62,7 @@ cur_frm.cscript.fiscal_year = function(doc,dt,dn){
 			var doc = locals[dt][dn];
 			cur_frm.refresh();
 			calculate_all(doc, dt, dn);
+			refresh_field(['earning_details','deduction_details'])
 		});
 }
 

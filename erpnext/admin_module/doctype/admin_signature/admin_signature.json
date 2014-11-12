@@ -9,6 +9,47 @@
  "document_type": "", 
  "fields": [
   {
+   "fieldname": "select_all", 
+   "fieldtype": "Check", 
+   "in_list_view": 1, 
+   "label": "Select All", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "column_break_2", 
+   "fieldtype": "Column Break", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "apply_status", 
+   "fieldtype": "Select", 
+   "label": "Apply Status", 
+   "options": "\nApproved\nRejected\nRemove", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "column_break_4", 
+   "fieldtype": "Column Break", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "processed", 
+   "fieldtype": "Button", 
+   "label": "Processed", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "section_break_6", 
+   "fieldtype": "Section Break", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "allow_on_submit": 0, 
    "fieldname": "admin_note", 
    "fieldtype": "Table", 
@@ -31,6 +72,7 @@
   {
    "fieldname": "update", 
    "fieldtype": "Button", 
+   "hidden": 1, 
    "label": "Authenticate", 
    "permlevel": 0, 
    "precision": ""
@@ -44,7 +86,7 @@
  "is_submittable": 0, 
  "issingle": 1, 
  "istable": 0, 
- "modified": "2014-11-02 18:40:51.359902", 
+ "modified": "2014-11-07 00:27:45.786836", 
  "modified_by": "Administrator", 
  "module": "Admin Module", 
  "name": "Admin Signature", 

@@ -30,7 +30,7 @@
    "permlevel": 0, 
    "precision": "", 
    "print_hide": 0, 
-   "read_only": 0, 
+   "read_only": 1, 
    "report_hide": 0, 
    "reqd": 0, 
    "search_index": 0, 
@@ -96,7 +96,7 @@
   {
    "fieldname": "outstanding", 
    "fieldtype": "Currency", 
-   "hidden": 1, 
+   "hidden": 0, 
    "in_list_view": 1, 
    "label": "Outstanding", 
    "permlevel": 0, 
@@ -104,12 +104,11 @@
    "read_only": 1
   }, 
   {
-   "fieldname": "min_payment", 
+   "fieldname": "balance_amount", 
    "fieldtype": "Currency", 
-   "hidden": 0, 
-   "label": "Min Payment", 
+   "label": "Balance Amount", 
    "permlevel": 0, 
-   "precision": "", 
+   "precision": "2", 
    "read_only": 1
   }, 
   {
@@ -118,10 +117,26 @@
    "fieldtype": "Select", 
    "in_list_view": 1, 
    "label": "Status", 
-   "options": "\nPending\nCompleted", 
+   "options": "\nPending\nApproved\nRejected\nRemove", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 0
+  }, 
+  {
+   "fieldname": "min_payment", 
+   "fieldtype": "Currency", 
+   "hidden": 1, 
+   "label": "Min Payment", 
    "permlevel": 0, 
    "precision": "", 
    "read_only": 1
+  }, 
+  {
+   "fieldname": "make_payment_inv", 
+   "fieldtype": "Button", 
+   "label": "Make Payment", 
+   "permlevel": 0, 
+   "precision": ""
   }
  ], 
  "hide_heading": 0, 
@@ -131,7 +146,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-10-10 11:30:47.704610", 
+ "modified": "2014-11-13 00:13:57.565172", 
  "modified_by": "Administrator", 
  "module": "Dashboard", 
  "name": "Cashier Payment", 

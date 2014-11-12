@@ -1,7 +1,7 @@
 # Copyright (c) 2013, Web Notes Technologies Pvt. Ltd. and Contributors and contributors
 # For license information, please see license.txt
 
-from __future__ import unicode_literals
+# from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
 from frappe.utils import cstr, flt, getdate, comma_and
@@ -71,14 +71,7 @@ class WorkOrder(Document):
 		return "Done"
 
 	def apply_rules(self, args):
-		for d in self.get('measurement_item'):
-			measurement_formula_template = frappe.db.get_value('Item', args.get('item'),'measurement_formula_template')
-			measurement_data = frappe.db.sql("select * from `tabMeasurement Rules` where parent='%s'"%(measurement_formula_template),as_dict=1)
-			for data in measurement_data:
-				if data.target_parameter == d.parameter and args.get('parameter') == data.parameter:
-					value = (data.formula).replace('S',cstr(args.get('value')))
-					d.value = cstr(eval(value))
-		return "Done"
+		apply_measurement_rules(self.get('measurement_item'), args)
 
 	def on_submit(self):
 		self.update_status('Completed')
@@ -106,3 +99,25 @@ class WorkOrder(Document):
 					where sales_invoice_no='%s' and article_code='%s' 
 					"""%(self.name, self.sales_invoice_no, self.item_code))
 
+@frappe.whitelist()
+def apply_measurement_rules(measurement_details=None, param_args=None):
+	result_list = []
+	if isinstance(measurement_details, basestring):
+		measurement_details = eval(measurement_details)
+	if isinstance(param_args, basestring):
+		param_args = eval(param_args)
+
+	for d in measurement_details:
+			if isinstance(d, dict):
+				d = type('new_dict', (object,), d)
+
+			measurement_formula_template = frappe.db.get_value('Item', param_args.get('item'),'measurement_formula_template')
+			measurement_data = frappe.db.sql("select * from `tabMeasurement Rules` where parent='%s'"%(measurement_formula_template),as_dict=1)
+
+			for data in measurement_data:
+				if data.target_parameter == d.parameter and param_args.get('parameter') == data.parameter:
+					value = (data.formula).replace('S',cstr(param_args.get('value')))
+					d.value = cstr(eval(value))
+					result_list.append({'parameter': data.target_parameter, 'value': d.value})
+					
+	return result_list

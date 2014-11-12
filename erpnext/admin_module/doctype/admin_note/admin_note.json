@@ -9,6 +9,14 @@
  "document_type": "", 
  "fields": [
   {
+   "fieldname": "select", 
+   "fieldtype": "Check", 
+   "in_list_view": 1, 
+   "label": "Select", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "allow_on_submit": 0, 
    "fieldname": "sales_invoice", 
    "fieldtype": "Link", 
@@ -46,6 +54,28 @@
    "reqd": 0, 
    "search_index": 0, 
    "set_only_once": 0
+  }, 
+  {
+   "fieldname": "column_break_4", 
+   "fieldtype": "Column Break", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "status", 
+   "fieldtype": "Select", 
+   "in_list_view": 1, 
+   "label": "Status", 
+   "options": "\nApproved\nRejected\nRemove", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "process", 
+   "fieldtype": "Button", 
+   "label": "Process", 
+   "permlevel": 0, 
+   "precision": ""
   }
  ], 
  "hide_heading": 0, 
@@ -55,7 +85,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-11-02 18:06:58.474083", 
+ "modified": "2014-11-07 00:24:24.807722", 
  "modified_by": "Administrator", 
  "module": "Admin Module", 
  "name": "Admin Note", 

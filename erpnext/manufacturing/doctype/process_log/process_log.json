@@ -93,6 +93,13 @@
    "set_only_once": 0
   }, 
   {
+   "fieldname": "trials_date", 
+   "fieldtype": "Datetime", 
+   "label": "Trials Date", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "allow_on_submit": 0, 
    "fieldname": "actual_fabric", 
    "fieldtype": "Check", 
@@ -167,6 +174,20 @@
    "reqd": 0, 
    "search_index": 0, 
    "set_only_once": 0
+  }, 
+  {
+   "fieldname": "skip_trial", 
+   "fieldtype": "Check", 
+   "label": "Skip Trial", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "skip_process", 
+   "fieldtype": "Check", 
+   "label": "Skip Process", 
+   "permlevel": 0, 
+   "precision": ""
   }
  ], 
  "hide_heading": 0, 
@@ -176,7 +197,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-10-27 12:59:07.560121", 
+ "modified": "2014-11-11 16:19:11.510916", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Process Log", 

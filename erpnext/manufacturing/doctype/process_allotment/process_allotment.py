@@ -7,8 +7,29 @@ from frappe.model.document import Document
 from frappe import _
 from frappe.utils import cstr, flt, getdate, comma_and, nowdate, cint, now, nowtime
 from erpnext.accounts.accounts_custom_methods import delte_doctype_data
+import datetime
 
 class ProcessAllotment(Document):
+	def on_update(self):
+		self.create_time_log()
+
+	def create_time_log(self):
+		if self.get('employee_details'):
+			for data in self.get('employee_details'):
+				if cint(data.idx) == cint(len(self.get('employee_details'))):
+					status = 'Closed' if data.employee_status == 'Completed' else 'Open'
+					frappe.db.sql("update `tabTask` set status ='%s' where name='%s'"%( status, data.tailor_task))
+				if data.employee_status =='Completed' and not data.time_log_name:
+					tl = frappe.new_doc('Time Log')
+					tl.from_time = data.tailor_from_time
+					tl.hours = flt(data.work_completed_time)/60
+					tl.to_time = datetime.datetime.strptime(tl.from_time, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(hours = flt(tl.hours))
+					tl.activity_type = self.process
+					tl.task = data.tailor_task
+					tl.project = self.sales_invoice_no
+					tl.submit()
+					data.time_log_name = tl.name
+
 	def get_details(self, item):
 		self.set('wo_process', [])
 		args = frappe.db.sql("""select * from `tabProcess Item`
@@ -43,6 +64,7 @@ class ProcessAllotment(Document):
 		tsk.project = self.sales_invoice_no
 		tsk.exp_start_date = self.start_date
 		tsk.exp_end_date = self.end_date
+		tsk.status = 'Open'
 		tsk.process_name = self.process
 		tsk.item_code = self.item
 		tsk.sales_order_number = self.sales_invoice_no
@@ -203,11 +225,26 @@ class ProcessAllotment(Document):
 		emp.employee_name = frappe.db.get_value('Employee', self.process_tailor, 'employee_name')
 		if self.emp_status=='Assigned':
 			self.task = self.create_task()
-		emp.task = self.task
+		emp.tailor_task = self.task
 		emp.employee_status = self.emp_status
+		emp.tailor_payment = self.payment
+		emp.tailor_wages = self.wages
+		emp.tailor_extra_wages = self.extra_charge
+		emp.tailor_extra_amt = self.extra_charge_amount
+		emp.tailor_from_time = self.from_time
+		emp.work_estimated_time = self.estimated_time
+		emp.work_completed_time = self.completed_time
+		emp.assigned_work_qty = self.work_qty 
 		return "Done"
 
+	def calculate_estimates_time(self):
+		self.estimated_time = cint(self.work_qty) * cint(frappe.db.get_value('EmployeeSkill',{'parent':self.process_tailor, 'process':self.process, 'item_code': self.item},'time'))
+		return "Done"
 
+	def calculate_wages(self):
+		self.wages = 0.0
+		if self.payment == 'Yes':
+			self.wages = cint(self.work_qty) * cint(frappe.db.get_value('EmployeeSkill',{'parent':self.process_tailor, 'process':self.process, 'item_code': self.item},'cost'))
 
 def create_se(raw_material):
 	count = 0

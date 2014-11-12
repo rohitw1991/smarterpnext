@@ -162,6 +162,14 @@ class MaterialRequest(BuyingController):
 		self.per_ordered = flt((per_ordered / flt(len(item_doclist))) * 100.0, 2)
 		frappe.db.set_value(self.doctype, self.name, "per_ordered", self.per_ordered)
 
+	def get_for_warehouse(self, branch):
+		for d in self.get('indent_details'):
+			if d.for_branch == branch:
+				d.warehouse = frappe.db.get_value('Branch',branch,'warehouse')
+			if d.from_branch == branch:
+				d.from_warehouse = frappe.db.get_value('Branch',branch,'warehouse')
+		return "Done"
+
 def update_completed_qty(doc, method):
 	if doc.doctype == "Stock Entry":
 		material_request_map = {}

@@ -10,6 +10,42 @@
  "document_type": "", 
  "fields": [
   {
+   "fieldname": "basic_details", 
+   "fieldtype": "Section Break", 
+   "label": "Basic Details", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "sales_invoice", 
+   "fieldtype": "Data", 
+   "label": "Sales Invoice", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
+   "fieldname": "customer", 
+   "fieldtype": "Link", 
+   "label": "Customer", 
+   "options": "Customer", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "customer_name", 
+   "fieldtype": "Data", 
+   "label": "Customer Name", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "column_break_4", 
+   "fieldtype": "Column Break", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "item_code", 
    "fieldtype": "Link", 
    "in_list_view": 1, 
@@ -29,14 +65,19 @@
    "precision": ""
   }, 
   {
-   "fieldname": "column_break_3", 
-   "fieldtype": "Column Break", 
+   "fieldname": "pdd", 
+   "fieldtype": "Data", 
+   "hidden": 0, 
+   "label": "PDD", 
+   "no_copy": 1, 
    "permlevel": 0, 
-   "precision": ""
+   "precision": "", 
+   "print_hide": 1
   }, 
   {
    "fieldname": "work_order", 
    "fieldtype": "Data", 
+   "hidden": 1, 
    "label": "Work Order", 
    "permlevel": 0, 
    "precision": "", 
@@ -76,7 +117,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-10-22 16:15:01.604830", 
+ "modified": "2014-11-12 11:40:59.204444", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Trials", 

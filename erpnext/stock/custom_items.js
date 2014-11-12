@@ -211,7 +211,7 @@ frappe.CustomerRate = Class.extend({
         this.remove_rates()
     },
 
-    make: function(data){
+    make: function(){
         if(this.data.branch && this.data.size){
             this.dialog = new frappe.ui.Dialog({
                 title:__(' Customer Rate'),
@@ -236,10 +236,10 @@ frappe.CustomerRate = Class.extend({
         }
     },
 
-    render_data: function(data){
+    render_data: function(){
         var me = this;
         if(this.data.costing_dict){
-            column = JSON.parse(data.costing_dict);
+            column = JSON.parse(me.data.costing_dict);
             $.each(column, function(i){
                 me.table = $(me.div).find('#mytable tbody').append('<tr><td>'+column[i].price_list+'</td><td><input type="Textbox" class="text_box" value="'+column[i].rate+'"></td><td>&nbsp;<button  class="remove">X</button></td></tr>')
             })
@@ -259,7 +259,7 @@ frappe.CustomerRate = Class.extend({
         })
     },
 
-    save_data: function(data){
+    save_data: function(){
         var me =this;
         $(this.control_trials.create_new.input).click(function(){
             var $rate_dict = {} 
