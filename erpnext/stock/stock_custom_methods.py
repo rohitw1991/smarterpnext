@@ -190,3 +190,13 @@ def delete_unnecessay_records(doc):
 	if bom_list:
 		frappe.db.sql("""delete from `tabSales BOM Item` 
 			where parenttype not in('Item') and name not in %s"""%("('"+bom_list+"')"), debug=1)
+
+def update_user_permissions_for_user(doc, method):
+	if doc.email:
+		frappe.permissions.add_user_permission("Branch", doc.branch, doc.email)
+		frappe.permissions.add_user_permission("Cost Center", frappe.db.get_value('Branch', doc.branch, 'cost_center'), doc.email)
+
+def update_user_permissions_for_emp(doc, method):
+	if doc.user:
+		frappe.permissions.add_user_permission("Branch", doc.branch, doc.user_id)
+		frappe.permissions.add_user_permission("Cost Center", frappe.db.get_value('Branch', doc.branch, 'cost_center'), doc.user_id)

@@ -234,7 +234,11 @@ class ProcessAllotment(Document):
 		emp.tailor_from_time = self.from_time
 		emp.work_estimated_time = self.estimated_time
 		emp.work_completed_time = self.completed_time
-		emp.assigned_work_qty = self.work_qty 
+		emp.assigned_work_qty = self.work_qty
+		emp.deduct_late_work = self.deduct_late_work
+		emp.latework = self.latework
+		emp.cost = self.cost
+
 		return "Done"
 
 	def calculate_estimates_time(self):
@@ -245,6 +249,10 @@ class ProcessAllotment(Document):
 		self.wages = 0.0
 		if self.payment == 'Yes':
 			self.wages = cint(self.work_qty) * cint(frappe.db.get_value('EmployeeSkill',{'parent':self.process_tailor, 'process':self.process, 'item_code': self.item},'cost'))
+
+	def calc_late_work_amt(self):
+		self.cost = flt(self.latework) * flt(frappe.db.get_value('Item',self.item,"late_work_cost"))
+		return "Done"
 
 def create_se(raw_material):
 	count = 0

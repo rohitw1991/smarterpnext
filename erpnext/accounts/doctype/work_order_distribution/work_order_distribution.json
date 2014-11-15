@@ -88,7 +88,7 @@
    "fieldname": "tailor_warehouse", 
    "fieldtype": "Link", 
    "label": "Tailor Warehouse", 
-   "options": "Branch", 
+   "options": "Branches", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -108,7 +108,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-10-31 19:28:27.738685", 
+ "modified": "2014-11-13 16:37:54.884869", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Work Order Distribution", 

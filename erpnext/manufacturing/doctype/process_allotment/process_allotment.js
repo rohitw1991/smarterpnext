@@ -104,3 +104,10 @@ cur_frm.cscript.payment = function(doc, cdt, cdn){
 	})
 	
 }
+
+cur_frm.cscript.latework = function(doc, cdt, cdn){
+	get_server_fields('calc_late_work_amt','','',doc, cdt, cdn,1, function(){
+		refresh_field('cost')	
+	})
+	
+}

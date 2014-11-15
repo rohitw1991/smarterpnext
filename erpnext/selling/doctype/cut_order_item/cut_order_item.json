@@ -9,6 +9,13 @@
  "document_type": "", 
  "fields": [
   {
+   "fieldname": "select", 
+   "fieldtype": "Check", 
+   "label": "Select", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "invoice_no", 
    "fieldtype": "Link", 
    "in_list_view": 1, 
@@ -75,6 +82,28 @@
    "read_only": 1
   }, 
   {
+   "fieldname": "actual_site", 
+   "fieldtype": "Data", 
+   "label": "Actual Branch", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "fabric_site", 
+   "fieldtype": "Data", 
+   "label": "Fabric Stock Branch", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "cut_order_id", 
+   "fieldtype": "Link", 
+   "label": "Cut Order Id", 
+   "options": "Cut Order", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "article_serial_no", 
    "fieldtype": "Data", 
    "in_list_view": 1, 
@@ -91,7 +120,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-10-28 14:50:03.671770", 
+ "modified": "2014-11-15 01:14:20.149009", 
  "modified_by": "Administrator", 
  "module": "Selling", 
  "name": "Cut Order Item", 

@@ -10,12 +10,71 @@
  "document_type": "", 
  "fields": [
   {
-   "fieldname": "s", 
-   "fieldtype": "Data", 
+   "fieldname": "invoice_no", 
+   "fieldtype": "Link", 
    "in_list_view": 1, 
-   "label": "s", 
+   "label": "Invoice No", 
+   "options": "Sales Invoice", 
    "permlevel": 0, 
    "precision": ""
+  }, 
+  {
+   "fieldname": "article_code", 
+   "fieldtype": "Link", 
+   "in_list_view": 1, 
+   "label": "Article Code", 
+   "options": "Item", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "fabric_code", 
+   "fieldtype": "Link", 
+   "in_list_view": 1, 
+   "label": "Fabric Code", 
+   "options": "Item", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "qty", 
+   "fieldtype": "Data", 
+   "in_list_view": 1, 
+   "label": "Qty", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "article_serial_no", 
+   "fieldtype": "Data", 
+   "in_list_view": 1, 
+   "label": "Article Serial No", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "actual_site", 
+   "fieldtype": "Data", 
+   "label": "Actual Site", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "fabric_site", 
+   "fieldtype": "Data", 
+   "label": "Fabric Site ", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "amended_from", 
+   "fieldtype": "Link", 
+   "label": "Amended From", 
+   "no_copy": 1, 
+   "options": "Cut Order", 
+   "permlevel": 0, 
+   "print_hide": 1, 
+   "read_only": 1
   }
  ], 
  "hide_heading": 0, 
@@ -25,7 +84,7 @@
  "is_submittable": 1, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-09-19 14:42:55.148496", 
+ "modified": "2014-11-14 18:42:57.978763", 
  "modified_by": "Administrator", 
  "module": "Selling", 
  "name": "Cut Order", 

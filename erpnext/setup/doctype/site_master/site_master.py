@@ -149,13 +149,13 @@ def validate_validity(doc, method):
 			frappe.errprint("else res1 ")
 			frappe.errprint(res1)
 	 		if res1 and res1[0][0]==2:
-	 			frappe.errprint("else if")
-	 			#frappe.db.sql("update `tabUser`set no_of_users=no_of_users-1  where name='Administrator'")
 				from frappe.utils import nowdate,add_months,cint
 				doc.validity_start_date=nowdate()
 				doc.validity_end_date=add_months(nowdate(),1)
 			else:	
-	 			frappe.throw(_("Your User Creation limit is exceeded . Please contact administrator"))
+				pass
+				#Comment by rohit
+	 			# frappe.throw(_("Your User Creation limit is exceeded . Please contact administrator"))
 
 	elif(get_url()!='http://smarttailor'):
 		frappe.errprint("updating existing user not smarttailor")

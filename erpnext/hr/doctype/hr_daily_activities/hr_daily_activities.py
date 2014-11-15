@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
 from frappe.utils import flt, today
+from tools.custom_data_methods import get_user_branch
 
 class HRDailyActivities(Document):
 	def get_employee(self):
@@ -32,7 +33,8 @@ class HRDailyActivities(Document):
 			att.employee_name = employee_details.employee_name
 			att.status = employee_details.status
 			att.att_date = self.date
-		# att.submit()
+			att.branch = get_user_branch()
+			att.submit()
 		
 	def create_drawing_entry(self, employee_details, drawings_id):
 		# date, employee_id, employee_name, amount

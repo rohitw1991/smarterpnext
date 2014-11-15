@@ -80,6 +80,28 @@
    "read_only": 1
   }, 
   {
+   "fieldname": "deduct_late_work", 
+   "fieldtype": "Select", 
+   "label": "Deduct Late Work", 
+   "options": "\nYes\nNo", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "latework", 
+   "fieldtype": "Data", 
+   "label": "Latework", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "cost", 
+   "fieldtype": "Data", 
+   "label": "Cost", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "column_break_6", 
    "fieldtype": "Column Break", 
    "permlevel": 0, 
@@ -151,7 +173,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-11-11 00:21:40.821804", 
+ "modified": "2014-11-13 21:39:35.111414", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Employee Details", 

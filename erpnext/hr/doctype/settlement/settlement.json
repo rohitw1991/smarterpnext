@@ -2,6 +2,7 @@
  "allow_copy": 0, 
  "allow_import": 0, 
  "allow_rename": 0, 
+ "autoname": "field:employee_id", 
  "creation": "2014-11-09 20:13:14.435747", 
  "custom": 0, 
  "docstatus": 0, 
@@ -65,7 +66,7 @@
   {
    "fieldname": "assigned_but_not_finished_task", 
    "fieldtype": "Section Break", 
-   "label": "Non Complited Assignments", 
+   "label": "Non Completed Assignments", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -139,7 +140,7 @@
  "is_submittable": 1, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-11-09 20:42:15.083592", 
+ "modified": "2014-11-14 15:55:15.766723", 
  "modified_by": "Administrator", 
  "module": "HR", 
  "name": "Settlement", 

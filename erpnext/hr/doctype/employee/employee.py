@@ -220,10 +220,3 @@ def update_user_permissions(doc, method):
 	if "Employee" in [d.role for d in doc.get("user_roles")]:
 		employee = frappe.get_doc("Employee", {"user_id": doc.name})
 		employee.update_user_permissions()
-
-
-@frappe.whitelist()
-def get_all_skills(arg=None):
-	"""return all roles"""
-	return [r[0] for r in frappe.db.sql("""select name from tabSkills
-		""")]			

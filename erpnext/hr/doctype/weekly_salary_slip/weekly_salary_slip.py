@@ -68,7 +68,7 @@ class WeeklySalarySlip(TransactionBase):
 
 		mapper = {'drawings': ['Drawings', drawings_overtime_details[0].get('drawings') if len(drawings_overtime_details) > 0 else 0.0], 
 				'loan': ['Loan',0.0], 
-				'late_work':['Late Work', 0.0]}
+				'late_work':['Late Work', earnings_details[0].get('cost') if len(earnings_details) > 0 else 0.0 ]}
 
 		self.set('deduction_details',[])
 		for types in mapper:
@@ -77,16 +77,16 @@ class WeeklySalarySlip(TransactionBase):
 			d.d_modified_amount = mapper.get(types)[1]
 
 	def get_mapper_details(self):
-		earnings_details = frappe.db.sql("""select sum(tailor_wages) as wages , sum(ifnull(tailor_extra_amt,0)) as extra_amt , group_concat(ed.name) as name
+		earnings_details = frappe.db.sql("""select sum(tailor_wages) as wages , sum(ifnull(tailor_extra_amt,0)) as extra_amt , sum(cost) as cost, group_concat(ed.name) as name
 						from `tabEmployee Details` ed, `tabTime Log` tl
 							where employee_status = 'Completed' 
 								and tailor_task is not null 
-								and date(tl.to_time) < curdate()
+								and date(tl.to_time) < date('%s')
 								and ed.tailor_task = tl.task
 								and tl.name = ed.time_log_name
 								and ifnull(ed.flag, 'No') != 'Yes'
 								and ed.employee = '%s'
-						"""%self.employee, as_dict=1)
+						"""%(self.to_date, self.employee), as_dict=1)
 
 		drawings_overtime_details = frappe.db.sql("""select sum(dd.drawing_amount) as drawings, sum(dd.overtime) as overtime, group_concat(name) as name from `tabDaily Drawing` dd 
 				where dd.employee_id = '%(employee)s' 

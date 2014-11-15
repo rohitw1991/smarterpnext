@@ -108,7 +108,7 @@
   {
    "fieldname": "principle", 
    "fieldtype": "Currency", 
-   "label": "Principle", 
+   "label": "Principal", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -172,7 +172,7 @@
   {
    "fieldname": "pending_amount", 
    "fieldtype": "Currency", 
-   "label": "Pending AMount", 
+   "label": "Pending Amount", 
    "permlevel": 0, 
    "precision": "2", 
    "read_only": 1
@@ -185,7 +185,7 @@
  "is_submittable": 1, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-11-11 18:00:16.298622", 
+ "modified": "2014-11-13 11:39:41.437813", 
  "modified_by": "Administrator", 
  "module": "HR", 
  "name": "Loan", 

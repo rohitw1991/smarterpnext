@@ -568,7 +568,7 @@
    "fieldname": "merchandise_branch", 
    "fieldtype": "Link", 
    "label": "Merchandise Branch", 
-   "options": "Branch", 
+   "options": "Branches", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -908,7 +908,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-10-31 19:36:49.857166", 
+ "modified": "2014-11-13 14:52:30.612262", 
  "modified_by": "Administrator", 
  "module": "Selling", 
  "name": "Merchandise Items", 

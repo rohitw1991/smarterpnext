@@ -59,7 +59,8 @@ doc_events = {
 	"User": {
 		"validate": [
 		"erpnext.hr.doctype.employee.employee.validate_employee_role",
-		"erpnext.setup.doctype.site_master.site_master.validate_validity"
+		"erpnext.setup.doctype.site_master.site_master.validate_validity",
+		"erpnext.stock.stock_custom_methods.update_user_permissions_for_user"
 		],
 		"on_update":[ 
 		"erpnext.hr.doctype.employee.employee.update_user_permissions",
@@ -67,17 +68,20 @@ doc_events = {
 		],
 	},
 	"Branch": {
-		"validate" : ["tools.tools_management.custom_methods.branches_creation"]
+		"validate" : "tools.tools_management.custom_methods.branches_creation"
 
 	},
 	"Sales Invoice": {
-		"on_update" : ["erpnext.accounts.accounts_custom_methods.add_data_in_work_order_assignment", "erpnext.accounts.accounts_custom_methods.create_serial_no"],#"tools.tools_management.custom_methods.update_work_order","tools.tools_management.custom_methods.create_se_or_mr"],
-		"validate"  : ["tools.tools_management.custom_methods.merge_tailoring_items"], 
+		"on_update" : ["erpnext.accounts.accounts_custom_methods.add_data_in_work_order_assignment", "erpnext.accounts.accounts_custom_methods.create_serial_no","tools.tools_management.custom_methods.create_se_or_mr"],#"tools.tools_management.custom_methods.update_work_order","tools.tools_management.custom_methods.create_se_or_mr"],
+		"validate"  : ["tools.tools_management.custom_methods.merge_tailoring_items", "erpnext.accounts.accounts_custom_methods.invoice_validation_method"], 
 		"on_submit" : ["tools.tools_management.custom_methods.sales_invoice_on_submit_methods","erpnext.accounts.accounts_custom_methods.create_production_process","erpnext.accounts.accounts_custom_methods.validate_sales_invoice"],
 		"on_cancel" : ["tools.tools_management.custom_methods.delete_project_aginst_si", "erpnext.accounts.accounts_custom_methods.delete_production_process"]
 	},
 	"Item":{
 		"on_update": "erpnext.stock.stock_custom_methods.item_validate_methods"
+	},
+	"Employee":{
+		"validate": "erpnext.stock.stock_custom_methods.update_user_permissions_for_emp"
 	}
 }
 

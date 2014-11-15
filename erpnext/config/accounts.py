@@ -7,6 +7,14 @@ def get_data():
 			"icon": "icon-star",
 			"items": [
 				{
+					"type": "page",
+					"name": "account-dashboard",
+					"icon": "icon-money",
+					"label": _("Dashboard"),
+					"description": _("Dashboard"),
+					"doctype": "Mreq",
+				},
+				{
 					"type": "doctype",
 					"name": "Journal Voucher",
 					"description": _("Accounting journal entries.")

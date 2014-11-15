@@ -275,11 +275,12 @@ def make_production_process_log(obj, process_list, args):
 def serial_no_log(obj, data):
 	sn = cstr(data.serial_no_data).split('\n')
 	for s in sn:
-		sn = obj.append('production_status_detail')
-		sn.item_code = data.tailoring_item
-		sn.serial_no = s
-		sn.branch = data.tailor_warehouse
-		sn.status = 'Ready'
+		if s:
+			sn = obj.append('production_status_detail')
+			sn.item_code = data.tailoring_item
+			sn.serial_no = s
+			sn.branch = data.tailor_warehouse
+			sn.status = 'Ready'
 
 def delete_production_process(doc, method):
 	for d in doc.get('entries'):
@@ -301,13 +302,14 @@ def add_data_in_work_order_assignment(doc, method):
 	if not doc.get('work_order_distribution'):
 		doc.set('work_order_distribution',[])
 	for d in doc.get('sales_invoice_items_one'):
-		if cint(d.check_split_qty)==1:
-			split_qty = eval(d.split_qty_dict)
-			for s in split_qty:
-				if s:
-					prepare_data_for_order(doc,d, split_qty[s]['qty'])
-		else:
-			prepare_data_for_order(doc, d, d.tailoring_qty)
+		if not frappe.db.get_value('Work Order Distribution', {'refer_doc':d.name},'refer_doc'):
+			if cint(d.check_split_qty)==1:
+				split_qty = eval(d.split_qty_dict)
+				for s in split_qty:
+					if s:
+						prepare_data_for_order(doc,d, split_qty[s]['qty'])
+			else:
+				prepare_data_for_order(doc, d, d.tailoring_qty)
 	validate_work_order_assignment(doc)
 	return "Done"
 
@@ -321,11 +323,13 @@ def prepare_data_for_order(doc, d, qty):
 		make_order(doc, d,qty, d.tailoring_item_code)
 
 def make_order(doc, d, qty, item_code):
-	if not frappe.db.get_value('Work Order Distribution', {'refer_doc':d.name},'refer_doc'):
-		e = doc.append('work_order_distribution', {})
+		e = frappe.new_doc('Work Order Distribution')
 		e.tailoring_item = item_code
 		e.tailor_item_name = frappe.db.get_value('Item', item_code, 'item_name')
 		e.tailor_qty = qty
+		e.parenttype = 'Sales Invoice'
+		e.parentfield = 'work_order_distribution'
+		e.parent = doc.name
 		e.serial_no_data = generate_serial_no(doc, item_code, qty)
 		e.tailor_fabric= d.fabric_code
 		e.refer_doc = d.name
@@ -335,8 +339,8 @@ def make_order(doc, d, qty, item_code):
 			e.tailor_work_order = create_work_order(doc, d, e.serial_no_data, item_code)
 		if not e.trials:
 			e.trials = make_schedule_for_trials(doc, d, e.tailor_work_order, item_code)
-		doc.save(ignore_permissions=True)
-	return "Done"
+		e.save()
+		return "Done"
 
 def make_schedule_for_trials(doc, args, work_order, item_code):
 	s =frappe.new_doc('Trials')
@@ -390,7 +394,7 @@ def generate_serial_no(doc, item_code, qty):
 	serial_no =''
 	temp_qty = qty
 	while cint(qty) > 0:
-		sn =frappe.new_doc('Serial No')
+		sn = frappe.new_doc('Serial No')
 		sn.name = make_autoname(str(doc.name) + '/.###') 
 		sn.serial_no = sn.name
 		sn.item_code = item_code
@@ -410,3 +414,7 @@ def get_process_detail(name):
 		ifnull(trials,'No') as trials, status from `tabProcess Log` 
 		where parent ='%s' and branch = '%s' 
 		order by process_data, trials"""%(name, branch),as_dict=1)
+
+def invoice_validation_method(doc, method):
+	if not doc.branch:
+		doc.branch = frappe.db.get_value('User', frappe.session.user, 'branch')

@@ -10,7 +10,7 @@ class AdminSignature(Document):
 	def get_invoices_list(self):
 		self.set('admin_note', [])
 		inv = frappe.db.sql(""" select name, authenticated from `tabSales Invoice` where docstatus = 1
-			and ifnull(authenticated, 'Rejected') = 'Rejected' """, as_dict=1)
+			and authenticated = 'Rejected' """, as_dict=1)
 		if inv:
 			for s in inv:
 				ad = self.append('admin_note', {})
