@@ -59,7 +59,6 @@ cur_frm.cscript.add = function(doc ,cdt , cdn){
 
 function check_serial_exist(sn_list, serial_no){
 	msg = "Done"
-	console.log(sn_list)
 		for(var i=0;i<sn_list.length;i++){
 			if (sn_list[i] == serial_no){
 				msg="False"
@@ -109,5 +108,10 @@ cur_frm.cscript.latework = function(doc, cdt, cdn){
 	get_server_fields('calc_late_work_amt','','',doc, cdt, cdn,1, function(){
 		refresh_field('cost')	
 	})
+	
+}
+
+cur_frm.cscript.validate = function(doc, cdt, cdn){
+	setTimeout(function(){refresh_field(['employee_details', 'task'])},1000)
 	
 }

@@ -521,9 +521,9 @@ cur_frm.fields_dict['merchandise_item'].grid.get_field('merchandise_item_code').
 
 cur_frm.fields_dict['sales_invoice_items_one'].grid.get_field('fabric_code').get_query = function(doc) {
 	return{
-		filters: {
-			'item_group': 'Fabric'
-		}
+		filters: [
+			['Item', 'item_group', 'in', 'Fabric, Fabric Swatch Item']
+		]
 	}
 }
 

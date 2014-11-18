@@ -46,6 +46,15 @@ class ProcessAllotment(Document):
 	def validate(self):
 		# self.assign_task()
 		self.update_process_status()
+		self.update_task()
+
+	def update_task(self):
+		if not self.task and not self.get("__islocal"):
+			self.task = self.create_task()
+		if self.get('employee_details'):
+			for d in self.get('employee_details'):
+				if not d.tailor_task:
+					d.tailor_task = self.task
 
 	def assign_task(self):
 		for d in self.get('wo_process'):
@@ -59,6 +68,7 @@ class ProcessAllotment(Document):
 					self.assigned_to_user(d)
 
 	def create_task(self):
+		self.validate_dates()
 		tsk = frappe.new_doc('Task')
 		tsk.subject = 'Do process %s for item %s'%(self.process, frappe.db.get_value('Item',self.item,'item_name'))
 		tsk.project = self.sales_invoice_no
@@ -223,8 +233,6 @@ class ProcessAllotment(Document):
 		emp = self.append('employee_details',{})
 		emp.employee = self.process_tailor
 		emp.employee_name = frappe.db.get_value('Employee', self.process_tailor, 'employee_name')
-		if self.emp_status=='Assigned':
-			self.task = self.create_task()
 		emp.tailor_task = self.task
 		emp.employee_status = self.emp_status
 		emp.tailor_payment = self.payment
@@ -253,6 +261,10 @@ class ProcessAllotment(Document):
 	def calc_late_work_amt(self):
 		self.cost = flt(self.latework) * flt(frappe.db.get_value('Item',self.item,"late_work_cost"))
 		return "Done"
+
+	def validate_dates(self):
+		if not self.start_date and not self.end_date:
+			frappe.throw(_('Start and End Date is necessary to create task'))
 
 def create_se(raw_material):
 	count = 0

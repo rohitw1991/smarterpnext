@@ -69,12 +69,13 @@ def create_work_order_measurement(data, wo_name, item_code):
 
 def create_process_wise_warehouse_detail(data, wo_name, item_code):
 	if wo_name:
-		for proc_wh in frappe.db.sql("""select process_name, warehouse, idx from `tabProcess Item`  
+		for proc_wh in frappe.db.sql("""select process_name, warehouse, idx, trials from `tabProcess Item`  
 			where parent = '%s'"""%item_code,as_list=1):
 			mi = frappe.new_doc('Process Wise Warehouse Detail')
  			mi.process = proc_wh[0]
  			mi.warehouse = proc_wh[1]
  			mi.idx = proc_wh[2]
+ 			mi.actual_fabric = cint(proc_wh[3])
  			mi.parent = wo_name
  			mi.parentfield = 'process_wise_warehouse_detail'
  			mi.parenttype = 'Work Order'
@@ -158,7 +159,7 @@ def make_trial(data, item_code, parent):
 # 		raw_material = frappe.db.sql("select raw_trial_no, raw_item_code, raw_item_sub_group from `tabRaw Material Item` where raw_process='%s' and raw_trial_no=%s and parent='%s'"%(args.get('process_name'),args.get('trial_no'),args.get('item')),as_dict=1)
 # 	if raw_material:
 # 		make_entry(raw_material, args)
-	return "Done"
+# 	return "Done"
 
 # def retrieve_fabric_raw_material(data, args):
 # 	return frappe.db.sql("""select '', name as raw_item_code, '' from `tabItem` 
@@ -245,6 +246,7 @@ def create_production_dashboard( process, data, doc):
 	pd.article_code = data.tailoring_item
 	pd.article_qty = data.tailor_qty
 	pd.fabric_code = data.tailor_fabric
+	pd.work_order = data.tailor_work_order
 	pd.warehouse = data.tailor_warehouse
 	pd.fabric_qty = data.tailor_fabric_qty
 	pd.serial_no = data.serial_no_data

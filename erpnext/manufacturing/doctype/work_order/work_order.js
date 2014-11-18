@@ -1,8 +1,3 @@
-cur_frm.cscript.onload = function(doc, dt, dn){
-  console.log("in the onload");
-  // location.reload();
-  // return get_server_fields('get_item_name','','',doc,dt,dn);
-}
 
 cur_frm.cscript.image = function(doc, cdt, cdn) {
 	var d = locals[cdt][cdn]
@@ -35,6 +30,17 @@ cur_frm.fields_dict.wo_style.grid.get_field("field_name").get_query = function(d
       		query : "tools.tools_management.custom_methods.get_style",
       		filters : {
       			'item_code':doc.item_code
+      		}
+      	}
+}
+
+cur_frm.fields_dict.process_wise_warehouse_detail.grid.get_field("warehouse").get_query = function(doc, cdt, cdn) {
+		var d = locals[cdt][cdn]
+      	return {
+      		query : "tools.tools_management.custom_methods.get_branch_of_process",
+      		filters : {
+      			'item_code':doc.item_code,
+      			'process' : d.process
       		}
       	}
 }

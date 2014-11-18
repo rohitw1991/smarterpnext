@@ -194,7 +194,7 @@
    "precision": ""
   }, 
   {
-   "depends_on": "eval:doc.payment=='Yes' && doc.emp_status=='Completed'", 
+   "depends_on": "eval:doc.payment=='Yes'  && doc.emp_status=='Completed'", 
    "fieldname": "wages", 
    "fieldtype": "Currency", 
    "label": "Wages", 
@@ -433,7 +433,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-11-13 21:18:51.546236", 
+ "modified": "2014-11-15 23:40:29.984050", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Process Allotment", 

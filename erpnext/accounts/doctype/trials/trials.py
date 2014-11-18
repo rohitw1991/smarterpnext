@@ -9,6 +9,7 @@ from frappe.utils import cint, cstr, flt
 class Trials(Document):
 	def validate(self):
 		self.make_event_for_trials()
+		# self.update_branch_of_warehouse()
 
 	def make_event_for_trials(self):
 		for d in self.get('trial_dates'):

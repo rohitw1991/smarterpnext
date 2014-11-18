@@ -38,7 +38,7 @@ erpnext.SalesChart = Class.extend({
 				{
 					label:__("Edit"),
 					condition: function(node) {
-						return !node.root && me.can_read;
+						return !node.root && me.can_read && user=='Administrator';
 					},
 					click: function(node) {
 						frappe.set_route("Form", me.ctype, node.label);
@@ -46,14 +46,14 @@ erpnext.SalesChart = Class.extend({
 				},
 				{
 					label:__("Add Child"),
-					condition: function(node) { return me.can_create && node.expandable; },
+					condition: function(node) { return me.can_create && node.expandable && user=='Administrator'; },
 					click: function(node) {
 						me.new_node();
 					}
 				},
 				{
 					label:__("Delete"),
-					condition: function(node) { return !node.root && me.can_delete; },
+					condition: function(node) { return !node.root && me.can_delete && user=='Administrator'; },
 					click: function(node) {
 						frappe.model.delete_doc(me.ctype, node.label, function() {
 							$('#image_view').html('');

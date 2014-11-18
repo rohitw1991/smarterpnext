@@ -7,6 +7,7 @@ from frappe.widgets.reportview import get_match_cond
 from frappe.utils import add_days, cint, cstr, date_diff, rounded, flt, getdate, nowdate, \
 	get_first_day, get_last_day,money_in_words, now
 from frappe import _
+from tools.custom_data_methods import generate_barcode
 from frappe.model.db_query import DatabaseQuery
 
 def update_status(doc, method):
@@ -200,3 +201,24 @@ def update_user_permissions_for_emp(doc, method):
 	if doc.user:
 		frappe.permissions.add_user_permission("Branch", doc.branch, doc.user_id)
 		frappe.permissions.add_user_permission("Cost Center", frappe.db.get_value('Branch', doc.branch, 'cost_center'), doc.user_id)
+
+def make_barcode(doc, method):
+	if not doc.barcode_image:
+		barcode = generate_barcode(doc.name, doc.doctype)
+		if barcode:
+			image = '<img src="/files/%s/%s.svg">'%(doc.doctype, doc.name)
+			make_barcode_log(doc.doctype, doc.name, image, doc.barcode_description)
+	else:
+		frappe.db.sql("update `tabBarcode Log` set barcode_description='%s' where doctype_name='%s' and barcode_id='%s'"%(doc.barcode_description, doc.doctype, doc.name))
+		image = frappe.db.get_value('Barcode Log', {'doctype_name':doc.doctype, 'barcode_id': doc.name}, 'path')
+	if image:
+		description = ("""<div style="width:100%">{0}</div>""").format(doc.barcode_description or 'Barcode')
+		doc.barcode_image = ("""<table><tr><td></td>{0}</tr><tr><td>{1}</td></tr></table>""").format(description, image)
+
+def make_barcode_log(doctype_name, barcode_id, path, barcode_description):
+	blog = frappe.new_doc('Barcode Log')			
+	blog.doctype_name = doctype_name
+	blog.barcode_id = barcode_id
+	blog.path = path
+	blog.barcode_description = barcode_description
+	blog.save(ignore_permissions=True)

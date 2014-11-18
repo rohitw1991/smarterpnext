@@ -1,4 +1,4 @@
-console.log("inthee")
+
 
 frappe.provide("erpnext.stock");
 frappe.require("assets/erpnext/js/controllers/stock_controller.js");

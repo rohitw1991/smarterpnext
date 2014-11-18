@@ -4,12 +4,42 @@
 # from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
-from frappe.utils import cstr, flt, getdate, comma_and
+from frappe.utils import cstr, flt, getdate, comma_and, cint
 from erpnext.accounts.accounts_custom_methods import generate_serial_no
 
 class WorkOrder(Document):
+	# def autoname(self):
+	# 	if self.supplier_code and frappe.db.get_value('Supplier', self.supplier_code, 'naming_series'):
+	# 		from frappe.model.naming import make_autoname
+	# 		self.item_code = make_autoname(frappe.db.get_value('Supplier', self.supplier_code, 'naming_series')+'.#####')
+	# 	elif frappe.db.get_default("item_naming_by")=="Naming Series":
+	# 		from frappe.model.naming import make_autoname
+	# 		self.item_code = make_autoname(self.naming_series+'.#####')
+	# 	elif not self.item_code:
+	# 		msgprint(_("Item Code is mandatory because Item is not automatically numbered"), raise_exception=1)
+
+	# 	self.name = self.item_code
+
 	def validate(self):
 		self.make_serial_no
+
+	def on_update(self):
+		self.update_process_in_production_dashboard()
+		self.update_branch_in_trials()
+
+	def update_process_in_production_dashboard(self):
+		for d in self.get('process_wise_warehouse_detail'):
+			if d.warehouse:
+				frappe.db.sql("""update `tabProcess Log` p, `tabProduction Dashboard Details` pd set p.branch = '%s' 
+					where p.parent = pd.name and p.process_name='%s' and pd.work_order='%s' 
+					and pd.sales_invoice_no='%s'"""%(d.warehouse, d.process, self.name, self.sales_invoice_no))
+
+
+	def update_branch_in_trials(self):
+		name = frappe.db.get_value('Work Order Distribution', {'tailor_work_order':self.name, 'tailoring_item':self.item_code}, 'trials')
+		for d in self.get('process_wise_warehouse_detail'):
+			if cint(d.actual_fabric) == 1 and d.warehouse and d.process:
+				frappe.db.sql("update `tabTrial Dates` set trial_branch = '%s' where parent ='%s' and process ='%s'"%(d.warehouse, name, d.process), debug=1)
 
 	def make_serial_no(self):
 		if not self.serial_no_data:

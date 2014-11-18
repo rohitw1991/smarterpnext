@@ -37,6 +37,7 @@ class Item(WebsiteGenerator):
 
 	def validate(self):
 		super(Item, self).validate()
+		# frappe.errprint(self.doctype)
 
 		if not self.stock_uom:
 			msgprint(_("Please enter default Unit of Measure"), raise_exception=1)

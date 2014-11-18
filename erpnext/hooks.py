@@ -72,13 +72,15 @@ doc_events = {
 
 	},
 	"Sales Invoice": {
-		"on_update" : ["erpnext.accounts.accounts_custom_methods.add_data_in_work_order_assignment", "erpnext.accounts.accounts_custom_methods.create_serial_no","tools.tools_management.custom_methods.create_se_or_mr"],#"tools.tools_management.custom_methods.update_work_order","tools.tools_management.custom_methods.create_se_or_mr"],
+		"on_update" : ["erpnext.accounts.accounts_custom_methods.add_data_in_work_order_assignment", "erpnext.accounts.accounts_custom_methods.create_serial_no"],#"tools.tools_management.custom_methods.update_work_order","tools.tools_management.custom_methods.create_se_or_mr"],
 		"validate"  : ["tools.tools_management.custom_methods.merge_tailoring_items", "erpnext.accounts.accounts_custom_methods.invoice_validation_method"], 
-		"on_submit" : ["tools.tools_management.custom_methods.sales_invoice_on_submit_methods","erpnext.accounts.accounts_custom_methods.create_production_process","erpnext.accounts.accounts_custom_methods.validate_sales_invoice"],
+		"on_submit" : ["tools.tools_management.custom_methods.sales_invoice_on_submit_methods","erpnext.accounts.accounts_custom_methods.create_production_process","erpnext.accounts.accounts_custom_methods.validate_sales_invoice","tools.tools_management.custom_methods.create_se_or_mr", "mreq.mreq.page.sales_dashboard.sales_dashboard.create_swatch_item_po"],
 		"on_cancel" : ["tools.tools_management.custom_methods.delete_project_aginst_si", "erpnext.accounts.accounts_custom_methods.delete_production_process"]
 	},
 	"Item":{
+		"validate" : "erpnext.stock.stock_custom_methods.make_barcode",
 		"on_update": "erpnext.stock.stock_custom_methods.item_validate_methods"
+
 	},
 	"Employee":{
 		"validate": "erpnext.stock.stock_custom_methods.update_user_permissions_for_emp"
