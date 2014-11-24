@@ -125,7 +125,6 @@ Purchase Return","","purpose_type",0,0,0,0,"","Material Issue",0,"",0,0,0,0,0,0
 "","""Stock Entry Detail-target_warehouse""","Stock Entry Detail","Link","Target Warehouse","t_warehouse","","Warehouse","","target_warehouse",0,0,0,0,"","",1,"",0,0,0,0,0,0
 "","""Stock Entry Detail-target_branch""","Stock Entry Detail","Link","Target Branch","col_break1","","Branches","","target_branch",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Stock Entry Detail-source_warehouse""","Stock Entry Detail","Link","Source Warehouse","s_warehouse","","Warehouse","","source_warehouse",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""User-branch""","User","Link","Branch","time_zone","","Branch","","branch",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Task-process_name""","Task","Data","Process Name","exp_end_date","","","","process_name",0,0,1,0,"","",0,"",0,0,0,0,0,0
 "","""Task-item_name""","Task","Data","Item Name","process_name","","","","item_name",0,0,1,0,"","",0,"",0,0,0,0,0,0
 "","""Company-registered_email_id""","Company","Data","Registered email id","address","","","","registered_email_id",0,0,0,0,"","",0,"",0,0,0,0,0,0
