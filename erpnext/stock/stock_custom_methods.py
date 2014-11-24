@@ -229,9 +229,7 @@ def delete_unnecessay_records(doc):
 			where parenttype not in('Item') and name not in %s"""%("('"+bom_list+"')"))
 
 def update_user_permissions_for_user(doc, method):
-	if doc.email and frappe.user not in ['Administrator', 'Guest']:
-		frappe.permissions.add_user_permission("Branch", doc.branch, doc.email)
-		frappe.permissions.add_user_permission("Cost Center", frappe.db.get_value('Branch', doc.branch, 'cost_center'), doc.email)
+	pass
 
 def update_user_permissions_for_emp(doc, method):
 	if doc.user:
