@@ -24,11 +24,10 @@ class Item(WebsiteGenerator):
 		self.get_size_details()
 
 	def autoname(self):
+		from frappe.model.naming import make_autoname
 		if self.supplier_code and frappe.db.get_value('Supplier', self.supplier_code, 'naming_series'):
-			from frappe.model.naming import make_autoname
-			self.item_code = make_autoname(frappe.db.get_value('Supplier', self.supplier_code, 'naming_series')+'.#####')
+			self.item_code = make_autoname(frappe.db.get_value('Supplier', self.supplier_code, 'naming_series')+'.######')
 		elif frappe.db.get_default("item_naming_by")=="Naming Series":
-			from frappe.model.naming import make_autoname
 			self.item_code = make_autoname(self.naming_series+'.#####')
 		elif not self.item_code:
 			msgprint(_("Item Code is mandatory because Item is not automatically numbered"), raise_exception=1)
@@ -37,7 +36,6 @@ class Item(WebsiteGenerator):
 
 	def validate(self):
 		super(Item, self).validate()
-		# frappe.errprint(self.doctype)
 
 		if not self.stock_uom:
 			msgprint(_("Please enter default Unit of Measure"), raise_exception=1)

@@ -14,7 +14,7 @@ class Trials(Document):
 	def make_event_for_trials(self):
 		for d in self.get('trial_dates'):
 			self.add_trials(d)
-			self.create_event(d)
+			# self.create_event(d)
 
 	def add_trials(self,args):
 		name = frappe.db.get_value('Process Log', {'process_name': args.process, 'trials': args.trial_no, 'parent':self.pdd},'name')

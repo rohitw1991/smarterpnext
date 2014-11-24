@@ -194,12 +194,19 @@
    "precision": ""
   }, 
   {
-   "depends_on": "eval:doc.payment=='Yes'  && doc.emp_status=='Completed'", 
+   "depends_on": "eval: doc.emp_status=='Completed'", 
    "fieldname": "wages", 
    "fieldtype": "Currency", 
    "label": "Wages", 
    "permlevel": 0, 
    "precision": "2"
+  }, 
+  {
+   "fieldname": "customer_trials", 
+   "fieldtype": "Select", 
+   "label": "Customer Trials", 
+   "permlevel": 0, 
+   "precision": ""
   }, 
   {
    "fieldname": "assigned", 
@@ -273,7 +280,7 @@
   }, 
   {
    "default": "", 
-   "depends_on": "eval:doc.extra_charge=='Yes'&& doc.emp_status=='Completed'", 
+   "depends_on": "eval: doc.emp_status=='Completed'", 
    "fieldname": "extra_charge_amount", 
    "fieldtype": "Currency", 
    "label": "Extra Charge Amount", 
@@ -290,7 +297,7 @@
    "precision": ""
   }, 
   {
-   "depends_on": "eval:doc.deduct_late_work=='Yes'", 
+   "depends_on": "", 
    "description": "Time in Min", 
    "fieldname": "latework", 
    "fieldtype": "Data", 
@@ -299,7 +306,7 @@
    "precision": ""
   }, 
   {
-   "depends_on": "eval:doc.deduct_late_work=='Yes'", 
+   "depends_on": "", 
    "fieldname": "cost", 
    "fieldtype": "Currency", 
    "label": "Cost", 
@@ -433,7 +440,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-11-15 23:40:29.984050", 
+ "modified": "2014-11-23 11:32:25.530883", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Process Allotment", 

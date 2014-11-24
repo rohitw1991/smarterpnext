@@ -9,6 +9,7 @@ from frappe.utils import add_days, cint, cstr, date_diff, rounded, flt, getdate,
 from frappe import _
 from tools.custom_data_methods import generate_barcode
 from frappe.model.db_query import DatabaseQuery
+from tools.custom_data_methods import get_user_branch, get_branch_cost_center
 
 def update_status(doc, method):
 	change_stock_entry_status(doc, 'Completed')
@@ -31,7 +32,8 @@ def set_to_null(self):
 def stock_out_entry(doc, method):
 	if doc.purpose_type == 'Material Out':
 		in_entry  = make_stock_entry_for_in(doc)
-	pass
+	elif doc.purpose_type == 'Material In':
+		open_process(doc)
 
 def make_stock_entry_for_in(doc):
 	branch_list = {}
@@ -75,6 +77,15 @@ def make_stock_entry_for_child(s, name):
 	sed.save(ignore_permissions=True)
 	return "Done"
 
+def open_process(doc):
+	for d in doc.get('mtn_details'):
+		if d.work_order:
+			frappe.db.sql(""" update  `tabProcess Log` p inner join 
+				`tabProduction Dashboard Details` d on p.parent=d.name inner join 
+				(select parent,min(idx) as idx from  `tabProcess Log` pd where  status='Pending'
+				and branch='%s' group by parent )foo on p.parent=foo.parent and p.idx=foo.idx
+				set p.status='Open' WHERE  d.work_order = '%s' AND p.branch= '%s' AND p.status='Pending'"""%(get_user_branch(), d.work_order, get_user_branch()))
+
 def in_stock_entry(doc, method):
 	pass
 
@@ -84,13 +95,37 @@ def get_details(item_name):
 		where attached_to_name ='%s'"""%(item_name),as_list=1)
 
 def item_validate_methods(doc, method):
-	manage_price_list(doc)
+	if doc.item_group == 'Tailoring':
+		manage_price_list_for_tailoring(doc)
+	else:
+		make_price_list_for_merchandise(doc)
 	make_sales_bom(doc)
 
-def manage_price_list(doc):
+def manage_price_list_for_tailoring(doc):
+	parent_list = []
 	for d in doc.get('costing_item'):
-		update_price_list(d)
+		parent = frappe.db.get_value('Item Price', {'item_code':doc.name, 'price_list':doc.service},'name')
+		if not parent:
+			parent = make_item_price(doc.name, doc.service)
+		parent_list.append(parent.encode('ascii', 'ignore'))
+		update_item_price(parent, d)
+		# delete_non_present_entry(parent_list, d)
+		# update_price_list(d)
 
+def make_price_list_for_merchandise(doc):
+	parent_list = []
+	for d in doc.get('fabric_costing'):
+		parent = frappe.db.get_value('Item Price', {'item_code':doc.name, 'price_list':d.merchandise_price_list},'name')
+		if not parent:
+			parent = make_item_price(doc.name, d.merchandise_price_list, d.rate)
+		parent_list.append(parent.encode('ascii', 'ignore'))
+		update_item_price_for_merchandise(parent, d)
+
+def update_item_price_for_merchandise(parent,d):
+	frappe.db.sql("update `tabItem Price` set price_list_rate='%s' where name='%s'"%(d.rate, parent))
+
+# Commented code of services
+"""
 def update_price_list(args):
 	data = args
 	args = eval(args.costing_dict)
@@ -103,28 +138,29 @@ def update_price_list(args):
 		update_item_price(parent, data, args.get(str(s)).get('rate'))
 	delete_non_present_entry(parent_list, data)
 	return "Done"
+"""
 
-def make_item_price(item_code, price_list):
+def make_item_price(item_code, price_list, rate=None):
 	ip = frappe.new_doc('Item Price')
 	ip.price_list = price_list
 	ip.item_code = item_code
 	ip.item_name = frappe.db.get_value('Item Name', item_code, 'item_name')
-	ip.price_list_rate = 1.00
+	ip.price_list_rate = rate or 1.00
 	ip.currency = frappe.db.get_value('Price List', price_list, 'currency')  
 	ip.save(ignore_permissions=True)
 	return ip.name
 
-def update_item_price(parent,data, rate):
+def update_item_price(parent,data):
 	frappe.errprint(parent)
 	name = frappe.db.get_value('Customer Rate', {'parent':parent, 'branch': data.get('branch'), 'size': data.get('size')}, 'name')
-	item_price_dict = get_dict(parent, data, rate)
+	item_price_dict = get_dict(parent, data)
 	if not name:
 		name = frappe.get_doc(item_price_dict).insert()
 	elif name:
-		frappe.db.sql("update `tabCustomer Rate` set rate='%s' where name='%s'"%(rate, name))
+		frappe.db.sql("update `tabCustomer Rate` set rate='%s' where name='%s'"%(data.service_rate, name))
 	return True
 
-def get_dict(parent, data, rate):
+def get_dict(parent, data):
 	return {
 				"doctype": "Customer Rate",
 				"parent": parent,
@@ -132,12 +168,12 @@ def get_dict(parent, data, rate):
 				"parenttype": "Item Price",
 				'parentfield': "customer_rate",
 				"size":data.get('size'),
-				"rate": rate,
+				"rate": data.service_rate,
 			}
 
 def delete_non_present_entry(parent, data):
 	parent =  "','".join(parent)
-	frappe.db.sql("delete from `tabCustomer Rate` where parent not in %s and branch='%s' and size='%s'"%("('"+parent+"')", data.branch, data.size), debug=1)
+	frappe.db.sql("delete from `tabCustomer Rate` where parent not in %s and branch='%s' and size='%s'"%("('"+parent+"')", data.branch, data.size))
 
 def make_sales_bom(doc):
 	if cint(doc.is_clubbed_product) == 1 and doc.is_stock_item == 'No':
@@ -190,7 +226,7 @@ def delete_unnecessay_records(doc):
 	bom_list =  "','".join(sales_bom_item_list)
 	if bom_list:
 		frappe.db.sql("""delete from `tabSales BOM Item` 
-			where parenttype not in('Item') and name not in %s"""%("('"+bom_list+"')"), debug=1)
+			where parenttype not in('Item') and name not in %s"""%("('"+bom_list+"')"))
 
 def update_user_permissions_for_user(doc, method):
 	if doc.email:

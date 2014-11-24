@@ -564,7 +564,6 @@ var fabric_detail = {}
 
 cur_frm.cscript.reserve_fabric = function(doc, cdt, cdn){
 	var e =locals[cdt][cdn]
-	console.log(e)
 	var image_data;
 	var dialog = new frappe.ui.Dialog({
 			title:__(e.field_name+' Styles'),
@@ -585,7 +584,6 @@ cur_frm.cscript.reserve_fabric = function(doc, cdt, cdn){
 				"qty": e.fabric_qty
 			},
 			callback: function(r) {
-				console.log([r.message])
 				if(r.message) {
 					
 					var result_set = r.message;
@@ -603,7 +601,6 @@ cur_frm.cscript.reserve_fabric = function(doc, cdt, cdn){
                   }	);
 					
 					$.each(result_set, function(i, d) {
-						console.log(d)
 						var row = $("<tr>").appendTo(me.table.find("tbody"));
                        $("<td>").html('<input type="radio" name="sp" value="'+d[0]+'">')
                        		   .attr("style", d[0])

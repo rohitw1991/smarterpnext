@@ -231,10 +231,10 @@ cur_frm.add_fetch('default_branch', 'warehouse', 'default_warehouse')
 {% include 'stock/custom_items.js' %}
 cur_frm.script_manager.make(erpnext.stock.CustomItem);
 
-cur_frm.cscript.onload_post_render = function() {
-	frappe.require('assets/frappe/js/lib/jscolor/jscolor.js');
-	$.each(["fabric_color"], function(i, v) {
-		$(cur_frm.fields_dict[v].input).addClass('color');
-	})
-	jscolor.bind();
-}
+// cur_frm.cscript.onload_post_render = function() {
+// 	frappe.require('assets/frappe/js/lib/jscolor/jscolor.js');
+// 	$.each(["fabric_color"], function(i, v) {
+// 		$(cur_frm.fields_dict[v].input).addClass('color');
+// 	})
+// 	jscolor.bind();
+// }

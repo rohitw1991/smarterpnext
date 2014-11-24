@@ -35,6 +35,15 @@
    "read_only": 1
   }, 
   {
+   "fieldname": "release_status", 
+   "fieldtype": "Select", 
+   "label": "Release Status", 
+   "options": "\nPending\nHold\nRelease", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
    "fieldname": "column_break_3", 
    "fieldtype": "Column Break", 
    "permlevel": 0, 
@@ -68,6 +77,15 @@
    "precision": ""
   }, 
   {
+   "fieldname": "production_cycle_details", 
+   "fieldtype": "Link", 
+   "hidden": 1, 
+   "label": "Production Cycle Details", 
+   "options": "Production Cycle Details", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "tailor_fabric", 
    "fieldtype": "Link", 
    "hidden": 0, 
@@ -79,8 +97,8 @@
   {
    "fieldname": "tailor_fabric_qty", 
    "fieldtype": "Int", 
-   "hidden": 1, 
-   "label": "Tailor Fabric Qty", 
+   "hidden": 0, 
+   "label": "Tailor Fabric Qty per item", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -108,7 +126,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-11-13 16:37:54.884869", 
+ "modified": "2014-11-23 19:30:24.304155", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Work Order Distribution", 

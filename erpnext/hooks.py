@@ -68,7 +68,7 @@ doc_events = {
 		],
 	},
 	"Branch": {
-		"validate" : "tools.tools_management.custom_methods.branches_creation"
+		"validate" : "tools.tools_management.custom_methods.branch_methods"
 
 	},
 	"Sales Invoice": {

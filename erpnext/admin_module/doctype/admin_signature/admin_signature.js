@@ -22,10 +22,15 @@ cur_frm.cscript.apply_status = function(doc, cdt, cdn){
 
 cur_frm.cscript.process = function(doc, cdt, cdn){
 	var d = locals[cdt][cdn]
-	get_server_fields('processed_methods',d.sales_invoice,'', doc, cdt, cdn, 1 , function(){
-		alert("Done")
-		refresh_field('admin_note')
-	})
+	if(parseInt(d.select) == 1){
+		get_server_fields('processed_methods',d.sales_invoice,'', doc, cdt, cdn, 1 , function(){
+			alert("Done")
+			refresh_field('admin_note')
+		})	
+	}else{
+		alert("Click on select check box")
+	}
+	
 }
 
 cur_frm.cscript.processed = function(doc, cdt, cdn){

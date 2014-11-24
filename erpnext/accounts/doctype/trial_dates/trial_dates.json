@@ -9,10 +9,15 @@
  "document_type": "", 
  "fields": [
   {
-   "fieldname": "skip_trial", 
-   "fieldtype": "Check", 
-   "in_list_view": 1, 
-   "label": "Skip Trial", 
+   "fieldname": "cb", 
+   "fieldtype": "Column Break", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "process_details", 
+   "fieldtype": "Section Break", 
+   "label": "Process Details", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -26,6 +31,31 @@
    "precision": ""
   }, 
   {
+   "fieldname": "production_status", 
+   "fieldtype": "Data", 
+   "in_list_view": 1, 
+   "label": "Production Status", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
+   "default": "Pending", 
+   "fieldname": "work_status", 
+   "fieldtype": "Select", 
+   "in_list_view": 1, 
+   "label": "Sales Approval", 
+   "options": "\nPending\nOk", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "cb1", 
+   "fieldtype": "Column Break", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "allow_on_submit": 0, 
    "fieldname": "trial_no", 
    "fieldtype": "Int", 
@@ -33,7 +63,7 @@
    "ignore_user_permissions": 0, 
    "in_filter": 0, 
    "in_list_view": 1, 
-   "label": "Trial No", 
+   "label": "Trial", 
    "no_copy": 0, 
    "permlevel": 0, 
    "precision": "", 
@@ -43,6 +73,14 @@
    "reqd": 0, 
    "search_index": 0, 
    "set_only_once": 0
+  }, 
+  {
+   "fieldname": "skip_trial", 
+   "fieldtype": "Check", 
+   "in_list_view": 0, 
+   "label": "Skip Trial", 
+   "permlevel": 0, 
+   "precision": ""
   }, 
   {
    "fieldname": "event_details", 
@@ -58,7 +96,7 @@
    "hidden": 0, 
    "ignore_user_permissions": 0, 
    "in_filter": 0, 
-   "in_list_view": 1, 
+   "in_list_view": 0, 
    "label": "From Time", 
    "no_copy": 0, 
    "permlevel": 0, 
@@ -81,11 +119,12 @@
    "fieldname": "trial_branch", 
    "fieldtype": "Link", 
    "hidden": 0, 
+   "in_list_view": 1, 
    "label": "Trial Branch", 
    "options": "Branches", 
    "permlevel": 0, 
    "precision": "", 
-   "read_only": 1
+   "read_only": 0
   }, 
   {
    "fieldname": "column_break_2", 
@@ -108,6 +147,76 @@
    "permlevel": 0, 
    "precision": "", 
    "read_only": 1
+  }, 
+  {
+   "fieldname": "branch_details", 
+   "fieldtype": "Section Break", 
+   "hidden": 1, 
+   "label": "Bundling Details", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "source_branch", 
+   "fieldtype": "Link", 
+   "in_list_view": 1, 
+   "label": "Source Branch", 
+   "options": "Branches", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "cb2", 
+   "fieldtype": "Column Break", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "target_branch", 
+   "fieldtype": "Link", 
+   "in_list_view": 1, 
+   "label": "Target Branch", 
+   "options": "Branches", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "work_order_details", 
+   "fieldtype": "Section Break", 
+   "label": "Work order Details", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "work_order_changes", 
+   "fieldtype": "Button", 
+   "label": "Work Order Changes", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "column_break_13", 
+   "fieldtype": "Column Break", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "work_order", 
+   "fieldtype": "Link", 
+   "label": "Work Order", 
+   "options": "Work Order", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "has_trials", 
+   "fieldtype": "Check", 
+   "label": "Has Trials", 
+   "no_copy": 1, 
+   "permlevel": 0, 
+   "precision": "", 
+   "print_hide": 1, 
+   "read_only": 1
   }
  ], 
  "hide_heading": 0, 
@@ -117,7 +226,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-11-17 12:28:58.361325", 
+ "modified": "2014-11-23 19:43:12.255870", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Trial Dates", 

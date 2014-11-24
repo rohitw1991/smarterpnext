@@ -71,11 +71,51 @@
   {
    "fieldname": "measurement", 
    "fieldtype": "Data", 
+   "hidden": 1, 
    "in_list_view": 1, 
    "label": "Measurement", 
    "options": "", 
    "permlevel": 0, 
    "precision": "", 
+   "read_only": 1
+  }, 
+  {
+   "fieldname": "min_payment_details", 
+   "fieldtype": "Section Break", 
+   "label": "Min Payment Details", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "description": "In Percentage %", 
+   "fieldname": "min_payment_percentage", 
+   "fieldtype": "Int", 
+   "label": "Min Payment", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
+   "fieldname": "paid_amount", 
+   "fieldtype": "Currency", 
+   "label": "Paid Amount", 
+   "permlevel": 0, 
+   "precision": "2", 
+   "read_only": 1
+  }, 
+  {
+   "fieldname": "column_break_10", 
+   "fieldtype": "Column Break", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "description": "In Amount", 
+   "fieldname": "min_payment_amount", 
+   "fieldtype": "Currency", 
+   "label": "Min Payment", 
+   "permlevel": 0, 
+   "precision": "2", 
    "read_only": 1
   }, 
   {
@@ -117,11 +157,18 @@
    "fieldname": "status", 
    "fieldtype": "Select", 
    "in_list_view": 1, 
-   "label": "Status", 
-   "options": "\nPending\nApproved\nRejected\nRemove", 
+   "label": "Min Payment Status", 
+   "options": "\nPending\nApproved\nRejected", 
    "permlevel": 0, 
    "precision": "", 
    "read_only": 0
+  }, 
+  {
+   "fieldname": "work_order_status", 
+   "fieldtype": "Button", 
+   "label": "Work Order Status", 
+   "permlevel": 0, 
+   "precision": ""
   }, 
   {
    "fieldname": "column_break_3", 
@@ -176,7 +223,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-11-13 12:30:33.374592", 
+ "modified": "2014-11-24 14:46:31.002793", 
  "modified_by": "Administrator", 
  "module": "Dashboard", 
  "name": "Cashier Payment", 

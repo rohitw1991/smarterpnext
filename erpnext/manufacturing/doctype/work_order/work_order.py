@@ -6,22 +6,17 @@ import frappe
 from frappe.model.document import Document
 from frappe.utils import cstr, flt, getdate, comma_and, cint
 from erpnext.accounts.accounts_custom_methods import generate_serial_no
+from frappe.model.naming import make_autoname
 
 class WorkOrder(Document):
-	# def autoname(self):
-	# 	if self.supplier_code and frappe.db.get_value('Supplier', self.supplier_code, 'naming_series'):
-	# 		from frappe.model.naming import make_autoname
-	# 		self.item_code = make_autoname(frappe.db.get_value('Supplier', self.supplier_code, 'naming_series')+'.#####')
-	# 	elif frappe.db.get_default("item_naming_by")=="Naming Series":
-	# 		from frappe.model.naming import make_autoname
-	# 		self.item_code = make_autoname(self.naming_series+'.#####')
-	# 	elif not self.item_code:
-	# 		msgprint(_("Item Code is mandatory because Item is not automatically numbered"), raise_exception=1)
+	def autoname(self):
+		if self.work_order_no:
+			self.name = self.work_order_no
+		else:
+			self.name = make_autoname(self.naming_series+'.#####')
 
-	# 	self.name = self.item_code
-
-	def validate(self):
-		self.make_serial_no
+	# def validate(self):
+	# 	self.make_serial_no
 
 	def on_update(self):
 		self.update_process_in_production_dashboard()
@@ -41,9 +36,9 @@ class WorkOrder(Document):
 			if cint(d.actual_fabric) == 1 and d.warehouse and d.process:
 				frappe.db.sql("update `tabTrial Dates` set trial_branch = '%s' where parent ='%s' and process ='%s'"%(d.warehouse, name, d.process), debug=1)
 
-	def make_serial_no(self):
-		if not self.serial_no_data:
-			generate_serial_no(self.item_code,self.item_qty)
+	# def make_serial_no(self):
+	# 	if not self.serial_no_data:
+	# 		generate_serial_no(self.item_code,self.item_qty)
 
 	def get_details(self, template):
 		self.get_measurement_details(template)

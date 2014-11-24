@@ -115,3 +115,13 @@ cur_frm.cscript.view = function(doc, cdt, cdn){
 			}
 		})		
 }
+
+cur_frm.fields_dict['trial_serial_no'].get_query = function(doc, cdt, cdn) {
+		
+      	return {
+      		query : "tools.tools_management.custom_methods.get_serial_no",
+      		filters : {
+      			'serial_no':doc.serial_no_data
+      		}
+      	}
+}

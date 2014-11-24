@@ -129,7 +129,6 @@ erpnext.stock.CustomItem = frappe.ui.form.Controller.extend({
         $(this.control_trials.create_new.input).click(function(){
             var status='true';
             var trials_dict={};
-            console.log(me.div)
             $(me.div).find("#mytable tbody tr").each(function(i) {
                 var key =['process','trial', 'quality_check','actual_fabric','amended','cost','cancel']
                 var $data= {};
@@ -192,7 +191,7 @@ erpnext.stock.CustomItem = frappe.ui.form.Controller.extend({
     },
     price_list: function(doc, cdt, cdn){
         var s;
-        new frappe.CustomerRate(doc, cdt, cdn)
+        // new frappe.CustomerRate(doc, cdt, cdn)
     },
     is_clubbed_product : function(doc){
         doc.has_serial_no = 'No'
@@ -212,28 +211,24 @@ frappe.CustomerRate = Class.extend({
     },
 
     make: function(){
-        if(this.data.branch && this.data.size){
-            this.dialog = new frappe.ui.Dialog({
-                title:__(' Customer Rate'),
-                fields: [
-                    {fieldtype:'Link', fieldname:'price_list', label:__('Price List'), reqd:false,
-                        description: __(""), options:'Service'},
-                    {fieldtype:'Currency', fieldname:'rate', label:__('Rate'), reqd:false,
-                        description: __("")},
-                    {fieldtype:'Button', fieldname:'add', label:__('Add'), reqd:false,
-                        description: __("")},
-                    {fieldtype:'HTML', fieldname:'customer_rate', label:__('Customer Rate'), reqd:false,
-                        description: __("")},
-                    {fieldtype:'Button', fieldname:'create_new', label:__('Ok') }
-                ]
-            })
-            this.control_trials = this.dialog.fields_dict;
-            this.div = $('<div id="myGrid" style="width:100%;height:200px;margin:10px;overflow-y:scroll;"><table class="table table-bordered" style="background-color: #f9f9f9;height:10px" id="mytable">\
-                        <thead><tr><td>Service</td><td>Rate</td><td>Remove</td></tr></thead><tbody></tbody></table></div>').appendTo($(this.control_trials.customer_rate.wrapper))
-            this.dialog.show();
-        }else{
-            alert("Mandatory Fields: Select Branch and Size")    
-        }
+        this.dialog = new frappe.ui.Dialog({
+            title:__(' Customer Rate'),
+            fields: [
+                {fieldtype:'Link', fieldname:'price_list', label:__('Price List'), reqd:false,
+                    description: __(""), options:'Service'},
+                {fieldtype:'Currency', fieldname:'rate', label:__('Rate'), reqd:false,
+                    description: __("")},
+                {fieldtype:'Button', fieldname:'add', label:__('Add'), reqd:false,
+                    description: __("")},
+                {fieldtype:'HTML', fieldname:'customer_rate', label:__('Customer Rate'), reqd:false,
+                    description: __("")},
+                {fieldtype:'Button', fieldname:'create_new', label:__('Ok') }
+            ]
+        })
+        this.control_trials = this.dialog.fields_dict;
+        this.div = $('<div id="myGrid" style="width:100%;height:200px;margin:10px;overflow-y:scroll;"><table class="table table-bordered" style="background-color: #f9f9f9;height:10px" id="mytable">\
+                    <thead><tr><td>Service</td><td>Rate</td><td>Remove</td></tr></thead><tbody></tbody></table></div>').appendTo($(this.control_trials.customer_rate.wrapper))
+        this.dialog.show();
     },
 
     render_data: function(){

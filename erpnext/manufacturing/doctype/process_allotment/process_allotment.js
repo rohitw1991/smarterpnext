@@ -76,7 +76,9 @@ cur_frm.cscript.emp_status= function(doc, cdt, cdn){
 	doc.process_status = 'Open'
 	if (doc.emp_status=='Completed')
 	{
-		doc.process_status = 'Closed'	
+		doc.process_status = 'Closed'
+		hide_field('wages');
+		hide_field('extra_charge_amount');
 	}
 	doc.completed_time = ''
 	doc.from_time = ''
@@ -98,10 +100,15 @@ cur_frm.cscript.work_qty = function(doc, cdt, cdn){
 }
 
 cur_frm.cscript.payment = function(doc, cdt, cdn){
+	if(doc.payment == 'Yes'){
+		unhide_field('wages');		
+	}else{
+		hide_field('wages');	
+	}
+	
 	get_server_fields('calculate_wages','','',doc, cdt, cdn,1, function(){
 		refresh_field('wages')	
 	})
-	
 }
 
 cur_frm.cscript.latework = function(doc, cdt, cdn){
@@ -114,4 +121,12 @@ cur_frm.cscript.latework = function(doc, cdt, cdn){
 cur_frm.cscript.validate = function(doc, cdt, cdn){
 	setTimeout(function(){refresh_field(['employee_details', 'task'])},1000)
 	
+}
+
+cur_frm.cscript.extra_charge = function(doc){
+	if(doc.extra_charge == 'Yes'){
+		unhide_field('extra_charge_amount');		
+	}else{
+		hide_field('extra_charge_amount');	
+	}
 }
