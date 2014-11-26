@@ -55,6 +55,13 @@
    "precision": ""
   }, 
   {
+   "fieldname": "tailor_process_trials", 
+   "fieldtype": "Data", 
+   "label": "Trials", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "employee_status", 
    "fieldtype": "Data", 
    "in_list_view": 1, 
@@ -173,7 +180,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-11-13 21:39:35.111414", 
+ "modified": "2014-11-25 23:11:18.650266", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Employee Details", 

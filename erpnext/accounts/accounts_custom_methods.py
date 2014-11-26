@@ -325,6 +325,7 @@ def make_order(doc, d, qty, item_code):
 		e.tailoring_item = item_code
 		e.tailor_item_name = frappe.db.get_value('Item', item_code, 'item_name')
 		e.tailor_qty = qty
+		e.work_order_service = d.tailoring_price_list
 		e.parenttype = 'Sales Invoice'
 		e.parentfield = 'work_order_distribution'
 		e.parent = doc.name
@@ -336,19 +337,20 @@ def make_order(doc, d, qty, item_code):
 		if not e.tailor_work_order:
 			e.tailor_work_order = create_work_order(doc, d, e.serial_no_data, item_code)
 		if not e.trials:
-			e.trials = make_schedule_for_trials(doc, d, e.tailor_work_order, item_code)
+			e.trials = make_schedule_for_trials(doc, d, e.tailor_work_order, item_code, e.serial_no_data)
 		e.save()
 		return "Done"
 
-def make_schedule_for_trials(doc, args, work_order, item_code):
+def make_schedule_for_trials(doc, args, work_order, item_code, serial_no_data):
 	s =frappe.new_doc('Trials')
 	s.item_code = item_code
 	s.sales_invoice = doc.name
+	s.serial_no_data = serial_no_data
 	s.customer = frappe.db.get_value('Sales Invoice', doc.name, 'customer')
 	s.item_name = frappe.db.get_value('Item', item_code, 'item_name')
 	s.work_order = work_order
 	s.save(ignore_permissions=True)
-	schedules_date(s.name, item_code)
+	schedules_date(s.name, item_code, work_order)
 	return s.name
 
 def schedules_date(parent, item):
@@ -364,6 +366,7 @@ def schedules_date(parent, item):
 					d.trial_branch = get_user_branch()
 					d.idx = cstr(s + 1)
 					d.parent = parent
+					d.work_order = work_order
 					d.parenttype = 'Trials'
 					d.parentfield = 'trial_dates'
 					d.save(ignore_permissions=True)
@@ -427,24 +430,32 @@ def get_work_order_details(sales_invoice_no):
 def update_status(sales_invoice_no, args):
 	args = eval(args)
 	for s in args:
+		frappe.errprint(s)
 		if s.get('status') == 'Release':
+			validate_work_order(s)
 			if frappe.db.get_value('Work Order Distribution', {'tailor_work_order':s.get('work_order'), 'parent': sales_invoice_no}, 'release_status') != 'Release' and not frappe.db.get_value('Stock Entry Detail', {'work_order': s.get('work_order'), 'docstatus':0}, 'name'):
 				target_branch, name = get_target_branch(sales_invoice_no, s)
 				if get_user_branch() == target_branch:
 					frappe.db.sql("""update `tabProcess Log` set status='Open' where
 						name = '%s'"""%(name))
 				else:
-					parent = frappe.db.get_value('Stock Entry Detail', {'target_branch':target_branch, 'docstatus':0}, 'parent')
+					parent = frappe.db.get_value('Stock Entry Detail', {'target_branch':target_branch, 'docstatus':0, 's_warehouse': get_branch_warehouse(get_user_branch())}, 'parent')
 					if parent:
 						obj = frappe.get_doc('Stock Entry', parent)
 						stock_entry_of_child(obj, s, target_branch)
 					else:
-						make_StockEntry(s, target_branch)
-					update_work_order_status(s, sales_invoice_no)
+						parent = make_StockEntry(s, target_branch)
+					frappe.errprint(parent)
+					if parent:
+						update_work_order_status(s, sales_invoice_no, parent)
 		elif s.get('status') == 'Hold' and frappe.db.get_value('Work Order Distribution', {'tailor_work_order':s.get('work_order'), 'parent': sales_invoice_no}, 'release_status') != 'Release':
 			update_work_order_status(s, sales_invoice_no)
 		else:
 			frappe.msgprint("Work order %s is already release"%(s.get('work_order')))
+
+def validate_work_order(args):
+	if cint(frappe.db.get_value('Work Order', args.get('work_order'), 'docstatus')) != 1:
+		frappe.throw(_("You must have to submit the work order {0} for releasing").format(args.get('work_order')))
 
 def get_target_branch(invoice_no, args):
 	branch = frappe.db.sql(""" Select a.branch, a.name from `tabProcess Log` a, `tabProduction Dashboard Details` b 
@@ -452,10 +463,13 @@ def get_target_branch(invoice_no, args):
 	if branch:
 		return branch[0][0], branch[0][1]
 
-def update_work_order_status(args, sales_invoice_no):
+def update_work_order_status(args, sales_invoice_no, stock_entry=None):
+	cond = "release_status='%s'"%(args.get('status'))
+	if stock_entry:
+		cond = "release_status='%s', release_stock_entry='%s'"%(args.get('status'), stock_entry)
 	frappe.db.sql("""update `tabWork Order Distribution` 
-				set release_status='%s' where tailor_work_order='%s' and 
-				parent='%s'"""%(args.get('status'), args.get('work_order'), sales_invoice_no)) 
+				set %s where tailor_work_order='%s' and 
+				parent='%s'"""%(cond, args.get('work_order'), sales_invoice_no)) 
 
 
 def make_StockEntry(args, target_branch):
@@ -464,6 +478,7 @@ def make_StockEntry(args, target_branch):
  	ste.purpose ='Material Issue'
  	stock_entry_of_child(ste, args, target_branch)
  	ste.save(ignore_permissions=True)
+ 	return ste.name
 
 def stock_entry_of_child(obj, args, target_branch):
 	ste = obj.append('mtn_details', {})

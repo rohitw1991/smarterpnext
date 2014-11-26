@@ -211,6 +211,7 @@
   {
    "fieldname": "has_trials", 
    "fieldtype": "Check", 
+   "hidden": 1, 
    "label": "Has Trials", 
    "no_copy": 1, 
    "permlevel": 0, 
@@ -226,7 +227,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-11-23 19:43:12.255870", 
+ "modified": "2014-11-25 17:33:27.621713", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Trial Dates", 

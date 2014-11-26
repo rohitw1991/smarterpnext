@@ -40,6 +40,37 @@
    "precision": ""
   }, 
   {
+   "fieldname": "serial_no_data", 
+   "fieldtype": "Small Text", 
+   "hidden": 1, 
+   "label": "Serial No Data", 
+   "no_copy": 1, 
+   "permlevel": 0, 
+   "precision": "", 
+   "print_hide": 1, 
+   "report_hide": 1
+  }, 
+  {
+   "fieldname": "trial_serial_no", 
+   "fieldtype": "Link", 
+   "label": "Serial No", 
+   "options": "Serial No", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "trials_serial_no_status", 
+   "fieldtype": "Data", 
+   "hidden": 0, 
+   "label": "Trial Serial Number", 
+   "no_copy": 1, 
+   "permlevel": 0, 
+   "precision": "", 
+   "print_hide": 1, 
+   "read_only": 1, 
+   "report_hide": 1
+  }, 
+  {
    "fieldname": "column_break_4", 
    "fieldtype": "Column Break", 
    "permlevel": 0, 
@@ -81,7 +112,7 @@
    "label": "Work Order", 
    "permlevel": 0, 
    "precision": "", 
-   "read_only": 0
+   "read_only": 1
   }, 
   {
    "fieldname": "section_break_5", 
@@ -117,7 +148,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-11-23 12:50:53.533253", 
+ "modified": "2014-11-25 17:08:09.815887", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Trials", 

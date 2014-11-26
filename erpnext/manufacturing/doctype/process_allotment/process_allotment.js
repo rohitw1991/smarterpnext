@@ -36,6 +36,9 @@ cur_frm.fields_dict['serial_no'].get_query = function(doc) {
 var sn_list=[]
 cur_frm.cscript.refresh = function(doc, cdt, cdn){
 	sn_list=[];
+	get_server_fields('show_trials_details', '','',doc, cdt, cdn, 1, function(){
+		refresh_field('trials_transaction')
+	})
 }
 
 cur_frm.cscript.add = function(doc ,cdt , cdn){

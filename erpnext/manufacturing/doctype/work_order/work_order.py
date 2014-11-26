@@ -7,6 +7,7 @@ from frappe.model.document import Document
 from frappe.utils import cstr, flt, getdate, comma_and, cint
 from erpnext.accounts.accounts_custom_methods import generate_serial_no
 from frappe.model.naming import make_autoname
+from frappe import _, msgprint, throw
 
 class WorkOrder(Document):
 	def autoname(self):
@@ -99,12 +100,17 @@ class WorkOrder(Document):
 		apply_measurement_rules(self.get('measurement_item'), args)
 
 	def on_submit(self):
+		self.validate_trial_serial_no()
 		self.update_status('Completed')
 		self.set_work_order()
 
 	def on_cancel(self):
 		self.update_status('Pending')
 		self.set_to_null()
+
+	def validate_trial_serial_no(self):
+		if self.serial_no_data and not self.trial_serial_no:
+			frappe.throw(_("Mandatory Field: select trial serial no").format(self.trial_serial_no))
 
 	def update_status(self, status):
 		frappe.db.sql(""" update `tabProduction Dashboard Details` 

@@ -9,6 +9,14 @@
  "document_type": "", 
  "fields": [
   {
+   "fieldname": "work_order_service", 
+   "fieldtype": "Link", 
+   "label": "Service", 
+   "options": "Service", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "tailoring_item", 
    "fieldtype": "Link", 
    "in_list_view": 1, 
@@ -41,7 +49,15 @@
    "options": "\nPending\nHold\nRelease", 
    "permlevel": 0, 
    "precision": "", 
-   "read_only": 1
+   "read_only": 0
+  }, 
+  {
+   "fieldname": "release_stock_entry", 
+   "fieldtype": "Link", 
+   "label": "Release Stock Entry", 
+   "options": "Stock Entry", 
+   "permlevel": 0, 
+   "precision": ""
   }, 
   {
    "fieldname": "column_break_3", 
@@ -126,7 +142,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-11-23 19:30:24.304155", 
+ "modified": "2014-11-25 14:18:46.747408", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Work Order Distribution", 
