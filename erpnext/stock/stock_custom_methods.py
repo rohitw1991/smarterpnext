@@ -9,7 +9,7 @@ from frappe.utils import add_days, cint, cstr, date_diff, rounded, flt, getdate,
 from frappe import _
 from tools.custom_data_methods import generate_barcode
 from frappe.model.db_query import DatabaseQuery
-from tools.custom_data_methods import get_user_branch, get_branch_cost_center
+from tools.custom_data_methods import get_user_branch, get_branch_cost_center, update_serial_no
 
 def update_status(doc, method):
 	change_stock_entry_status(doc, 'Completed')
@@ -64,6 +64,7 @@ def make_stock_entry_for_child(s, name):
 	sed.description = s.description
 	sed.qty = s.qty
 	sed.conversion_factor = s.conversion_factor
+	sed.work_order = s.work_order
 	sed.uom = s.uom
 	sed.incoming_rate = s.incoming_rate
 	sed.serial_no = s.serial_no
@@ -79,12 +80,30 @@ def make_stock_entry_for_child(s, name):
 
 def open_process(doc):
 	for d in doc.get('mtn_details'):
-		if d.work_order:
-			frappe.db.sql(""" update  `tabProcess Log` p inner join 
-				`tabProduction Dashboard Details` d on p.parent=d.name inner join 
-				(select parent,min(idx) as idx from  `tabProcess Log` pd where  status='Pending'
-				and branch='%s' group by parent )foo on p.parent=foo.parent and p.idx=foo.idx
-				set p.status='Open' WHERE  d.work_order = '%s' AND p.branch= '%s' AND p.status='Pending'"""%(get_user_branch(), d.work_order, get_user_branch()))
+		if d.work_order and d.has_trials!='Yes':
+			if d.trials:
+				frappe.db.sql(""" update `tabProcess Log` a, `tabProduction Dashboard Details` b set a.status = 'Open'
+					where b.work_order = '%s' and a.branch = '%s' and a.trials ='%s' and a.status = 'Pending'"""%(d.work_order, get_user_branch(), d.trials))
+			else:		
+				name = frappe.db.get_value('Production Dashboard Details', {'work_order': d.work_order}, '*')
+				if d.serial_no == name.serial_no:
+					process = frappe.db.sql(""" select p.process_name from `tabProcess Log` p, `tabProduction Dashboard Details` pd where pd.work_order = '%s' AND p.branch= '%s'
+						AND p.status='Pending' and p.parent = pd.name order by p.idx limit 1"""%(d.work_order,get_user_branch()), as_list=1)
+					frappe.db.sql(""" update  `tabProcess Log` p inner join 
+						`tabProduction Dashboard Details` d on p.parent=d.name inner join 
+						(select parent,min(idx) as idx from  `tabProcess Log` pd where  status='Pending'
+						and branch='%s' group by parent )foo on p.parent=foo.parent and p.idx=foo.idx
+						set p.status='Open' WHERE  d.work_order = '%s' AND p.branch= '%s' AND p.status='Pending'"""%(get_user_branch(), d.work_order, get_user_branch()))
+					if process:
+						parent = frappe.db.get_value('Production Dashboard Details',{'work_order':d.work_order}, 'name')
+						update_serial_no_status(process[0][0], parent, d.serial_no)
+
+def update_serial_no_status(process, parent, serial_no):
+	serial_no = cstr(serial_no).split('\n')
+	for s in serial_no:
+		msg = "Ready For " + process
+		update_serial_no(parent, s, msg)
+				
 
 def in_stock_entry(doc, method):
 	pass
@@ -229,12 +248,28 @@ def delete_unnecessay_records(doc):
 			where parenttype not in('Item') and name not in %s"""%("('"+bom_list+"')"))
 
 def update_user_permissions_for_user(doc, method):
-	pass
+	assigen_user_permission(doc.branch, doc.email)
 
 def update_user_permissions_for_emp(doc, method):
-	if doc.user:
-		frappe.permissions.add_user_permission("Branch", doc.branch, doc.user_id)
-		frappe.permissions.add_user_permission("Cost Center", frappe.db.get_value('Branch', doc.branch, 'cost_center'), doc.user_id)
+	assigen_user_permission(doc.branch, doc.user_id)
+
+def assigen_user_permission(branch, email):
+	if email and branch:
+		branch_data, cost_center_data = get_user_details(email)
+		if not branch_data:
+			frappe.permissions.add_user_permission("Branch", branch, email)
+		else:
+			update_details(branch, branch_data)
+		if not cost_center_data:
+			frappe.permissions.add_user_permission("Cost Center", frappe.db.get_value('Branch', branch, 'cost_center'), email)
+		else:
+			update_details(frappe.db.get_value('Branch', branch, 'cost_center'), cost_center_data)			
+
+def get_user_details(user_id):
+	return frappe.db.get_value('DefaultValue',{'parent': user_id, 'defkey': 'Branch'}, 'name') , frappe.db.get_value('DefaultValue',{'parent': user_id, 'defkey': 'Cost Center'}, 'name')
+
+def update_details(value, name):
+	frappe.db.sql("""update `tabDefaultValue` set defvalue='%s' where name='%s'"""%(value, name))	
 
 def make_barcode(doc, method):
 	if not doc.barcode_image:

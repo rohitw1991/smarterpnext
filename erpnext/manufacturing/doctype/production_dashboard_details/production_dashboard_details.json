@@ -30,6 +30,13 @@
    "set_only_once": 0
   }, 
   {
+   "fieldname": "tailoring_service", 
+   "fieldtype": "Data", 
+   "label": "Tailoring Service", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "production_cycle_details", 
    "fieldtype": "Data", 
    "label": "Production Cycle Details", 
@@ -182,6 +189,14 @@
    "set_only_once": 0
   }, 
   {
+   "fieldname": "dummy_fabric_code", 
+   "fieldtype": "Link", 
+   "label": "Dummy Fabric Code", 
+   "options": "Item", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "actual_qty", 
    "fieldtype": "Int", 
    "label": "Actual Qty", 
@@ -295,6 +310,7 @@
   {
    "fieldname": "production_status_detail", 
    "fieldtype": "Table", 
+   "hidden": 1, 
    "label": "Production Status Detail", 
    "options": "Production Status Detail", 
    "permlevel": 0, 
@@ -323,6 +339,14 @@
    "precision": ""
   }, 
   {
+   "fieldname": "serial_no_history", 
+   "fieldtype": "Table", 
+   "label": "Serial No History", 
+   "options": "Serial No History", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "issue_raw_material", 
    "fieldtype": "Table", 
    "label": "Issue Raw Material", 
@@ -346,7 +370,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-11-24 11:20:02.211656", 
+ "modified": "2014-12-04 19:42:03.457412", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Production Dashboard Details", 

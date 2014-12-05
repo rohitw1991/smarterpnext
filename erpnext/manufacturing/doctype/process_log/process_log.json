@@ -188,6 +188,15 @@
    "label": "Skip Process", 
    "permlevel": 0, 
    "precision": ""
+  }, 
+  {
+   "default": "Pending", 
+   "fieldname": "reverse_entry", 
+   "fieldtype": "Select", 
+   "label": "Reverse Entry", 
+   "options": "\nPending\nDone", 
+   "permlevel": 0, 
+   "precision": ""
   }
  ], 
  "hide_heading": 0, 
@@ -197,7 +206,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-11-25 23:17:39.156827", 
+ "modified": "2014-11-26 11:02:37.960989", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Process Log", 

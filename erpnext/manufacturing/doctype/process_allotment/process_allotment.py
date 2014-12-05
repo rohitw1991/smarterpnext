@@ -6,16 +6,24 @@ import frappe
 from frappe.model.document import Document
 from frappe import _
 from frappe.utils import cstr, flt, getdate, comma_and, nowdate, cint, now, nowtime
-from erpnext.accounts.accounts_custom_methods import delte_doctype_data
-from tools.custom_data_methods import get_user_branch, get_branch_cost_center, get_branch_warehouse
+from erpnext.accounts.accounts_custom_methods import delte_doctype_data, prepare_serial_no_list
+from tools.custom_data_methods import get_user_branch, get_branch_cost_center, get_branch_warehouse, update_serial_no, find_next_process
 import datetime
 
 class ProcessAllotment(Document):
-	def on_update(self):
+
+	def validate(self):
+		# self.assign_task()
+		# self.update_process_status()
 		self.create_time_log()
+		self.update_task()
+		# self.make_auto_ste()
+		self.auto_ste_for_trials()
+		
 
 	def show_trials_details(self):
-		trials_data = frappe.db.sql("select * from `tabProcess Log` where (ifnull(status,'') = 'Open' or ifnull(status,'')='Closed') and process_name='%s' and process_data = '%s' order by trials"%(self.process, self.name), as_dict=1)
+		trials_data = frappe.db.sql("select * from `tabProcess Log` where (ifnull(status,'') = 'Open' or ifnull(status,'')='Closed') and process_name='%s' and process_data = '%s' and trials is not null order by trials"%(self.process, self.name), as_dict=1)
+		self.set('trials_transaction', [])
 		for data in trials_data:
 			td = self.append('trials_transaction', {})
 			td.trial_no = data.trials
@@ -25,6 +33,13 @@ class ProcessAllotment(Document):
 	def create_time_log(self):
 		if self.get('employee_details'):
 			for data in self.get('employee_details'):
+				if (data.employee_status == 'Assigned' or data.employee_status == 'Reassigned') and data.status_update != 'Yes':
+					process = self.process
+					serial_no_status = 'Open'
+				if data.employee_status == 'Completed':
+					process = find_next_process(self.pdd, self.process)
+					serial_no_status = 'Closed'
+				prepare_serial_no_list(data.tailor_serial_no, process, serial_no_status)
 				if cint(data.idx) == cint(len(self.get('employee_details'))):
 					status = 'Closed' if data.employee_status == 'Completed' else 'Open'
 					frappe.db.sql("update `tabTask` set status ='%s' where name='%s'"%( status, data.tailor_task))
@@ -32,32 +47,29 @@ class ProcessAllotment(Document):
 					tl = frappe.new_doc('Time Log')
 					tl.from_time = data.tailor_from_time
 					tl.hours = flt(data.work_completed_time)/60
+					frappe.errprint(tl.hours)
 					tl.to_time = datetime.datetime.strptime(tl.from_time, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(hours = flt(tl.hours))
 					tl.activity_type = self.process
 					tl.task = data.tailor_task
 					tl.project = self.sales_invoice_no
-					tl.submit()
+					tl.save(ignore_permissions=True)
+					t = frappe.get_doc('Time Log', tl.name)
+					t.submit()
 					data.time_log_name = tl.name
 
-	def get_details(self, item):
-		self.set('wo_process', [])
-		args = frappe.db.sql("""select * from `tabProcess Item`
-			where parent='%s'"""%(item),as_dict=1)
-		if args:
-			for data in args:
-				prd = self.append('wo_process', {})
-				prd.process = data.process_name
-				prd.trial = data.trial
-				prd.status = 'Pending'
-				prd.quality_check = data.quality_check
-		return "Done"
+	# def get_details(self, item):
+	# 	self.set('wo_process', [])
+	# 	args = frappe.db.sql("""select * from `tabProcess Item`
+	# 		where parent='%s'"""%(item),as_dict=1)
+	# 	if args:
+	# 		for data in args:
+	# 			prd = self.append('wo_process', {})
+	# 			prd.process = data.process_name
+	# 			prd.trial = data.trial
+	# 			prd.status = 'Pending'
+	# 			prd.quality_check = data.quality_check
+	# 	return "Done"
 
-	def validate(self):
-		# self.assign_task()
-		# self.update_process_status()
-		# self.update_task()
-		self.make_auto_ste()
-		self.auto_ste_for_trials()
 
 	def make_auto_ste(self):
 		if self.process_status == 'Closed':
@@ -66,19 +78,23 @@ class ProcessAllotment(Document):
 			current_name, next_name = self.get_details(cond)
 			target_branch = frappe.db.get_value('Process Log', next_name, 'branch')
 			args = {'qty': self.finished_good_qty, 'serial_data': self.serials_data, 'work_order': self.process_work_order, 'item': self.item}
-			parent = self.prepare_stock_entry_for_process(target_branch, args)
-			if parent:
+			if get_user_branch() == target_branch:
 				self.update_status(current_name, next_name)
+				frappe.db.sql("""update `tabProcess Log` set status = 'Open' where name='%s' and trials is null"""%(next_name))
+			else:
+				parent = self.prepare_stock_entry_for_process(target_branch, args)
+				if parent:
+					self.update_status(current_name, next_name)
+					frappe.msgprint("Created Stock Entry %s"%(parent))
 		
 	def validate_trials_closed(self):
-		count = frappe.db.sql("select ifnull(count(*),0) from `tabProcess Log` where process_data = '%s' and status = 'Open'"%(self.name))
+		count = frappe.db.sql("select ifnull(count(*),0) from `tabProcess Log` where process_data = '%s' and status = 'Open' and trials is not null"%(self.name), debug=1)
 		if count:
 			if cint(count[0][0])!=0	and self.process_status == 'Closed':
 				frappe.throw(_("You must have to closed all trials"))	
 
 	def update_status(self, current_name, next_name):
 		frappe.db.sql("""update `tabProcess Log` set status = 'Closed' where name='%s'"""%(current_name))
-		frappe.db.sql("""update `tabProcess Log` set status = 'Open' where name='%s' and trials is null"""%(current_name))
 
 	def prepare_stock_entry_for_process(self, target_branch, args):
 		if self.branch != target_branch and not frappe.db.get_value('Stock Entry Detail', {'work_order': self.process_work_order, 'target_branch':target_branch, 'docstatus':0, 's_warehouse': get_branch_warehouse(self.branch)}, 'name'):
@@ -86,28 +102,55 @@ class ProcessAllotment(Document):
 			if parent:
 				st = frappe.get_doc('Stock Entry', parent)
 				self.stock_entry_of_child(st, args, target_branch)
+				st.save(ignore_permissions= True)
 			else:
 				parent = self.make_stock_entry(target_branch, args)
+			frappe.msgprint(parent)
 			return parent
 
 	def auto_ste_for_trials(self):
 		for d in self.get('employee_details'):
-			if d.tailor_process_trials and d.employee_status == 'Completed':
-				cond = "trials ='%s'"%(d.tailor_process_trials)
+			cond = "1=1"
+			self.update_serial_no_status(d)
+			status = frappe.db.get_value('Process Log', {'process_data': self.name, 'trials': d.tailor_process_trials}, 'status')
+			if d.employee_status == 'Completed' and not d.ste_no and status!='Closed':
+				if d.tailor_process_trials:
+					cond = "trials ='%s'"%(d.tailor_process_trials)
 				current_name, next_name = self.get_details(cond)
-				trial_name = frappe.db.get_value('Trials',{'sales_invoice': self.sales_invoice_no, 'work_order': self.process_work_order}, 'name')
-				target_branch = frappe.db.get_value('Trials Dates', {'parent': trial_name, 'process': self.process, 'trial': d.tailor_process_trials}, 'trial_branch')
-				trials_serial_no = frappe.db.get_value('Trials', {'sales_invoice': self.sales_invoice_no, 'work_order': self.process_work_order}, 'trials_serial_no_status')
-				args = {'qty': 1, 'serial_data': trials_serial_no, 'work_order': self.process_work_order, 'item': self.item}
-				parent = self.prepare_stock_entry_for_process(target_branch)
-				if parent:
-					self.update_status(current_name, next_name)
+				target_branch = self.get_target_branch(d, next_name)
+
+				args = {'qty': d.assigned_work_qty, 'serial_data': d.tailor_serial_no, 'work_order': self.process_work_order, 'item': self.item}
+				d.ste_no = self.prepare_stock_entry_for_process(target_branch, args)
+				self.update_status(current_name, next_name)
+				if d.tailor_process_trials:
+					# trial_name = frappe.db.get_value('Trials',{'sales_invoice': self.sales_invoice_no, 'work_order': self.process_work_order, 'trial_no': d.tailor_process_trials}, 'name')
+					parent = frappe.db.sql(""" select name from `tabTrials` where sales_invoice='%s' and work_order='%s'"""%(self.sales_invoice_no, self.process_work_order), as_list=1)
+					if parent:
+						frappe.db.sql("""update `tabTrial Dates` set production_status = 'Closed' where
+							parent = '%s' and trial_no = '%s'"""%(parent[0][0], d.tailor_process_trials))
+
+	def get_target_branch(self, args, next_name):
+		if args.tailor_process_trials:
+			trial_name = frappe.db.get_value('Trials',{'sales_invoice': self.sales_invoice_no, 'work_order': self.process_work_order}, 'name')
+			trials = frappe.db.get_value('Trial Dates', {'parent': trial_name, 'process': self.process, 'trial_no': args.tailor_process_trials}, '*')
+			return trials.trial_branch
+		else:
+			return frappe.db.get_value('Process Log', next_name, 'branch')
+
+	def update_serial_no_status(self, args):
+		if args.tailor_serial_no:
+			serial_no = cstr(args.tailor_serial_no).split('\n')
+			for sn in serial_no:
+				msg = self.process + ' ' + self.emp_status
+				parent = frappe.db.get_value('Process Log', {'process_data': self.name}, 'parent')
+				update_serial_no(parent, sn, msg)
 
 	def make_stock_entry(self, t_branch, args):
 		ste = frappe.new_doc('Stock Entry')
 		ste.purpose_type = 'Material Out'
  		ste.purpose ='Material Issue' 		
  		self.stock_entry_of_child(ste, args, t_branch)
+ 		ste.branch = get_user_branch()
  		ste.save(ignore_permissions=True)
  		return ste.name
 
@@ -132,31 +175,35 @@ class ProcessAllotment(Document):
  		name = frappe.db.sql("""SELECT ifnull(foo.name, '') AS current_name,  (SELECT  ifnull(name, '') FROM `tabProcess Log` 
  								WHERE name > foo.name AND parent = foo.parent order by process_data, trials limit 1) AS next_name
 								FROM ( SELECT  name, parent  FROM  `tabProcess Log` WHERE   branch = '%s' 
-								and status != 'Closed' and process_data = '%s' and %s ORDER BY idx limit 1) AS foo """%(self.branch, self.name, cond), as_dict=1)
- 		return name[0].current_name, name[0].next_name if name else ''
-
- 	def create_stock_entry():
- 		pass
-
+								and status != 'Closed' and process_data = '%s' and %s ORDER BY idx limit 1) AS foo """%(self.branch, self.name, cond), as_dict=1, debug=1)
+ 		if name:
+ 			return name[0].current_name, name[0].next_name
+ 		else:
+ 			'',''
 
 	def update_task(self):
-		if not self.task and not self.get("__islocal"):
+		if self.emp_status=='Assigned' and not self.get("__islocal"):
 			self.task = self.create_task()
-		if self.get('employee_details'):
-			for d in self.get('employee_details'):
-				if not d.tailor_task:
-					d.tailor_task = self.task
+			self.update_work_order()
+			if self.get('employee_details'):
+				for d in self.get('employee_details'):
+					if not d.tailor_task:
+						d.tailor_task = self.task
 
-	def assign_task(self):
-		for d in self.get('wo_process'):
-			if d.tailor_employee:
-				self.validate_process(d.idx)
-				task = frappe.db.get_value('Task',{'item_code':self.item,'process_name':d.process,'sales_order_number':self.sales_invoice_no},'name')
-				if not task:
-					d.task = self.create_task(d)
-				assigned = frappe.db.get_value('ToDo',{'owner':d.user,'reference_name':d.task},'name')
-				if not assigned:
-					self.assigned_to_user(d)
+	def update_work_order(self):
+		if self.process_trials:
+			fabric = ''
+			data = frappe.db.sql(""" select a.work_order as work_order, ifnull(a.actual_fabric, '') as actual_fabric, b.pdd as pdd from `tabTrial Dates` a, `tabTrials` b where a.parent= b.name 
+									 and b.work_order ='%s' and process = '%s' and trial_no = '%s'"""%(self.process_work_order, self.process, self.process_trials), as_dict=1)
+			if data:
+				for d in data:
+					if cint(d.actual_fabric) == 1:
+						fabric = frappe.db.get_value('Production Dashboard Details', d.pdd, 'fabric_code')
+					else:
+						fabric = frappe.db.get_value('Production Dashboard Details', d.pdd, 'dummy_fabric_code')
+					if fabric:
+						frappe.db.sql(""" update `tabWork Order` set fabric__code = '%s' and trial_no = '%s'
+							where name = '%s'"""%(fabric, self.process_trials, d.work_order))			
 
 	def create_task(self):
 		self.validate_dates()
@@ -190,7 +237,6 @@ class ProcessAllotment(Document):
 	def on_submit(self):
 		self.check_status()
 		self.change_status('Completed')
-		# self.update_status()
 		# self.make_stock_entry_for_finished_goods()
 
 	def check_status(self):
@@ -225,12 +271,6 @@ class ProcessAllotment(Document):
 	def get_dict(self, task, user):
 		return {'Task':{'name':task}}
 
-	# def update_status(self):
-	# 	frappe.db.sql(""" update `tabProduction Dashboard Details` 
-	# 				set process_allotment= '%s', process_status ='Completed'
-	# 				where sales_invoice_no='%s' and article_code='%s' 
-	# 				"""%(self.name, self.sales_invoice_no, self.item))
-
 	def on_status_trigger_method(self, args):
 		self.set_completion_date(args)
 		self.update_process_status(args)
@@ -247,51 +287,53 @@ class ProcessAllotment(Document):
 	# 	if self.get('issue_raw_material'):
 	# 		create_se(self.get('issue_raw_material'))
 
-	def make_stock_entry_for_finished_goods(self):
-		ste = frappe.new_doc('Stock Entry')
-		ste.purpose = 'Manufacture/Repack'
-		ste.save(ignore_permissions=True)
-		self.make_child_entry(ste.name)
-		ste = frappe.get_doc('Stock Entry',ste.name)
-		ste.submit()
-		self.make_gs_entry()
-		return ste.name
+	# def make_stock_entry_for_finished_goods(self):
+	# 	ste = frappe.new_doc('Stock Entry')
+	# 	ste.purpose = 'Manufacture/Repack'
+	# 	ste.branch = get_user_branch()
+	# 	ste.save(ignore_permissions=True)
+	# 	self.make_child_entry(ste.name)
+	# 	ste = frappe.get_doc('Stock Entry',ste.name)
+	# 	ste.submit()
+	# 	self.make_gs_entry()
+	# 	return ste.name
 
-	def make_child_entry(self, name):
-		ste = frappe.new_doc('Stock Entry Detail')
-		ste.t_warehouse = 'Finished Goods - I'
-		ste.item_code = self.item
-		ste.serial_no = self.serials_data
-		ste.qty = self.finished_good_qty
-		ste.parent = name
-		ste.conversion_factor = 1
-		ste.parenttype = 'Stock Entry'
-		ste.uom = frappe.db.get_value('Item', ste.item_code, 'stock_uom')
-		ste.stock_uom = frappe.db.get_value('Item', ste.item_code, 'stock_uom')
-		ste.incoming_rate = 1.00
-		ste.parentfield = 'mtn_details'
-		ste.expense_account = 'Stock Adjustment - I'
-		ste.cost_center = 'Main - I'
-		ste.transfer_qty = self.finished_good_qty
-		ste.save(ignore_permissions = True)
-		return "Done"
+	# def make_child_entry(self, name):
+	# 	ste = frappe.new_doc('Stock Entry Detail')
+	# 	ste.t_warehouse = 'Finished Goods - I'
+	# 	ste.item_code = self.item
+	# 	ste.serial_no = self.serials_data
+	# 	ste.qty = self.finished_good_qty
+	# 	ste.parent = name
+	# 	ste.conversion_factor = 1
+	# 	ste.has_trials = 'No'
+	# 	ste.parenttype = 'Stock Entry'
+	# 	ste.uom = frappe.db.get_value('Item', ste.item_code, 'stock_uom')
+	# 	ste.stock_uom = frappe.db.get_value('Item', ste.item_code, 'stock_uom')
+	# 	ste.incoming_rate = 1.00
+	# 	ste.parentfield = 'mtn_details'
+	# 	ste.expense_account = 'Stock Adjustment - I'
+	# 	ste.cost_center = 'Main - I'
+	# 	ste.transfer_qty = self.finished_good_qty
+	# 	ste.save(ignore_permissions = True)
+	# 	return "Done"
 
-	def make_gs_entry(self):
-		if self.serials_data:
-			parent = frappe.db.get_value('Production Dashboard Details',{'sales_invoice_no':self.sales_invoice_no,'article_code':self.item,'process_allotment':self.name},'name')
-			sn = cstr(self.serials_data).splitlines()
-			for s in sn:
-				if not frappe.db.get_value('Production Status Detail',{'item_code':self.item, 'serial_no':s[0]},'name'):
-					if parent:
-						pd = frappe.new_doc('Production Status Detail')
-						pd.item_code = self.item
-						pd.serial_no = s
-						pd.status = 'Ready'
-						pd.parent = parent
-						pd.save(ignore_permissions = True)
-			if parent:
-				frappe.db.sql("update `tabProduction Dashboard Details` set status='Completed', trial_no=0 where name='%s'"%(parent))
-		return "Done"
+	# def make_gs_entry(self):
+	# 	if self.serials_data:
+	# 		parent = frappe.db.get_value('Production Dashboard Details',{'sales_invoice_no':self.sales_invoice_no,'article_code':self.item,'process_allotment':self.name},'name')
+	# 		sn = cstr(self.serials_data).splitlines()
+	# 		for s in sn:
+	# 			if not frappe.db.get_value('Production Status Detail',{'item_code':self.item, 'serial_no':s[0]},'name'):
+	# 				if parent:
+	# 					pd = frappe.new_doc('Production Status Detail')
+	# 					pd.item_code = self.item
+	# 					pd.serial_no = s
+	# 					pd.status = 'Ready'
+	# 					pd.parent = parent
+	# 					pd.save(ignore_permissions = True)
+	# 		if parent:
+	# 			frappe.db.sql("update `tabProduction Dashboard Details` set status='Completed', trial_no=0 where name='%s'"%(parent))
+	# 	return "Done"
 
 	def update_process_status(self, args=None):
 		self.update_parent_status()
@@ -337,6 +379,7 @@ class ProcessAllotment(Document):
 		emp.assigned_work_qty = self.work_qty
 		emp.deduct_late_work = self.deduct_late_work
 		emp.latework = self.latework
+		emp.tailor_serial_no = self.serial_no_data
 		emp.cost = self.cost
 
 		return "Done"
@@ -357,6 +400,12 @@ class ProcessAllotment(Document):
 	def validate_dates(self):
 		if not self.start_date and not self.end_date:
 			frappe.throw(_('Start and End Date is necessary to create task'))
+
+	def get_trial_serial_no(self):
+		get_trials = frappe.db.get_value('Trials', {'work_order':self.process_work_order}, '*')
+		self.serial_no_data = get_trials.trials_serial_no_status
+		self.work_qty = 1
+		return "Done"
 
 def create_se(raw_material):
 	count = 0

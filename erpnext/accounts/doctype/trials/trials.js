@@ -37,4 +37,29 @@ cur_frm.cscript.refresh= function(doc){
 	if(doc.trials_serial_no_status){
 		hide_field('trial_serial_no');
 	}
-}	
+}
+
+cur_frm.cscript.finished_all_trials = function(doc){
+	var cl = doc.trial_dates || [ ]
+	$.each(cl, function(i){
+		if(cl[i].production_status!='Closed'){
+			cl[i].skip_trial = parseInt(doc.finished_all_trials)
+		}
+	})
+	refresh_field('trial_dates')
+}
+
+cur_frm.cscript.work_status = function(doc, cdt, cdn){
+	var d = locals[cdt][cdn]
+	var cl = doc.trial_dates || [ ]
+
+	if(d.work_status == 'Open'){
+
+		$.each(cl, function(i){
+			if(cl[i].production_status!='Closed' && parseInt(cl[i].idx) < parseInt(d.idx)){
+				cl[i].next_trial_no = d.trial_no
+			}
+		})
+	}
+	refresh_field('trial_dates')
+}

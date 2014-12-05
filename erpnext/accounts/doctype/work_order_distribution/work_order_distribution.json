@@ -12,7 +12,7 @@
    "fieldname": "work_order_service", 
    "fieldtype": "Link", 
    "label": "Service", 
-   "options": "Service", 
+   "options": "Price List", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -142,7 +142,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-11-25 14:18:46.747408", 
+ "modified": "2014-12-02 18:21:11.968184", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Work Order Distribution", 

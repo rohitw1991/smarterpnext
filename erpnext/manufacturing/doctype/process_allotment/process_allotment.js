@@ -36,6 +36,7 @@ cur_frm.fields_dict['serial_no'].get_query = function(doc) {
 var sn_list=[]
 cur_frm.cscript.refresh = function(doc, cdt, cdn){
 	sn_list=[];
+	cur_frm.cscript.toogle_field(doc)
 	get_server_fields('show_trials_details', '','',doc, cdt, cdn, 1, function(){
 		refresh_field('trials_transaction')
 	})
@@ -77,15 +78,23 @@ cur_frm.cscript.process_status= function(doc, cdt, cdn){
 
 cur_frm.cscript.emp_status= function(doc, cdt, cdn){
 	doc.process_status = 'Open'
+	cur_frm.cscript.toogle_field(doc)
+	refresh_field(['process_status', 'completed_time', 'from_time'])
+}
+
+cur_frm.cscript.toogle_field = function(doc){
+	hide_field(['wages', 'extra_charge_amount', 'latework', 'cost'])
 	if (doc.emp_status=='Completed')
 	{
 		doc.process_status = 'Closed'
-		hide_field('wages');
-		hide_field('extra_charge_amount');
+		hide_field(['estimated_time', 'start_date', 'end_date']);
+		unhide_field(['from_time', 'completed_time', 'payment', 'extra_charge', 'deduct_late_work']);
+	}else if(doc.emp_status=='Assigned'){
+		unhide_field(['start_date', 'end_date', 'estimated_time'])
+		hide_field(['from_time', 'completed_time', 'payment', 'extra_charge', 'deduct_late_work']);
+		doc.completed_time = ''
+		doc.from_time = ''
 	}
-	doc.completed_time = ''
-	doc.from_time = ''
-	refresh_field(['process_status', 'completed_time', 'from_time'])
 }
 
 cur_frm.cscript.assigned= function(doc, cdt, cdn){
@@ -93,6 +102,14 @@ cur_frm.cscript.assigned= function(doc, cdt, cdn){
 		refresh_field('employee_details')	
 	})
 	
+}
+
+cur_frm.cscript.deduct_late_work = function(doc){
+	if(doc.deduct_late_work == 'Yes'){
+		unhide_field(['latework', 'cost']);		
+	}else{
+		hide_field(['latework', 'cost']);
+	}
 }
 
 cur_frm.cscript.work_qty = function(doc, cdt, cdn){
@@ -131,5 +148,21 @@ cur_frm.cscript.extra_charge = function(doc){
 		unhide_field('extra_charge_amount');		
 	}else{
 		hide_field('extra_charge_amount');	
+	}
+}
+
+
+cur_frm.cscript.process_trials = function(doc, cdt, cdn){
+	if(doc.process_trials){
+		get_server_fields('get_trial_serial_no', '', '', doc, cdt, cdn, 1, function(){
+			refresh_field(['serial_no_data', 'work_qty'])
+		})
+	}
+}
+
+cur_frm.fields_dict['serial_no'].get_query = function(doc) {
+	return{
+		query: "erpnext.accounts.accounts_custom_methods.get_serial_no",
+		filters: {'branch': doc.branch, 'process': doc.process, 'work_order': doc.process_work_order, 'trial_no':doc.process_trials}
 	}
 }

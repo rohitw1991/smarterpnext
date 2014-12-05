@@ -57,15 +57,6 @@
    "set_only_once": 0
   }, 
   {
-   "fieldname": "serial_no", 
-   "fieldtype": "Link", 
-   "hidden": 1, 
-   "label": "Serial No", 
-   "options": "Serial No", 
-   "permlevel": 0, 
-   "precision": ""
-  }, 
-  {
    "fieldname": "add", 
    "fieldtype": "Button", 
    "hidden": 1, 
@@ -142,6 +133,7 @@
   {
    "fieldname": "skip_process", 
    "fieldtype": "Check", 
+   "hidden": 1, 
    "label": "Skip Process", 
    "permlevel": 0, 
    "precision": ""
@@ -150,6 +142,14 @@
    "fieldname": "section_break_11", 
    "fieldtype": "Section Break", 
    "label": "Tailor Details", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "emp_status", 
+   "fieldtype": "Select", 
+   "label": "Status", 
+   "options": "\nPending\nAssigned\nReassigned\nCompleted", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -170,10 +170,18 @@
    "precision": ""
   }, 
   {
-   "fieldname": "process_trials", 
-   "fieldtype": "Select", 
-   "label": "Process Trials", 
-   "options": "\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n41\n42\n43\n44\n45\n46\n47\n48\n49\n50", 
+   "depends_on": "", 
+   "fieldname": "from_time", 
+   "fieldtype": "Datetime", 
+   "label": "From Time", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "depends_on": "", 
+   "fieldname": "completed_time", 
+   "fieldtype": "Int", 
+   "label": "Completed Time", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -212,88 +220,10 @@
   {
    "fieldname": "customer_trials", 
    "fieldtype": "Select", 
+   "hidden": 1, 
    "label": "Customer Trials", 
    "permlevel": 0, 
    "precision": ""
-  }, 
-  {
-   "fieldname": "assigned", 
-   "fieldtype": "Button", 
-   "label": "Add", 
-   "permlevel": 0, 
-   "precision": ""
-  }, 
-  {
-   "fieldname": "column_break_16", 
-   "fieldtype": "Column Break", 
-   "permlevel": 0, 
-   "precision": ""
-  }, 
-  {
-   "fieldname": "emp_status", 
-   "fieldtype": "Select", 
-   "label": "Status", 
-   "options": "\nPending\nAssigned\nReassigned\nCompleted", 
-   "permlevel": 0, 
-   "precision": ""
-  }, 
-  {
-   "fieldname": "work_qty", 
-   "fieldtype": "Int", 
-   "label": "Qty", 
-   "permlevel": 0, 
-   "precision": ""
-  }, 
-  {
-   "depends_on": "eval:doc.emp_status=='Assigned' || doc.emp_status=='Reassigned'", 
-   "fieldname": "estimated_time", 
-   "fieldtype": "Int", 
-   "label": "Estimated Time", 
-   "permlevel": 0, 
-   "precision": ""
-  }, 
-  {
-   "depends_on": "eval:doc.emp_status=='Completed'", 
-   "fieldname": "from_time", 
-   "fieldtype": "Datetime", 
-   "label": "From Time", 
-   "permlevel": 0, 
-   "precision": ""
-  }, 
-  {
-   "depends_on": "eval:doc.emp_status=='Completed'", 
-   "fieldname": "completed_time", 
-   "fieldtype": "Int", 
-   "label": "Completed Time", 
-   "permlevel": 0, 
-   "precision": ""
-  }, 
-  {
-   "fieldname": "task", 
-   "fieldtype": "Data", 
-   "label": "Task", 
-   "permlevel": 0, 
-   "precision": "", 
-   "read_only": 1
-  }, 
-  {
-   "default": "No", 
-   "depends_on": "eval:doc.emp_status=='Completed'", 
-   "fieldname": "extra_charge", 
-   "fieldtype": "Select", 
-   "label": "Extra Charge", 
-   "options": "\nYes\nNo", 
-   "permlevel": 0, 
-   "precision": ""
-  }, 
-  {
-   "default": "", 
-   "depends_on": "eval: doc.emp_status=='Completed'", 
-   "fieldname": "extra_charge_amount", 
-   "fieldtype": "Currency", 
-   "label": "Extra Charge Amount", 
-   "permlevel": 0, 
-   "precision": "2"
   }, 
   {
    "depends_on": "eval:doc.emp_status=='Completed'", 
@@ -320,6 +250,85 @@
    "label": "Cost", 
    "permlevel": 0, 
    "precision": ""
+  }, 
+  {
+   "fieldname": "assigned", 
+   "fieldtype": "Button", 
+   "label": "Add", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "column_break_16", 
+   "fieldtype": "Column Break", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "process_trials", 
+   "fieldtype": "Select", 
+   "label": "Process Trials", 
+   "options": "\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n41\n42\n43\n44\n45\n46\n47\n48\n49\n50", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "work_qty", 
+   "fieldtype": "Int", 
+   "label": "Qty", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "serial_no", 
+   "fieldtype": "Link", 
+   "hidden": 0, 
+   "label": "Serial No", 
+   "options": "Serial No", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "serial_no_data", 
+   "fieldtype": "Small Text", 
+   "label": "Serial No Data", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "depends_on": "", 
+   "fieldname": "estimated_time", 
+   "fieldtype": "Int", 
+   "label": "Estimated Time", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "task", 
+   "fieldtype": "Data", 
+   "label": "Task", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
+   "default": "No", 
+   "depends_on": "", 
+   "fieldname": "extra_charge", 
+   "fieldtype": "Select", 
+   "label": "Extra Charge", 
+   "options": "\nYes\nNo", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "default": "", 
+   "depends_on": "eval: doc.emp_status=='Completed'", 
+   "fieldname": "extra_charge_amount", 
+   "fieldtype": "Currency", 
+   "label": "Extra Charge Amount", 
+   "permlevel": 0, 
+   "precision": "2"
   }, 
   {
    "fieldname": "section_break_23", 
@@ -431,6 +440,34 @@
    "precision": ""
   }, 
   {
+   "fieldname": "has_trials", 
+   "fieldtype": "Check", 
+   "label": "Has Trials", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
+   "fieldname": "pdd", 
+   "fieldtype": "Data", 
+   "label": "PDD", 
+   "no_copy": 1, 
+   "permlevel": 0, 
+   "precision": "", 
+   "print_hide": 1, 
+   "read_only": 1
+  }, 
+  {
+   "fieldname": "trial_dates", 
+   "fieldtype": "Data", 
+   "label": "Trial Dates", 
+   "no_copy": 1, 
+   "permlevel": 0, 
+   "precision": "", 
+   "print_hide": 1, 
+   "read_only": 1
+  }, 
+  {
    "fieldname": "amended_from", 
    "fieldtype": "Link", 
    "label": "Amended From", 
@@ -448,7 +485,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-11-25 20:11:44.624491", 
+ "modified": "2014-12-04 22:26:32.061567", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Process Allotment", 
@@ -469,24 +506,6 @@
    "read": 1, 
    "report": 0, 
    "role": "Manufacturing User", 
-   "set_user_permissions": 1, 
-   "submit": 0, 
-   "write": 1
-  }, 
-  {
-   "amend": 0, 
-   "apply_user_permissions": 0, 
-   "cancel": 0, 
-   "create": 1, 
-   "delete": 1, 
-   "email": 0, 
-   "export": 0, 
-   "import": 0, 
-   "permlevel": 0, 
-   "print": 0, 
-   "read": 1, 
-   "report": 0, 
-   "role": "Sales User", 
    "set_user_permissions": 0, 
    "submit": 0, 
    "write": 1
@@ -500,7 +519,7 @@
    "permlevel": 0, 
    "read": 1, 
    "role": "Manufacturing Manager", 
-   "set_user_permissions": 1, 
+   "set_user_permissions": 0, 
    "submit": 0, 
    "write": 1
   }

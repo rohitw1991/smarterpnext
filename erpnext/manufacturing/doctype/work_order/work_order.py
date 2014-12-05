@@ -35,7 +35,7 @@ class WorkOrder(Document):
 		name = frappe.db.get_value('Work Order Distribution', {'tailor_work_order':self.name, 'tailoring_item':self.item_code}, 'trials')
 		for d in self.get('process_wise_warehouse_detail'):
 			if cint(d.actual_fabric) == 1 and d.warehouse and d.process:
-				frappe.db.sql("update `tabTrial Dates` set trial_branch = '%s' where parent ='%s' and process ='%s'"%(d.warehouse, name, d.process), debug=1)
+				frappe.db.sql("update `tabTrial Dates` set trial_branch = '%s' where parent ='%s' and process ='%s'"%(d.warehouse, name, d.process))
 
 	# def make_serial_no(self):
 	# 	if not self.serial_no_data:
@@ -100,7 +100,6 @@ class WorkOrder(Document):
 		apply_measurement_rules(self.get('measurement_item'), args)
 
 	def on_submit(self):
-		self.validate_trial_serial_no()
 		self.update_status('Completed')
 		self.set_work_order()
 
@@ -148,7 +147,8 @@ def apply_measurement_rules(measurement_details=None, param_args=None):
 			for data in measurement_data:
 				if data.target_parameter == d.parameter and param_args.get('parameter') == data.parameter:
 					value = (data.formula).replace('S',cstr(param_args.get('value')))
-					d.value = cstr(eval(value))
+					d.value = cstr(flt(eval(value)))
+					frappe.errprint(d.value)
 					result_list.append({'parameter': data.target_parameter, 'value': d.value})
 					
 	return result_list

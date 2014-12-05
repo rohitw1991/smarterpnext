@@ -340,11 +340,12 @@ frappe.WOForm = Class.extend({
 
 		$.each(me.field_area.find('#measurement_details tbody tr'), function(i){
 			measurement_dict = {}
-			var key = ['parameter', 'abbreviation', 'value']
+			var key = ['parameter', 'abbreviation']
 			cells = $(this).find('td')
 			$.each(cells, function(i){
-				measurement_dict[key[i]] = $(this).text() || $(this).find('.text_box').val() || ''	
+				measurement_dict[key[i]] = $(this).text() || ''	
 			})
+			measurement_dict['value'] = $(this).find('.text_box').val()
 			me.wo_details[i] = measurement_dict
 		})
 		

@@ -34,11 +34,6 @@ erpnext.hr.EmployeeController = frappe.ui.form.Controller.extend({
 		
 	},
 
-	validate:function(doc, dt, dn){
-
-		cur_frm.cscript.skill_validate(doc, dt, dn)
-	},
-
 	date_of_birth: function() {
 		return cur_frm.call({
 			method: "get_retirement_date",

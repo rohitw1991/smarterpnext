@@ -45,7 +45,7 @@
    "fieldtype": "Select", 
    "in_list_view": 1, 
    "label": "Sales Approval", 
-   "options": "\nPending\nOk", 
+   "options": "\nPending\nOpen", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -218,6 +218,41 @@
    "precision": "", 
    "print_hide": 1, 
    "read_only": 1
+  }, 
+  {
+   "fieldname": "actual_fabric", 
+   "fieldtype": "Check", 
+   "label": "Actual Fabric", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
+   "fieldname": "next_trial_no", 
+   "fieldtype": "Data", 
+   "hidden": 1, 
+   "label": "Next Trial No", 
+   "no_copy": 1, 
+   "permlevel": 0, 
+   "precision": "", 
+   "print_hide": 1, 
+   "read_only": 0
+  }, 
+  {
+   "fieldname": "amend", 
+   "fieldtype": "Check", 
+   "label": "Amend", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
+   "fieldname": "quality_check", 
+   "fieldtype": "Check", 
+   "label": "Quality Check", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
   }
  ], 
  "hide_heading": 0, 
@@ -227,7 +262,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-11-25 17:33:27.621713", 
+ "modified": "2014-12-02 18:14:36.574372", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Trial Dates", 

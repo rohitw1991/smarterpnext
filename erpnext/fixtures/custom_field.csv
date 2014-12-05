@@ -18,8 +18,18 @@
 "Type:","Data (text)","Link","Select","Data","Select","Select","Text","Text","Data","Int","Check","Check","Check","Data","Text","Check","Data","Check","Check","Check","Check","Check","Check"
 "Info:","","Valid DocType","One of: Button, Check, Code, Column Break, Currency, Data, Date, Datetime, Dynamic Link, Float, HTML, Image, Int, Link, Long Text, Password, Percent, Read Only, Section Break, Select, Small Text, Table, Text, Text Editor, Time","","","One of: 1, 2, 3, 4, 5, 6","","","","Integer","0 or 1","0 or 1","0 or 1","","","0 or 1","","0 or 1","0 or 1","0 or 1","0 or 1","0 or 1","0 or 1"
 "Start entering data below this line"
+"","""Serial No-work_order""","Serial No","Link","Work Order","finished_trial_no","","Work Order","","work_order",0,0,0,0,"","",0,"",0,1,0,0,0,0
+"","""Serial No-process""","Serial No","Data","Process","work_order","","","","process",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Serial No-process_status""","Serial No","Data","Process Status","process","","","","process_status",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Serial No-finished_trial_no""","Serial No","Data","Finished Trial No","warehouse","","","","finished_trial_no",0,0,1,0,"","",0,"",0,0,0,0,0,0
+"","""Stock Entry Detail-has_trials""","Stock Entry Detail","Data","Has Trials","process","","","","has_trials",0,0,1,0,"","",0,"",1,1,0,0,0,0
+"","""Sales Invoice-release""","Sales Invoice","Check","Release","authenticated","","","","release",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Sales Invoice-work_order_distribution""","Sales Invoice","Table","Work Order Distribution","merchandise_item","","Work Order Distribution","","work_order_distribution",0,0,1,0,"","",0,"eval:!doc.__islocal",1,1,0,0,0,0
+"","""Stock Entry Detail-trials""","Stock Entry Detail","Data","Trials","process","","","","trials",0,0,0,0,"","",1,"",1,1,0,0,0,1
+"","""Stock Entry Detail-process""","Stock Entry Detail","Data","Process","work_order","","","","process",0,0,0,0,"","",1,"",1,1,0,0,0,1
+"","""User-disable_ticker""","User","Check","Disable Ticker","ticker","","","","disable_ticker",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""User-ticker""","User","Data","Ticker","github_username","","","","ticker",0,0,0,0,"","",1,"",0,0,0,0,0,0
 "","""Sales Invoice-fabric_details""","Sales Invoice","Small Text","Fabric Details","sales_invoice_items_one","","","","fabric_details",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Sales Invoice-work_order_distribution""","Sales Invoice","Table","Work Order Distribution","merchandise_item","","Work Order Distribution","","work_order_distribution",0,0,0,0,"","",0,"eval:!doc.__islocal",1,1,0,0,0,0
 "","""Sales Invoice-merchandise_item""","Sales Invoice","Table","Merchandise Product","sales_invoice_items_one","","Merchandise Items","","merchandise_item",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Sales Invoice-sales_invoice_items_one""","Sales Invoice","Table","Tailoring Product","update_stock","","Sales Invoice Items","","sales_invoice_items_one",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Sales Invoice-branch""","Sales Invoice","Link","Branch","admin_authentication_note","","Branch","","branch",0,0,0,0,"","",0,"",0,0,0,0,0,0
@@ -95,7 +105,6 @@ Yes","","co",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Branch-payment_modes""","Branch","Link","Payment Modes","min_advance_payment","","Mode of Payment","","payment_modes",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Branch-currency""","Branch","Link","Currency","y","","Currency","","currency",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Branch-y""","Branch","Column Break","","currency","","Currency","","y",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""User-ticker""","User","Button","Ticker","github_username","","","","ticker",0,0,0,0,"","",1,"",0,0,0,0,0,0
 "","""Sales Invoice-admin_authentication_note""","Sales Invoice","Small Text","Admin Authentication Note","authenticated","","","","admin_authentication_note",0,0,1,0,"","",0,"",0,1,0,0,0,0
 "","""Sales Invoice-authenticated""","Sales Invoice","Select","Authenticated","delivery_date","","
 Approved
