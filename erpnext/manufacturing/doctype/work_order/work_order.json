@@ -48,6 +48,18 @@
    "report_hide": 1
   }, 
   {
+   "fieldname": "status", 
+   "fieldtype": "Select", 
+   "hidden": 0, 
+   "label": "Status", 
+   "no_copy": 1, 
+   "options": "\nPending\nRelease", 
+   "permlevel": 0, 
+   "precision": "", 
+   "print_hide": 1, 
+   "read_only": 1
+  }, 
+  {
    "fieldname": "sales_invoice_no", 
    "fieldtype": "Data", 
    "label": "Sales Invoice No", 
@@ -281,7 +293,7 @@
  "is_submittable": 1, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-11-26 17:38:53.201802", 
+ "modified": "2014-12-07 23:58:43.748477", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Work Order", 

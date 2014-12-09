@@ -173,7 +173,30 @@
    "depends_on": "", 
    "fieldname": "from_time", 
    "fieldtype": "Datetime", 
+   "hidden": 1, 
    "label": "From Time", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "start_date", 
+   "fieldtype": "Datetime", 
+   "label": "Start Date", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "end_date", 
+   "fieldtype": "Datetime", 
+   "label": "End Date", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "depends_on": "", 
+   "fieldname": "estimated_time", 
+   "fieldtype": "Int", 
+   "label": "Estimated Time", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -182,20 +205,6 @@
    "fieldname": "completed_time", 
    "fieldtype": "Int", 
    "label": "Completed Time", 
-   "permlevel": 0, 
-   "precision": ""
-  }, 
-  {
-   "fieldname": "start_date", 
-   "fieldtype": "Date", 
-   "label": "Start Date", 
-   "permlevel": 0, 
-   "precision": ""
-  }, 
-  {
-   "fieldname": "end_date", 
-   "fieldtype": "Date", 
-   "label": "End Date", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -292,14 +301,6 @@
    "fieldname": "serial_no_data", 
    "fieldtype": "Small Text", 
    "label": "Serial No Data", 
-   "permlevel": 0, 
-   "precision": ""
-  }, 
-  {
-   "depends_on": "", 
-   "fieldname": "estimated_time", 
-   "fieldtype": "Int", 
-   "label": "Estimated Time", 
    "permlevel": 0, 
    "precision": ""
   }, 
@@ -485,7 +486,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-12-04 22:26:32.061567", 
+ "modified": "2014-12-08 14:22:48.587500", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Process Allotment", 

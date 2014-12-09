@@ -360,6 +360,7 @@ def make_order(doc, d, qty, item_code):
 		e.tailor_warehouse = d.tailoring_branch
 		if not e.tailor_work_order:
 			e.tailor_work_order = create_work_order(doc, d, e.serial_no_data, item_code)
+			update_serial_no_with_wo(e.serial_no_data, e.tailor_work_order)
 		if not e.trials:
 			e.trials = make_schedule_for_trials(doc, d, e.tailor_work_order, item_code, e.serial_no_data)
 		e.save()
@@ -417,9 +418,10 @@ def check_work_order_assignment(doc, item_code, qty):
 def create_serial_no(doc, method):
 	for d in doc.get('work_order_distribution'):
 		if not d.serial_no_data:
-			d.serial_no_data = generate_serial_no(doc,d.tailoring_item, d.tailor_qty,d)
+			d.serial_no_data = generate_serial_no(doc,d.tailoring_item, d.tailor_qty)
+			update_serial_no_with_wo(d.serial_no_data, d.tailor_work_order)
 
-def generate_serial_no(doc, item_code, qty, args):
+def generate_serial_no(doc, item_code, qty):
 	serial_no =''
 	temp_qty = qty
 	while cint(qty) > 0:
@@ -428,7 +430,6 @@ def generate_serial_no(doc, item_code, qty, args):
 		sn.serial_no = sn.name
 		sn.process_status = 'Open'
 		sn.item_code = item_code
-		sn.work_order = args.tailor_work_order
 		sn.status = 'Available'
 		sn.save(ignore_permissions=True)
 		if cint(temp_qty) == qty:
@@ -437,6 +438,13 @@ def generate_serial_no(doc, item_code, qty, args):
 			serial_no += '\n' + sn.name 
 		qty = cint(qty) -1
 	return serial_no
+
+def update_serial_no_with_wo(serial_no_list, work_order):
+	if serial_no_list and work_order:
+		serial_no_list = cstr(serial_no_list).split('\n')
+		for serial_no in serial_no_list:
+			frappe.db.sql(""" update `tabSerial No` set work_order='%s' where
+				name ='%s'"""%(work_order, serial_no))
 
 @frappe.whitelist()
 def get_process_detail(name):
@@ -451,28 +459,24 @@ def invoice_validation_method(doc, method):
 
 @frappe.whitelist()
 def get_work_order_details(sales_invoice_no):
-	return frappe.db.sql(""" Select tailor_work_order, tailoring_item, ifnull(release_status, 'Pending') as release_status 
-		from `tabWork Order Distribution` where parent='%s'"""%(sales_invoice_no), as_dict=1, debug=1)
+	return frappe.db.sql(""" Select name, item_code, ifnull(status, 'Pending') as release_status 
+		from `tabWork Order` where sales_invoice_no='%s'"""%(sales_invoice_no), as_dict=1)
 
 @frappe.whitelist()
 def update_status(sales_invoice_no, args):
 	args = eval(args)
 	for s in args:
-		if s.get('status') == 'Release':
+		if s.get('status') == 'Release' and frappe.db.get_value('Work Order', s.get('work_order'), 'status')!='Release':
 			validate_work_order(s)
-			get_work_order_details = frappe.db.get_value('Work Order Distribution', {'tailor_work_order':s.get('work_order'), 'parent': sales_invoice_no}, '*')
-			if get_work_order_details.release_status != 'Release' and not frappe.db.get_value('Stock Entry Detail', {'work_order': s.get('work_order'), 'docstatus':0}, 'name'):
-				target_branch, name = get_target_branch(sales_invoice_no, s)
-				parent = stock_entry_for_out(s, target_branch)
-				if parent:
-					status = get_status(s.get('work_order'))
-					if status:
-						prepare_serial_no_list(get_work_order_details.serial_no_data, status, 'Closed')
-					# update_work_order_status(s, sales_invoice_no, parent)
-					cut_order_generation(s.get('work_order'), sales_invoice_no)
+			details = open_next_branch(frappe.db.get_value('Production Dashboard Details',{'work_order': s.get('work_order')}, 'name'), 1)
+			add_to_serial_no(details, s.get('work_order'))
+			cut_order_generation(s.get('work_order'), sales_invoice_no)
+			update_work_order_status(s.get('work_order'), s.get('status'))
+			if not frappe.db.get_value('Stock Entry Detail', {'work_order': s.get('work_order'), 'docstatus':0}, 'name'):
+				sn_list = frappe.db.get_value('Work Order', s.get('work_order'), 'serial_no_data')
+				parent = stock_entry_for_out(s, details.branch, sn_list, frappe.db.get_value('Work Order', s.get('work_order'), 'item_qty'))
 		elif s.get('status') == 'Hold' and frappe.db.get_value('Work Order Distribution', {'tailor_work_order':s.get('work_order'), 'parent': sales_invoice_no}, 'release_status') != 'Release':
-			prepare_serial_no_list(get_work_order_details.serial_no_data, 'Hold', 'Pending')
-			# update_work_order_status(s, sales_invoice_no)
+			update_work_order_status(s.get('work_order'), 'Pending')
 		else:
 			frappe.msgprint("Work order %s is already release"%(s.get('work_order')))
 
@@ -481,45 +485,55 @@ def get_status(work_order):
 	if process:
 		return process[0][0]
 
-def release_work_order(doc, method):
-	if cint(doc.release) == 1:
-		for d in doc.get('work_order_distribution'):
-			s= {'work_order': d.tailor_work_order, 'status': 'Release', 'item': d.tailoring_item}
-			target_branch, name = get_target_branch(doc.name, s)
-			parent = stock_entry_for_out(s, target_branch)
-			if parent:
-				status = get_status(d.tailor_work_order)
-				if status:
-					prepare_serial_no_list(d.serial_no_data, status, 'Closed')
-				# update_work_order_status(s, doc.name, parent)
-				cut_order_generation(d.tailor_work_order, doc.name)
+def release_work_order(doc):
+	if doc.status != 'Release' and cint(frappe.db.get_value('Sales Invoice', doc.sales_invoice_no, 'release')) == 1:
+		s= {'work_order': doc.name, 'status': 'Release', 'item': doc.item_code}
+		details = open_next_branch(frappe.db.get_value('Production Dashboard Details',{'work_order': doc.name}, 'name'), 1)
+		add_to_serial_no(details, s.get('work_order'))
+		sn_list = frappe.db.get_value('Work Order', doc.name, 'serial_no_data')
+		parent = stock_entry_for_out(s, details.branch, sn_list, frappe.db.get_value('Work Order', doc.name, 'item_qty'))
+		update_work_order_status(doc.name, 'Release')
+		cut_order_generation(d.tailor_work_order, doc.name)	
 
-def stock_entry_for_out(args, target_branch):
-	parent = frappe.db.get_value('Stock Entry Detail', {'target_branch':target_branch, 'docstatus':0, 's_warehouse': get_branch_warehouse(get_user_branch())}, 'parent')
-	if parent:
-		obj = frappe.get_doc('Stock Entry', parent)
-		stock_entry_of_child(obj, args, target_branch)
-		obj.save(ignore_permissions=True)
+def add_to_serial_no(args, work_order, sn_list=None):
+	if sn_list:
+		serial_no_list = sn_list
 	else:
-		parent = make_StockEntry(args, target_branch)
-	return parent
+		serial_no_list = frappe.db.get_value('Work Order', work_order, 'serial_no_data')
+	if serial_no_list:
+		serial_no_list = cstr(serial_no_list).split('\n')
+		for serial_no in serial_no_list:
+			make_serial_no_log(serial_no, args, work_order)
 
-def make_StockEntry(args, target_branch):
+def stock_entry_for_out(args, target_branch, sn_list, qty):
+	if target_branch != get_user_branch():
+		parent = frappe.db.get_value('Stock Entry Detail', {'target_branch':target_branch, 'docstatus':0, 's_warehouse': get_branch_warehouse(get_user_branch())}, 'parent')
+		if parent:
+			obj = frappe.get_doc('Stock Entry', parent)
+			stock_entry_of_child(obj, args, target_branch, sn_list, qty)
+			obj.save(ignore_permissions=True)
+		else:
+			parent = make_StockEntry(args, target_branch, sn_list, qty)
+		return parent
+	else:
+		return "Completed"
+
+def make_StockEntry(args, target_branch, sn_list, qty):
 	ste = frappe.new_doc('Stock Entry')
  	ste.purpose_type = 'Material Out'
  	ste.purpose ='Material Issue'
  	ste.branch = get_user_branch()
- 	stock_entry_of_child(ste, args, target_branch)
+ 	stock_entry_of_child(ste, args, target_branch, sn_list, qty)
  	ste.save(ignore_permissions=True)
  	return ste.name
 
-def stock_entry_of_child(obj, args, target_branch):
+def stock_entry_of_child(obj, args, target_branch, sn_list, qty):
 	ste = obj.append('mtn_details', {})
 	ste.s_warehouse = get_branch_warehouse(get_user_branch())
 	ste.target_branch = target_branch
 	ste.t_warehouse = get_branch_warehouse(target_branch)
-	ste.qty = frappe.db.get_value('Work Order', args.get('work_order'), 'item_qty')
-	ste.serial_no = frappe.db.get_value('Work Order', args.get('work_order'), 'serial_no_data')
+	ste.qty = qty
+	ste.serial_no = sn_list
 	ste.incoming_rate = 1.0
 	ste.conversion_factor = 1.0
 	ste.work_order = args.get('work_order')
@@ -540,13 +554,9 @@ def get_target_branch(invoice_no, args):
 	if branch:
 		return branch[0][0], branch[0][1]
 
-def update_work_order_status(args, sales_invoice_no, stock_entry=None):
-	cond = "release_status='%s'"%(args.get('status'))
-	if stock_entry:
-		cond = "release_status='%s', release_stock_entry='%s'"%(args.get('status'), stock_entry)
-	frappe.db.sql("""update `tabWork Order Distribution` 
-				set %s where tailor_work_order='%s' and 
-				parent='%s'"""%(cond, args.get('work_order'), sales_invoice_no)) 
+def update_work_order_status(work_order, status):
+	frappe.db.sql("""update `tabWork Order` set status= '%s' 
+		where name='%s'"""%(status, work_order)) 
 
 def prepare_serial_no_list(serial_no_list, process, process_status):
 	if serial_no_list:
@@ -562,12 +572,100 @@ def update_serial_no_status(serial_no, process, process_status):
 
 def get_serial_no(doctype, txt, searchfield, start, page_len, filters):
 	if filters.get('trial_no'):
-		return frappe.db.sql(""" select name from `tabSerial No` where warehouse = '%s' and work_order='%s' and finished_trial_no = '%s'"""%(get_branch_warehouse(filters.get('branch')), filters.get('work_order'), filters.get('trial_no')))
+		return frappe.db.sql(""" select name from `tabSerial No` where name in (select 
+			trials_serial_no_status from `tabTrials` where work_order='%s') and warehouse='%s'"""%(filters.get('work_order'), get_branch_warehouse(get_user_branch())))
 	else:
-		return frappe.db.sql(""" select name from `tabSerial No` where warehouse = '%s' and work_order='%s'"""%(get_branch_warehouse(filters.get('branch')), filters.get('work_order')))
+		return frappe.db.sql(""" select name from `tabSerial No` where warehouse = '%s' and work_order='%s'"""%(get_branch_warehouse(get_user_branch()), filters.get('work_order')))
 
 def validate_status(serial_no, process_status):
 	mapper = {'Closed':'Open', 'Open': 'Closed'}
 	data = frappe.db.get_value('Serial No', serial_no, 'process_status')
 	if mapper[process_status] != data:
 		frappe.throw(_("Either process is closed or last process is not completed"))
+
+def open_next_branch(pdd, idx):
+	if pdd and idx:
+		return frappe.db.get_value('Process Log',{'parent':pdd, 'idx':idx}, '*')
+
+def check_previous_is_closed(serial_no, args, work_order):
+	if frappe.db.get_value('Trials', {'pdd': args.parent, 'work_order': work_order}, 'trials_serial_no_status') != serial_no:
+		process = frappe.db.sql("""select process from `tabProcess Wise Warehouse Detail` where 
+			parent='%s' and idx < (select idx from `tabProcess Wise Warehouse Detail` where 
+			parent='%s' and process='%s') order by idx desc limit 1"""%(args.parent, args.parent, args.process_name), as_list=1)
+		if process:
+			if frappe.db.get_value('Serial No Detail', {'parent': serial_no, 'process': process[0][0]}, 'status') != 'Completed':
+				frappe.throw(_('You have not closed previous process or trials'))
+	else:
+		check_previous_is_closed_for_trials(serial_no, args, work_order)
+
+def check_previous_is_closed_for_trials(serial_no, args, work_order):
+	cond = "1=1"
+	if args.trials:
+		cond = "trials='%s'"%(args.trials)
+	process_detail = frappe.db.sql("""select process_name, trials from 
+		`tabProcess Log` where parent='%s' and idx < (select idx from `tabProcess Log` 
+		where parent='%s' and process_name='%s' and %s ) and skip_trial!=1 
+		order by idx desc limit 1"""%(args.parent, args.parent, args.process_name, cond), as_list=1)
+
+	if process_detail:
+		if process_detail[0][1]:
+			if frappe.db.get_value('Serial No Detail', {'parent': serial_no, 'process': process_detail[0][0], 'trial_no': process_detail[0][1]}, 'status') != 'Completed':
+				frappe.throw(_('You have not closed previous process or trials'))
+		elif frappe.db.get_value('Serial No Detail', {'parent': serial_no, 'process': process_detail[0][0]}, 'status') != 'Completed':
+			frappe.throw(_('You have not closed previous process or trials'))
+
+
+def make_serial_no_log(serial_no, args, work_order):
+	if cint(args.idx)>1:
+		check_previous_is_closed(serial_no, args, work_order)
+
+	if args.trials:
+		if not frappe.db.get_value('Serial No Detail', {'parent':serial_no, 'process': args.process_name,'trial_no': args.trials,  'work_order': work_order}, 'name'):
+			make_sn_detail(serial_no, args, work_order)
+	elif not frappe.db.get_value('Serial No Detail', {'parent':serial_no, 'process': args.process_name, 'work_order': work_order}, 'name'):
+		make_sn_detail(serial_no, args, work_order)
+
+def make_sn_detail(serial_no, args, work_order):
+	snd = frappe.new_doc('Serial No Detail')
+	snd.process_data = args.process_data
+	snd.process = args.process_name
+	snd.trial_no = args.trials
+	snd.work_order = work_order
+	snd.parenttype = 'Serial No'
+	snd.parentfield = 'serial_no_detail'
+	snd.status = 'Assigned'
+	snd.idx_no = args.idx
+	snd.parent = serial_no
+	snd.save(ignore_permissions=True)
+
+def update_status_to_completed(serial_no, process_data, trial_no):
+	cond = "1=1"
+	if trial_no:
+		cond = "trial_no = '%s'"%(trial_no)
+	name = frappe.db.sql("""select name from `tabSerial No Detail` where parent='%s'
+		and process_data='%s' and status='Assigned' and %s"""%(serial_no, process_data, cond), as_list=1)
+	if name:
+		update_serial_no_log_status(name[0][0], 'Completed')
+	else:
+		frappe.throw(_("already completed"))
+
+def get_idx_for_serialNo(args, pdd, process):
+	if args.tailor_process_trials:
+		return frappe.db.get_value('Process Log' ,{'parent': pdd, 'process_name': process, 'trials':args.tailor_process_trials}, 'idx')
+	else:
+		return  frappe.db.get_value('Process Log' ,{'parent': pdd, 'process_name': process}, 'idx')
+
+def check_for_reassigned(serial_no, args, process):
+	cond = "1=1"
+	if args.tailor_process_trials:
+		cond = "trial_no='%s'"%(args.tailor_process_trials)
+
+	name = frappe.db.sql("""select name from `tabSerial No Detail`
+		where parent='%s' and process='%s' and status='Completed' and %s"""%(serial_no, process, cond), as_list=1)
+	if name:
+		update_serial_no_log_status(name[0][0], 'Assigned')
+	else:
+		frappe.throw(_("already completed"))
+
+def update_serial_no_log_status(name, status):
+	frappe.db.sql("Update `tabSerial No Detail` set status='%s' where name='%s'"%(status, name))

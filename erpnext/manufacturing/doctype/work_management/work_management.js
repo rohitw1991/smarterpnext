@@ -10,6 +10,12 @@ cur_frm.cscript.sales_invoice_no = function(doc, cdt, cdn){
 	})	
 }
 
+cur_frm.cscript.services = function(doc, cdt, cdn){
+	get_server_fields('get_invoice_details', doc.sales_invoice_no,'',doc,cdt,cdn , 1 , function(){
+		refresh_field('production_details')
+	})	
+}
+
 cur_frm.cscript.search = function(doc, cdt, cdn){
 	var s =document.getElementById('view');
 	s.src = 'http://localhost:9777/desk#Form/Sales Invoice/SINV-00039';
@@ -80,15 +86,10 @@ cur_frm.cscript.process_allocation = function(doc, cdt, cdn){
 		})
 		var fd = dialog.fields_dict;
 		$(this.div).find('myDiv').remove()
-		this.div = $('<div id="myDiv"><table class="table table-bordered" style="background-color: #D8D8D8;height:10px" id="mytable"><thead><tr><td>Process Name</td><td>Process</td><td>Trials</td><td>Status</td></tr></thead><tbody></tbody></table></div>').appendTo($(fd.styles_name.wrapper))
+		this.div = $('<div id="myDiv"><table class="table table-bordered" style="background-color: #D8D8D8;height:10px" id="mytable"><thead><tr><td>Process Name</td><td>Process</td><td>Trials</td></tr></thead><tbody></tbody></table></div>').appendTo($(fd.styles_name.wrapper))
 		for(i=0;i<r.message.length;i++){
-			if(r.message[i].status != 'Pending')
-			{
-				this.table = $(this.div).find('#mytable').append('<tr style="background-color: #FFFFFF;"><td><a href="#Form/Process Allotment/'+r.message[i].process_data+'">'+r.message[i].process_data+'</a></td><td>'+r.message[i].process_name+'</td><td>'+r.message[i].trials+'</td><td>'+r.message[i].status+'</td></tr>')			
-			}
-			else{
-				this.table = $(this.div).find('#mytable').append('<tr style="background-color: #FFFFFF;"><td>'+r.message[i].process_data+'</td><td>'+r.message[i].process_name+'</td><td>'+r.message[i].trials+'</td><td>'+r.message[i].status+'</td></tr>')				
-			}
+			
+				this.table = $(this.div).find('#mytable').append('<tr style="background-color: #FFFFFF;"><td><a href="#Form/Process Allotment/'+r.message[i].process_data+'">'+r.message[i].process_data+'</a></td><td>'+r.message[i].process_name+'</td><td>'+r.message[i].trials+'</td></tr>')			
 			
 		}
 		dialog.show()

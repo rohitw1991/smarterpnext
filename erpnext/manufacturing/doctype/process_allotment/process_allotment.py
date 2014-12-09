@@ -6,7 +6,7 @@ import frappe
 from frappe.model.document import Document
 from frappe import _
 from frappe.utils import cstr, flt, getdate, comma_and, nowdate, cint, now, nowtime
-from erpnext.accounts.accounts_custom_methods import delte_doctype_data, prepare_serial_no_list
+from erpnext.accounts.accounts_custom_methods import delte_doctype_data, prepare_serial_no_list, check_for_reassigned, update_status_to_completed, stock_entry_for_out, add_to_serial_no, get_idx_for_serialNo, open_next_branch
 from tools.custom_data_methods import get_user_branch, get_branch_cost_center, get_branch_warehouse, update_serial_no, find_next_process
 import datetime
 
@@ -18,7 +18,7 @@ class ProcessAllotment(Document):
 		self.create_time_log()
 		self.update_task()
 		# self.make_auto_ste()
-		self.auto_ste_for_trials()
+		# self.auto_ste_for_trials()
 		
 
 	def show_trials_details(self):
@@ -33,13 +33,8 @@ class ProcessAllotment(Document):
 	def create_time_log(self):
 		if self.get('employee_details'):
 			for data in self.get('employee_details'):
-				if (data.employee_status == 'Assigned' or data.employee_status == 'Reassigned') and data.status_update != 'Yes':
-					process = self.process
-					serial_no_status = 'Open'
-				if data.employee_status == 'Completed':
-					process = find_next_process(self.pdd, self.process)
-					serial_no_status = 'Closed'
-				prepare_serial_no_list(data.tailor_serial_no, process, serial_no_status)
+				self.validate_trials(data)
+				self.start_process_for_serialNo(data)
 				if cint(data.idx) == cint(len(self.get('employee_details'))):
 					status = 'Closed' if data.employee_status == 'Completed' else 'Open'
 					frappe.db.sql("update `tabTask` set status ='%s' where name='%s'"%( status, data.tailor_task))
@@ -47,7 +42,6 @@ class ProcessAllotment(Document):
 					tl = frappe.new_doc('Time Log')
 					tl.from_time = data.tailor_from_time
 					tl.hours = flt(data.work_completed_time)/60
-					frappe.errprint(tl.hours)
 					tl.to_time = datetime.datetime.strptime(tl.from_time, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(hours = flt(tl.hours))
 					tl.activity_type = self.process
 					tl.task = data.tailor_task
@@ -57,19 +51,73 @@ class ProcessAllotment(Document):
 					t.submit()
 					data.time_log_name = tl.name
 
-	# def get_details(self, item):
-	# 	self.set('wo_process', [])
-	# 	args = frappe.db.sql("""select * from `tabProcess Item`
-	# 		where parent='%s'"""%(item),as_dict=1)
-	# 	if args:
-	# 		for data in args:
-	# 			prd = self.append('wo_process', {})
-	# 			prd.process = data.process_name
-	# 			prd.trial = data.trial
-	# 			prd.status = 'Pending'
-	# 			prd.quality_check = data.quality_check
-	# 	return "Done"
+	def start_process_for_serialNo(self, data):
+		if data.employee_status == 'Assigned':
+			idx = get_idx_for_serialNo(data, self.pdd, self.process)
+			details = open_next_branch(self.pdd, idx)
+			add_to_serial_no(details, self.process_work_order, data.tailor_serial_no)
+		else:
+			# self.update_sn_status(data)
+			if data.employee_status == 'Completed' and not data.ste_no:
+				s= {'work_order': self.process_work_order, 'status': 'Release', 'item': self.item}
+				details = find_next_process(self.pdd, self.process, data.tailor_process_trials)
+				sn_list = self.get_not_added_sn(data.tailor_serial_no)
+				if sn_list:
+					if data.tailor_process_trials:
+						branch = frappe.db.get_value('Trial Dates', {'parent': self.trial_dates, 'trial_no': data.tailor_process_trials}, 'trial_branch')
+						frappe.msgprint(branch)
+						data.ste_no = stock_entry_for_out(s, branch, sn_list, data.assigned_work_qty)
+					else:
+						data.ste_no = stock_entry_for_out(s, details.branch, sn_list, data.assigned_work_qty)
 
+	def get_not_added_sn(self, sn_list):
+		new_sn_list = ''
+		data = frappe.db.sql(""" select serial_no from `tabStock Entry Detail` where 
+			work_order = '%s' and docstatus=0"""%(self.process_work_order), as_list=1)
+		if data:
+			for sn in data:
+				sn = cstr(sn).split('\n')
+				for s in sn:
+					serial_no = self.check_available(s, sn_list)
+					if new_sn_list:
+						new_sn_list = new_sn_list + '\n' + serial_no
+					else:
+						new_sn_list = serial_no
+		else:
+			return sn_list
+		return new_sn_list
+
+	def check_available(self, serial_no, sn_list):
+		sn_data = ''
+		sn_list = cstr(sn_list).split('\n')
+		for sn in sn_list:
+			if sn != serial_no:
+				if sn_data:
+					sn_data = sn_data + '\n' + sn
+				else:
+					sn_data = sn
+		return sn_data
+
+
+	def update_sn_status(self, args):
+		if args.tailor_serial_no:
+			serial_no_list = cstr(args.tailor_serial_no).split('\n')
+			for serial_no in serial_no_list:
+				if args.employee_status == 'Completed' and not args.ste_no:
+					update_status_to_completed(serial_no, self.name, args.tailor_process_trials)
+				elif args.employee_status == 'Reassigned':
+					check_for_reassigned(serial_no, args, self.process)
+
+	def validate_trials(self, args):
+		if self.process_trials and cint(args.assigned_work_qty) > 1:
+			frappe.throw(_("Only one serial no is allocated for trial no"))
+		if args.employee_status == 'Completed' and args.tailor_process_trials:
+			details = frappe.db.sql("""select name, production_status from `tabTrial Dates` where
+				parent='%s' and trial_no='%s'"""%(self.trial_dates, args.tailor_process_trials), as_list=1)
+			if details:
+				if details[0][1] != 'Closed':
+					frappe.db.sql(""" update `tabTrial Dates` set production_status='Closed'
+						where name='%s'	"""%(details[0][0]))
 
 	def make_auto_ste(self):
 		if self.process_status == 'Closed':
@@ -145,6 +193,14 @@ class ProcessAllotment(Document):
 				parent = frappe.db.get_value('Process Log', {'process_data': self.name}, 'parent')
 				update_serial_no(parent, sn, msg)
 
+	def find_to_time(self, date_type=None):
+		import math
+		if not date_type:
+			self.end_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+		after = datetime.datetime.strptime(self.end_date, '%Y-%m-%d %H:%M:%S') 
+		before = datetime.datetime.strptime(self.start_date, '%Y-%m-%d %H:%M:%S')
+		self.completed_time = cstr(math.floor(((after - before).seconds) / 60))
+
 	def make_stock_entry(self, t_branch, args):
 		ste = frappe.new_doc('Stock Entry')
 		ste.purpose_type = 'Material Out'
@@ -210,8 +266,8 @@ class ProcessAllotment(Document):
 		tsk = frappe.new_doc('Task')
 		tsk.subject = 'Do process %s for item %s'%(self.process, frappe.db.get_value('Item',self.item,'item_name'))
 		tsk.project = self.sales_invoice_no
-		tsk.exp_start_date = self.start_date
-		tsk.exp_end_date = self.end_date
+		tsk.exp_start_date = datetime.datetime.strptime(self.start_date, '%Y-%m-%d %H:%M:%S').date()
+		tsk.exp_end_date = datetime.datetime.strptime(self.end_date, '%Y-%m-%d %H:%M:%S').date()
 		tsk.status = 'Open'
 		tsk.process_name = self.process
 		tsk.item_code = self.item
@@ -373,7 +429,7 @@ class ProcessAllotment(Document):
 		emp.tailor_process_trials = self.process_trials
 		emp.tailor_extra_wages = self.extra_charge
 		emp.tailor_extra_amt = self.extra_charge_amount
-		emp.tailor_from_time = self.from_time
+		emp.tailor_from_time = self.start_date
 		emp.work_estimated_time = self.estimated_time
 		emp.work_completed_time = self.completed_time
 		emp.assigned_work_qty = self.work_qty
@@ -386,6 +442,7 @@ class ProcessAllotment(Document):
 
 	def calculate_estimates_time(self):
 		self.estimated_time = cint(self.work_qty) * cint(frappe.db.get_value('EmployeeSkill',{'parent':self.process_tailor, 'process':self.process, 'item_code': self.item},'time'))
+		self.end_date = datetime.datetime.strptime(self.start_date, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(minutes = cint(self.estimated_time))
 		return "Done"
 
 	def calculate_wages(self):

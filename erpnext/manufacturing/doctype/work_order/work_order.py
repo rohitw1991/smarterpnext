@@ -5,7 +5,7 @@
 import frappe
 from frappe.model.document import Document
 from frappe.utils import cstr, flt, getdate, comma_and, cint
-from erpnext.accounts.accounts_custom_methods import generate_serial_no
+from erpnext.accounts.accounts_custom_methods import generate_serial_no, release_work_order
 from frappe.model.naming import make_autoname
 from frappe import _, msgprint, throw
 
@@ -21,7 +21,7 @@ class WorkOrder(Document):
 
 	def on_update(self):
 		self.update_process_in_production_dashboard()
-		self.update_branch_in_trials()
+		# self.update_branch_in_trials()
 
 	def update_process_in_production_dashboard(self):
 		for d in self.get('process_wise_warehouse_detail'):
@@ -102,6 +102,7 @@ class WorkOrder(Document):
 	def on_submit(self):
 		self.update_status('Completed')
 		self.set_work_order()
+		release_work_order(self)
 
 	def on_cancel(self):
 		self.update_status('Pending')

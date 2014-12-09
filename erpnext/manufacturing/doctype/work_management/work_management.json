@@ -19,6 +19,26 @@
    "precision": ""
   }, 
   {
+   "fieldname": "column_break_2", 
+   "fieldtype": "Column Break", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "services", 
+   "fieldtype": "Link", 
+   "label": "Services", 
+   "options": "Price List", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "sb4", 
+   "fieldtype": "Section Break", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "search", 
    "fieldtype": "Button", 
    "label": "Search", 
@@ -101,7 +121,7 @@
  "is_submittable": 0, 
  "issingle": 1, 
  "istable": 0, 
- "modified": "2014-10-15 11:47:49.428960", 
+ "modified": "2014-12-08 16:06:11.418907", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Work Management", 

@@ -22,8 +22,12 @@ class WorkManagement(Document):
 
 	def get_invoice(self, invoice_no=None):
 		cond = "1=1"
-		if invoice_no:
+		if invoice_no and not self.services:
 			cond = "sales_invoice_no='%s'"%(invoice_no)
+		elif self.services and not invoice_no:
+			cond = "tailoring_service='%s'"%(self.services)
+		elif self.services and invoice_no:
+			cond = "sales_invoice_no='%s' and tailoring_service='%s'"%(invoice_no, self.services)
 		return frappe.db.sql("select * from `tabProduction Dashboard Details` where %s order by sales_invoice_no desc"%(cond),as_dict=1, debug=1)
 
 	def create_invoice_bundle(self, invoice_detail, si):

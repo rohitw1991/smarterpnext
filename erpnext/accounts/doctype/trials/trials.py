@@ -28,10 +28,11 @@ class Trials(Document):
 		data = frappe.db.get_value('Process Log', {'parent': self.pdd, 'process_name': trial_data.process, 'trials': trial_data.trial_no}, '*')
 		if data:
 			reverse_entry = data.reverse_entry if data.reverse_entry else ''
-			if trial_data.production_status == 'Closed' and reverse_entry == 'Pending' and trial_data.trial_branch != data.branch:
-				branch = data.branch
-				msg = cstr(trial_data.trial_no) + ' ' +cstr(trial_data.production_status)
-				self.prepare_for_ste(trial_data, branch, data, msg)
+			if trial_data.production_status == 'Closed':
+				if reverse_entry == 'Pending' and trial_data.trial_branch != data.branch:
+					branch = data.branch
+					msg = cstr(trial_data.trial_no) + ' ' +cstr(trial_data.production_status)
+					self.prepare_for_ste(trial_data, branch, data, msg)
 			elif cint(self.finished_all_trials) == 1:
 				branch = self.get_target_branch(trial_data)
 				if branch != trial_data.trial_branch and not frappe.db.get_value('Stock Entry Detail', {'work_order': self.work_order, 'target_branch':branch, 'docstatus':0, 's_warehouse': get_branch_warehouse(get_user_branch())}, 'name'):
@@ -41,7 +42,12 @@ class Trials(Document):
 					self.OpenNextTrial(trial_data)
 			else:
 				self.OpenNextTrial(trial_data)
+				if trial_data.work_status == 'Open' and cint(trial_data.skip_trial)!=1:
+					self.open_trial(data, trial_data.trial_no)
 
+	def open_trial(self, args, trial_no):
+		if args.process_data:
+			frappe.db.sql("""update `tabProcess Allotment` set process_trials='%s', status='Assigned' where name = '%s'"""%(trial_no, args.process_data))
 
 	def prepare_for_ste(self, trial_data, branch, data, msg):
 		parent = frappe.db.get_value('Stock Entry Detail', {'target_branch':data.branch, 'docstatus':0, 's_warehouse': get_branch_warehouse(trial_data.trial_branch)}, 'parent')
@@ -116,8 +122,9 @@ class Trials(Document):
 			pl.skip_trial = cint(args.skip_trial)
 			pl.process_name = args.process
 			pl.trials_date = args.trial_date
-			pl.branch = args.trial_branch
+			pl.branch = frappe.db.get_value('Process Wise Warehouse Detail', {'process': args.process, 'parent': self.work_order, 'actual_fabric':1}, 'warehouse') # to retrieve name of the branch where production is happened
 			pl.trials = cint(args.trial_no)
+			pl.trials_date = args.trial_date
 			pl.parent = self.pdd
 			if max_id:
 				pl.idx = cint(max_id[0][0]) + 1
