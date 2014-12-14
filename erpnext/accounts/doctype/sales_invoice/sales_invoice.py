@@ -681,5 +681,5 @@ def make_delivery_note(source_name, target_doc=None):
 			"add_if_empty": True
 		}
 	}, target_doc, set_missing_values)
-
+	frappe.errprint(doclist)
 	return doclist

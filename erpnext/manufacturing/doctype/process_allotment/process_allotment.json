@@ -282,6 +282,14 @@
    "precision": ""
   }, 
   {
+   "fieldname": "qc", 
+   "fieldtype": "Check", 
+   "label": "QC", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 0
+  }, 
+  {
    "fieldname": "work_qty", 
    "fieldtype": "Int", 
    "label": "Qty", 
@@ -486,7 +494,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-12-08 14:22:48.587500", 
+ "modified": "2014-12-11 21:40:27.325239", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Process Allotment", 

@@ -220,6 +220,14 @@
    "read_only": 1
   }, 
   {
+   "fieldname": "quality_check_status", 
+   "fieldtype": "Data", 
+   "label": "Quality Check Status", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
    "fieldname": "actual_fabric", 
    "fieldtype": "Check", 
    "label": "Actual Fabric", 
@@ -262,7 +270,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-12-02 18:14:36.574372", 
+ "modified": "2014-12-10 18:01:09.339467", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Trial Dates", 

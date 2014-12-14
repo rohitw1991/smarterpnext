@@ -101,6 +101,9 @@ doc_events = {
 	},
 	"Employee":{
 		"validate": "erpnext.stock.stock_custom_methods.update_user_permissions_for_emp"
+	},
+	"Quality Inspection":{
+		"on_submit" : "erpnext.accounts.accounts_custom_methods.make_stock_entry_against_qc"
 	}
 }
 

@@ -71,6 +71,14 @@
    "report_hide": 1
   }, 
   {
+   "fieldname": "finish_trial_for_process", 
+   "fieldtype": "Link", 
+   "label": "Finish Trial For Process", 
+   "options": "Process", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "finished_all_trials", 
    "fieldtype": "Check", 
    "label": "Finished All Trials", 
@@ -146,6 +154,15 @@
    "reqd": 0, 
    "search_index": 0, 
    "set_only_once": 0
+  }, 
+  {
+   "fieldname": "completed_process_log", 
+   "fieldtype": "Table", 
+   "label": "Completed Process Log", 
+   "options": "Completed Process Log", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 0
   }
  ], 
  "hide_heading": 0, 
@@ -155,7 +172,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-12-01 20:27:34.587732", 
+ "modified": "2014-12-13 12:36:15.377233", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Trials", 

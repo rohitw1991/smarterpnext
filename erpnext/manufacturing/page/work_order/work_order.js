@@ -240,7 +240,7 @@ frappe.WOForm = Class.extend({
 	view_style:function(col_id, tab){
 		var style_name = $(col_id[0]).text();
 		var image_data;
-		
+		alert($(this).parent().index())
 		var me1 = this;
 		var dialog = new frappe.ui.Dialog({
 				title:__(style_name+' Styles'),

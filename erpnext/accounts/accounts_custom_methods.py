@@ -10,7 +10,7 @@ from frappe import _
 from frappe.model.db_query import DatabaseQuery
 from frappe import msgprint, _, throw
 from frappe.model.naming import make_autoname
-from tools.custom_data_methods import get_user_branch, get_branch_cost_center, get_branch_warehouse
+from tools.custom_data_methods import get_user_branch, get_branch_cost_center, get_branch_warehouse, find_next_process
 from tools.tools_management.custom_methods import cut_order_generation
 
 def create_production_process(doc, method):
@@ -19,13 +19,13 @@ def create_production_process(doc, method):
 		if process_allotment:
 			create_dashboard(process_allotment,d,doc)
 
-def create_work_order(doc, data, serial_no, item_code):
+def create_work_order(doc, data, serial_no, item_code, qty):
 	wo = frappe.new_doc('Work Order')
  	wo.item_code = item_code
  	wo.customer = doc.customer
  	wo.sales_invoice_no = doc.name
  	wo.customer_name = frappe.db.get_value('Customer',wo.customer,'customer_name')
- 	wo.item_qty = data.tailoring_qty
+ 	wo.item_qty = qty
  	wo.fabric__code = get_dummy_fabric(item_code)
  	wo.serial_no_data = serial_no
  	wo.branch = data.tailoring_warehouse
@@ -84,12 +84,11 @@ def create_process_wise_warehouse_detail(data, wo_name, item_code):
  			mi.parentfield = 'process_wise_warehouse_detail'
  			mi.parenttype = 'Work Order'
  			mi.save(ignore_permissions =True)
- 			
 
 def create_process_allotment(data):
 	process_list=[]
 	i = 1
-	process = frappe.db.sql(""" select distinct process_name,idx from `tabProcess Item` where parent = '%s' order by idx asc
+	process = frappe.db.sql(""" select distinct process_name,idx, quality_check from `tabProcess Item` where parent = '%s' order by idx asc
 		"""%(data.tailoring_item),as_dict = 1)
 	if process:
 		for s in process:
@@ -98,6 +97,7 @@ def create_process_allotment(data):
 		 	pa.process_no = i
 		 	pa.process = s.process_name
 		 	pa.process_work_order = data.tailor_work_order
+		 	pa.qc = cint(s.quality_check)
 		 	pa.status = 'Pending'
 		 	pa.item = data.tailoring_item
 		 	pa.branch = frappe.db.get_value('Process Wise Warehouse Detail',{'parent':data.tailor_work_order,'process':pa.process}, 'warehouse')
@@ -359,7 +359,7 @@ def make_order(doc, d, qty, item_code):
 		e.tailor_fabric_qty = frappe.db.get_value('Size Item', {'parent':d.tailoring_item_code, 'size':d.tailoring_size, 'width':d.width }, 'fabric_qty')
 		e.tailor_warehouse = d.tailoring_branch
 		if not e.tailor_work_order:
-			e.tailor_work_order = create_work_order(doc, d, e.serial_no_data, item_code)
+			e.tailor_work_order = create_work_order(doc, d, e.serial_no_data, item_code, qty)
 			update_serial_no_with_wo(e.serial_no_data, e.tailor_work_order)
 		if not e.trials:
 			e.trials = make_schedule_for_trials(doc, d, e.tailor_work_order, item_code, e.serial_no_data)
@@ -493,9 +493,9 @@ def release_work_order(doc):
 		sn_list = frappe.db.get_value('Work Order', doc.name, 'serial_no_data')
 		parent = stock_entry_for_out(s, details.branch, sn_list, frappe.db.get_value('Work Order', doc.name, 'item_qty'))
 		update_work_order_status(doc.name, 'Release')
-		cut_order_generation(d.tailor_work_order, doc.name)	
+		cut_order_generation(doc.name, doc.sales_invoice_no)	
 
-def add_to_serial_no(args, work_order, sn_list=None):
+def add_to_serial_no(args, work_order, sn_list=None, qc=0):
 	if sn_list:
 		serial_no_list = sn_list
 	else:
@@ -503,7 +503,7 @@ def add_to_serial_no(args, work_order, sn_list=None):
 	if serial_no_list:
 		serial_no_list = cstr(serial_no_list).split('\n')
 		for serial_no in serial_no_list:
-			make_serial_no_log(serial_no, args, work_order)
+			make_serial_no_log(serial_no, args, work_order, qc)
 
 def stock_entry_for_out(args, target_branch, sn_list, qty):
 	if target_branch != get_user_branch():
@@ -572,10 +572,12 @@ def update_serial_no_status(serial_no, process, process_status):
 
 def get_serial_no(doctype, txt, searchfield, start, page_len, filters):
 	if filters.get('trial_no'):
-		return frappe.db.sql(""" select name from `tabSerial No` where name in (select 
-			trials_serial_no_status from `tabTrials` where work_order='%s') and warehouse='%s'"""%(filters.get('work_order'), get_branch_warehouse(get_user_branch())))
+		return frappe.db.sql(""" select name from `tabSerial No` where name in (select
+			trials_serial_no_status from `tabTrials` where work_order='%s') and warehouse='%s'
+			and (select status from `tabWork Order` where name='%s') = 'Release'"""%(filters.get('work_order'), get_branch_warehouse(get_user_branch()), filters.get('work_order')))
 	else:
-		return frappe.db.sql(""" select name from `tabSerial No` where warehouse = '%s' and work_order='%s'"""%(get_branch_warehouse(get_user_branch()), filters.get('work_order')))
+		return frappe.db.sql(""" select name from `tabSerial No` where warehouse = '%s' and work_order='%s' 
+			and (select status from `tabWork Order` where name='%s') = 'Release'"""%(get_branch_warehouse(get_user_branch()), filters.get('work_order'), filters.get('work_order')))
 
 def validate_status(serial_no, process_status):
 	mapper = {'Closed':'Open', 'Open': 'Closed'}
@@ -593,8 +595,11 @@ def check_previous_is_closed(serial_no, args, work_order):
 			parent='%s' and idx < (select idx from `tabProcess Wise Warehouse Detail` where 
 			parent='%s' and process='%s') order by idx desc limit 1"""%(args.parent, args.parent, args.process_name), as_list=1)
 		if process:
-			if frappe.db.get_value('Serial No Detail', {'parent': serial_no, 'process': process[0][0]}, 'status') != 'Completed':
+			serial_no_data = frappe.db.get_value('Serial No Detail', {'parent': serial_no, 'process': process[0][0]}, '*')
+			if serial_no_data.status != 'Completed':
 				frappe.throw(_('You have not closed previous process or trials'))
+			elif cint(serial_no_data.has_qc) == 1 and qc_completed != 'Completed':
+				frappe.throw(_('Quality checking is pending for previous process or trials'))
 	else:
 		check_previous_is_closed_for_trials(serial_no, args, work_order)
 
@@ -605,7 +610,7 @@ def check_previous_is_closed_for_trials(serial_no, args, work_order):
 	process_detail = frappe.db.sql("""select process_name, trials from 
 		`tabProcess Log` where parent='%s' and idx < (select idx from `tabProcess Log` 
 		where parent='%s' and process_name='%s' and %s ) and skip_trial!=1 
-		order by idx desc limit 1"""%(args.parent, args.parent, args.process_name, cond), as_list=1)
+		order by idx desc limit 1"""%(args.parent, args.parent, args.process_name, cond), as_list=1, debug=1)
 
 	if process_detail:
 		if process_detail[0][1]:
@@ -615,20 +620,21 @@ def check_previous_is_closed_for_trials(serial_no, args, work_order):
 			frappe.throw(_('You have not closed previous process or trials'))
 
 
-def make_serial_no_log(serial_no, args, work_order):
+def make_serial_no_log(serial_no, args, work_order, qc):
 	if cint(args.idx)>1:
 		check_previous_is_closed(serial_no, args, work_order)
 
 	if args.trials:
 		if not frappe.db.get_value('Serial No Detail', {'parent':serial_no, 'process': args.process_name,'trial_no': args.trials,  'work_order': work_order}, 'name'):
-			make_sn_detail(serial_no, args, work_order)
+			make_sn_detail(serial_no, args, work_order, qc)
 	elif not frappe.db.get_value('Serial No Detail', {'parent':serial_no, 'process': args.process_name, 'work_order': work_order}, 'name'):
-		make_sn_detail(serial_no, args, work_order)
+		make_sn_detail(serial_no, args, work_order, qc)
 
-def make_sn_detail(serial_no, args, work_order):
+def make_sn_detail(serial_no, args, work_order, qc):
 	snd = frappe.new_doc('Serial No Detail')
 	snd.process_data = args.process_data
 	snd.process = args.process_name
+	snd.has_qc = cint(qc)
 	snd.trial_no = args.trials
 	snd.work_order = work_order
 	snd.parenttype = 'Serial No'
@@ -647,7 +653,7 @@ def update_status_to_completed(serial_no, process_data, trial_no):
 	if name:
 		update_serial_no_log_status(name[0][0], 'Completed')
 	else:
-		frappe.throw(_("already completed"))
+		frappe.throw(_("Already completed or not assigned"))
 
 def get_idx_for_serialNo(args, pdd, process):
 	if args.tailor_process_trials:
@@ -669,3 +675,42 @@ def check_for_reassigned(serial_no, args, process):
 
 def update_serial_no_log_status(name, status):
 	frappe.db.sql("Update `tabSerial No Detail` set status='%s' where name='%s'"%(status, name))
+
+
+def make_stock_entry_against_qc(doc, method):
+	if doc.get('qa_specification_details'):
+		for data in doc.get('qa_specification_details'):
+			if data.status == 'Rejected':
+				frappe.throw(_('Quality checking is rejected at row {0}').format(data.idx))
+			elif doc.serial_no_data:
+				update_QI_for_SerialNo(doc, data)
+		make_ste_for_QI(doc, data)
+
+def update_QI_for_SerialNo(doc, data):
+	sn_list = cstr(doc.serial_no_data).split('\n')
+	cond = "1=1"
+	if doc.process:
+		cond = "process = '%s'"%(doc.process)
+	elif doc.process and doc.trial_no:
+		cond = "process = '%s' and trial_no='%s'"%(doc.process, doc.trial_no)
+	for serial_no in sn_list:
+		frappe.db.sql(""" update `tabSerial No Detail` set qc_completed='Completed' where 
+			parent= '%s' and work_order='%s' and %s"""%(serial_no, doc.work_order, cond))
+
+def make_ste_for_QI(self, data):
+	details = find_next_process(self.pdd, self.process, self.trial_no)
+	target_branch = get_branch(self, details)
+	args = {'work_order': self.work_order, 'status': 'Release', 'item': self.item_code}
+	parent = stock_entry_for_out(args, target_branch, self.serial_no_data, self.sample_size)
+	if parent and self.tdd and self.trial_no:
+		frappe.db.sql("""update `tabTrial Dates` set quality_check_status='Completed' where 
+			parent='%s' and trial_no = '%s'"""%(self.tdd, self.trial_no))
+
+def get_branch(self, pdlog):
+	if pdlog:
+		branch = pdlog.branch	
+	else:
+		branch = frappe.db.get_value('Production Dashboard Details', self.pdd, 'end_branch')
+	if self.trial_no and self.tdd:
+		branch = frappe.db.get_value('Trial Dates', {'parent': self.tdd, 'trial_no': self.trial_no}, 'trial_branch')	
+	return branch

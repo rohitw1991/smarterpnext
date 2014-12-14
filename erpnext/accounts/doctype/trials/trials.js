@@ -31,6 +31,7 @@ cur_frm.cscript.validate= function(doc){
 	if(doc.trials_serial_no_status){
 		hide_field('trial_serial_no');
 	}
+	setTimeout(function(){refresh_field(['trial_dates', 'completed_process_log'])}, 1000)
 }
 
 cur_frm.cscript.refresh= function(doc){
@@ -62,4 +63,31 @@ cur_frm.cscript.work_status = function(doc, cdt, cdn){
 		})
 	}
 	refresh_field('trial_dates')
+}
+
+cur_frm.fields_dict['finish_trial_for_process'].get_query = function(doc, cdt, cdn) {
+		get_finished_list = cur_frm.cscript.get_finished_list(doc)
+      	return {
+      		query : "tools.tools_management.custom_methods.get_unfinished_process",
+      		filters : {
+      			'item_code':doc.item_code,
+      			'get_finished_list' : get_finished_list
+      		}
+      	}
+}
+
+cur_frm.cscript.get_finished_list= function(doc){
+	var cl = doc.completed_process_log || [ ]
+	var process_list = ""
+	if (parseInt(cl.length) > 1){
+		$.each(cl, function(i){
+			if(cl[i].completed_process && process_list){
+				process_list = process_list + ",'" + cl[i].completed_process + "'"
+			}else{
+				process_list = "'" + cl[i].completed_process + "'"
+			}
+		})
+		process_list = "(" + process_list + ")"
+	}
+	return process_list
 }

@@ -83,12 +83,7 @@ cur_frm.cscript.emp_status= function(doc, cdt, cdn){
 }
 
 cur_frm.cscript.clear_field= function(doc){
-	if(doc.emp_status == 'Assigned'){
-		doc.start_date = ''
-		doc.work_qty = ''
-		doc.serial_no = ''
-		doc.serial_no_data = ''
-	}else if(doc.emp_status == 'Completed'){
+	if(doc.emp_status == 'Completed'){
 		doc.start_date = ''
 		doc.end_date = ''
 		doc.work_qty = ''
@@ -110,7 +105,18 @@ cur_frm.cscript.toogle_field = function(doc){
 	}else if(doc.emp_status=='Assigned'){
 		unhide_field(['start_date', 'end_date', 'estimated_time'])
 		hide_field([ 'completed_time', 'payment', 'extra_charge', 'deduct_late_work']);
+		doc.process_tailor = ''
+		doc.employee_name = ''
+		doc.end_date = ''
+		doc.estimated_time = ''
 		doc.completed_time = ''
+		
+		if(!doc.process_trials){
+			doc.serial_no = ''
+			doc.serial_no_data = ''
+			doc.work_qty = ''
+		}
+		refresh_field(['process_tailor', 'employee_name', 'start_date', 'end_date', 'estimated_time', 'serial_no', 'serial_no_data', 'work_qty'])
 	}
 }
 
@@ -190,7 +196,7 @@ cur_frm.fields_dict['serial_no'].get_query = function(doc) {
 	}
 }
 
-cur_frm.cscript.serial_no = function(doc){
+cur_frm.cscript.serial_no = function(doc, cdt, cdn){
 	status = 'Done'
 	if(doc.serial_no_data){
 		status = cur_frm.cscript.check_serial_exist(doc.serial_no_data, doc.serial_no)	
@@ -208,6 +214,15 @@ cur_frm.cscript.serial_no = function(doc){
 	
 	cur_frm.cscript.calculate_qty(doc)
 	refresh_field(['serial_no_data', 'work_qty'])
+	get_server_fields('calculate_estimates_time','','',doc, cdt, cdn,1, function(){
+		refresh_field(['estimated_time', 'end_date'])	
+	})
+}
+
+cur_frm.cscript.start_date = function(doc, cdt, cdn){
+	get_server_fields('calculate_estimates_time','','',doc, cdt, cdn,1, function(){
+		refresh_field(['estimated_time', 'end_date'])	
+	})
 }
 
 cur_frm.cscript.calculate_qty = function(doc){

@@ -194,6 +194,13 @@
    "label": "Status Update", 
    "permlevel": 0, 
    "precision": ""
+  }, 
+  {
+   "fieldname": "qc_required", 
+   "fieldtype": "Check", 
+   "label": "QC Required", 
+   "permlevel": 0, 
+   "precision": ""
   }
  ], 
  "hide_heading": 0, 
@@ -203,7 +210,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 1, 
- "modified": "2014-12-05 20:08:04.714425", 
+ "modified": "2014-12-10 20:57:59.280665", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Employee Details", 

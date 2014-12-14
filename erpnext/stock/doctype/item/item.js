@@ -231,6 +231,29 @@ cur_frm.add_fetch('default_branch', 'warehouse', 'default_warehouse')
 {% include 'stock/custom_items.js' %}
 cur_frm.script_manager.make(erpnext.stock.CustomItem);
 
+
+cur_frm.fields_dict.item_specification_details.grid.get_field("qi_process").get_query = function(doc, cdt, cdn) {
+		var d = locals[cdt][cdn]
+		get_list = cur_frm.cscript.get_list(doc, cdt, cdn)
+      	return {
+      		query : "tools.tools_management.custom_methods.get_process_details",
+      		filters : {
+      			'obj':JSON.stringify(get_list),
+      		}
+      	}
+}
+
+cur_frm.cscript.get_list= function(doc, cdt, cdn){
+	var cl = doc.process_item || [ ]
+	data = []
+	$.each(cl, function(i){
+		if(parseInt(cl[i].quality_check)==1 || parseInt(cl[i].trials_qc)==1){
+			data.push(cl[i].process_name)
+		}
+	})
+	return data
+}
+
 // cur_frm.cscript.onload_post_render = function() {
 // 	frappe.require('assets/frappe/js/lib/jscolor/jscolor.js');
 // 	$.each(["fabric_color"], function(i, v) {

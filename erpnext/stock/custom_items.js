@@ -54,10 +54,11 @@ erpnext.stock.CustomItem = frappe.ui.form.Controller.extend({
             this.add_trial(d) // add new rows
             this.save_data(d) // save data
             this.remove_row() // remove row
+            this.auto_checked_actual_fabric()
             refresh_field('branch_dict')
         }
         else{
-              alert("Click on Check Split Qty")
+              alert("Click on Check box Trials")
         }
     },
     init_trials : function(data){
@@ -112,14 +113,7 @@ erpnext.stock.CustomItem = frappe.ui.form.Controller.extend({
                 <td><input id="actual_fabric" class="quality_check" type="checkbox" name="actual_fabric" '+ch+'></td>\
                 <td><input class="quality_check" type="checkbox" name="amended" ></td><td><input class="text_box" data-fieldtype="Int" type="Textbox">\
                 </td><td>&nbsp;<button  class="remove">X</button></td></tr>')
-            $(me.div).find('.quality_check').click(function(){
-                var s= $(this).parent().parent().index();
-                var count = $('#mytable').children('tbody').children('tr').length;
-                for(i=s+1 ; i<count;i++)
-                {
-                    $(me.div).find('#mytable tbody tr:eq('+i+') td:eq(3) .quality_check').prop('checked','checked')
-                }
-            })
+            me.auto_checked_actual_fabric()
             me.remove_row()
         })
     },
@@ -147,6 +141,7 @@ erpnext.stock.CustomItem = frappe.ui.form.Controller.extend({
             })
 
             if(status=='true' && trials_dict){
+                data.trials_qc = me.find_trials_hasQC(trials_dict)
                 data.branch_dict = JSON.stringify(trials_dict)
                 refresh_field('process_item')
                 me.dialog.hide()
@@ -155,6 +150,15 @@ erpnext.stock.CustomItem = frappe.ui.form.Controller.extend({
             }
         
         })
+    },
+    find_trials_hasQC: function(trials_dict){
+        msg = 0
+        $.each(trials_dict, function(i){
+            if(trials_dict[i]['quality_check'] == 'checked'){
+                msg = 1
+            }
+        })
+        return msg
     },
     remove_row : function(){
         var me =this;
@@ -196,6 +200,17 @@ erpnext.stock.CustomItem = frappe.ui.form.Controller.extend({
     is_clubbed_product : function(doc){
         doc.has_serial_no = 'No'
         refresh_field('has_serial_no')
+    },
+    auto_checked_actual_fabric: function(){
+        var me = this
+        $(me.div).find('.quality_check').click(function(){
+            var s= $(this).parent().parent().index();
+            var count = $('#mytable').children('tbody').children('tr').length;
+            for(i=s+1 ; i<count;i++)
+            {
+                $(me.div).find('#mytable tbody tr:eq('+i+') td:eq(3) .quality_check').prop('checked','checked')
+            }
+        })
     }
 })
 
