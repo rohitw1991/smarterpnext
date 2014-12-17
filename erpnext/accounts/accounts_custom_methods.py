@@ -210,7 +210,7 @@ def make_stock_entry_of_child(obj, data):
 		st.transfer_qty = data.tailor_qty or 1
 		st.incoming_rate = 1.00
 		st.expense_account = 'Stock Adjustment - '+frappe.db.get_value('Company', frappe.db.get_value('GLobal Default', None, 'company'), 'abbr')
-		st.cost_center = 'Main - '++frappe.db.get_value('Company', frappe.db.get_value('GLobal Default', None, 'company'), 'abbr')
+		st.cost_center = 'Main - '+frappe.db.get_value('Company', frappe.db.get_value('GLobal Default', None, 'company'), 'abbr')
  	return True
 
 def create_stock(name, item_code, warehouse, warehouse_type , qty=None):
