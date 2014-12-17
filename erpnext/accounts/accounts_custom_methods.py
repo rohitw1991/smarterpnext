@@ -450,7 +450,8 @@ def update_serial_no_with_wo(serial_no_list, work_order):
 @frappe.whitelist()
 def get_process_detail(name):
 	return frappe.db.sql("""select process_data, process_name, 
-		ifnull(trials,'No') as trials, qi_status from `tabProcess Log` 
+		ifnull(trials,'No') as trials, (select ifnull(qi_status, '') from `tabProcess Allotment`
+			where name =a.process_data) as qi_status from `tabProcess Log` a
 		where parent ='%s' and branch = '%s' 
 		order by process_data, trials"""%(name, get_user_branch()),as_dict=1, debug=1)
 
