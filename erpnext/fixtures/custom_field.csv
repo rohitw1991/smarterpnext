@@ -18,6 +18,43 @@
 "Type:","Data (text)","Link","Select","Data","Select","Select","Text","Text","Data","Int","Check","Check","Check","Data","Text","Check","Data","Check","Check","Check","Check","Check","Check"
 "Info:","","Valid DocType","One of: Button, Check, Code, Column Break, Currency, Data, Date, Datetime, Dynamic Link, Float, HTML, Image, Int, Link, Long Text, Password, Percent, Read Only, Section Break, Select, Small Text, Table, Text, Text Editor, Time","","","One of: 1, 2, 3, 4, 5, 6","","","","Integer","0 or 1","0 or 1","0 or 1","","","0 or 1","","0 or 1","0 or 1","0 or 1","0 or 1","0 or 1","0 or 1"
 "Start entering data below this line"
+"","""Serial No-barcode_image""","Serial No","Small Text","Barcode Image","brand","","","","barcode_image",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Serial No-completed""","Serial No","Data","Completed","serial_no_detail","","","","completed",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Stock Entry-stock_in""","Stock Entry","Data","Bundle No","purpose","","","","stock_in",0,0,0,0,"","",0,"eval:doc.purpose_type == 'Material In'",0,0,0,1,0,0
+"","""Sales Invoice Item-sales_invoice_branch""","Sales Invoice Item","Link","Sales Invoice Branch","warehouse","","Branches","","sales_invoice_branch",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Item Quality Inspection Parameter-qi_process""","Item Quality Inspection Parameter","Link","Process","value","","Process","","qi_process",0,0,0,0,"","",0,"",0,0,0,0,1,0
+"","""Quality Inspection-work_order""","Quality Inspection","Data","Work Order","serial_no_data","","","","work_order",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Quality Inspection-pdd""","Quality Inspection","Data","PDD","","","","","pdd",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Quality Inspection-process""","Quality Inspection","Data","Process","pdd","","","","process",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Quality Inspection-trial_no""","Quality Inspection","Data","Trial No","process","","","","trial_no",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Quality Inspection-tdd""","Quality Inspection","Data","TDD","trial_no","","","","tdd",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Serial No-quality_check""","Serial No","Select","Quality Check","serial_no","","
+Pending
+Completed","","quality_check",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Quality Inspection-serial_no_data""","Quality Inspection","Small Text","Serial No Data","batch_no","","","","serial_no_data",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Item-sales_bom_item""","Item","Table","Sales BOM Item","x","","Sales BOM Item","","sales_bom_item",0,0,0,0,"","",0,"eval:doc.is_clubbed_product==1",0,0,0,0,0,0
+"","""Item-x""","Item","Section Break","","weight_uom","","","","x",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Item-default_branch""","Item","Link","Default Branch","is_stock_item","","Branch","","default_branch",0,0,0,0,"","",0,"eval:doc.is_stock_item=='Yes'",0,0,0,0,0,0
+"","""Item-is_clubbed_product""","Item","Check","Is Clubbed Product","is_stock_item","","","","is_clubbed_product",0,0,0,0,"","",0,"eval:doc.is_stock_item=='No'",0,0,0,0,0,0
+"","""Item-raw_material_item""","Item","Table","Raw Material Item","raw_material","","Raw Material Item","","raw_material_item",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Item-raw_material""","Item","Section Break","Raw Material","costing_item","","","","raw_material",0,0,0,0,"","",0,"eval:doc.item_group=='Tailoring' && !doc.__islocal",0,0,0,0,0,0
+"","""Item-costing_item""","Item","Table","Costing Item","process_item","","Costing Item","","costing_item",0,0,0,0,"","",0,"eval:!doc.__islocal && (doc.item_group=='Tailoring')",0,0,0,0,0,0
+"","""Item-fabric_costing""","Item","Table","Merchandise Costing","item_costing","","Fabric Costing","","fabric_costing",0,0,0,0,"","",0,"eval:!doc.__islocal && (doc.item_group=='Fabric' || doc.item_group=='Merchandise' || doc.item_group=='Fabric Swatch Item')",0,0,0,0,0,0
+"","""Item-service""","Item","Link","Service","item_costing","","Service","","service",0,0,0,0,"","",0,"eval:!doc.__islocal && (doc.item_group=='Tailoring')",0,0,0,0,0,0
+"","""Item-item_costing""","Item","Section Break","Item Costing","raw_material_item","","","","item_costing",0,0,0,0,"","",0,"eval:!doc.__islocal",0,0,0,0,0,0
+"","""Item-style_item""","Item","Table","Style Fields","measurement_item","","Style Item","","style_item",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Item-measurement_item""","Item","Table","Measurement Fields","s_","","Measurement Item","","measurement_item",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Item-test_label""","Item","HTML","Test Label","","","","","test_label",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Item-s_""","Item","Section Break","Measurement and Style Option","measurement_formula_template","","","","s_",0,0,0,0,"","",0,"eval:doc.item_group=='Tailoring' && !doc.__islocal",0,0,0,0,0,0
+"","""Item-measurement_formula_template""","Item","Link","Measurement Formula Template","c","","Measurement Formula","","measurement_formula_template",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Item-c""","Item","Column Break","c","measurement_template","","","","c",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Item-measurement_template""","Item","Link","Measurement Template","measurement_formula","","Measurement Template","","measurement_template",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Item-measurement_formula""","Item","Section Break","Measurement Formula","size_item","","","","measurement_formula",0,0,0,0,"","",0,"eval:doc.item_group=='Tailoring' && !doc.__islocal",0,0,0,0,0,0
+"","""Item-size_item""","Item","Table","Size Item","more_details","","Size Item","","size_item",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Item-more_details""","Item","Section Break","Size Details","add_image","","","","more_details",0,0,0,0,"","",0,"eval:!doc.__islocal && doc.item_group == 'Tailoring'",0,0,0,0,0,0
+"","""Item-process_item""","Item","Table","Process Item","style_item","","Process Item","","process_item",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Item-process_details""","Item","Section Break","Process Details","","","","","process_details",0,0,0,0,"","",0,"",0,0,0,0,0,0
+"","""Serial No-serial_no_detail""","Serial No","Table","Serial No Detail","process_status","","Serial No Detail","","serial_no_detail",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Serial No-work_order""","Serial No","Link","Work Order","finished_trial_no","","Work Order","","work_order",0,0,0,0,"","",0,"",0,1,0,0,0,0
 "","""Serial No-process""","Serial No","Data","Process","work_order","","","","process",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Serial No-process_status""","Serial No","Data","Process Status","process","","","","process_status",0,0,0,0,"","",0,"",0,0,0,0,0,0
@@ -35,26 +72,6 @@
 "","""Sales Invoice-branch""","Sales Invoice","Link","Branch","admin_authentication_note","","Branch","","branch",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Stock Entry Detail-work_order""","Stock Entry Detail","Link","Work Order","material_request_item","","Work Order","","work_order",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Branch-min_advance_payment""","Branch","Int","Min Advance Payment","y","2","","In Percentage %","min_advance_payment",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Item-sales_bom_item""","Item","Table","Sales BOM Item","x","","Sales BOM Item","","sales_bom_item",0,0,0,0,"","",0,"eval:doc.is_clubbed_product==1",0,0,0,0,0,0
-"","""Item-x""","Item","Section Break","","weight_uom","","","","x",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Item-default_branch""","Item","Link","Default Branch","is_stock_item","","Branch","","default_branch",0,0,0,0,"","",0,"eval:doc.is_stock_item=='Yes'",0,0,0,0,0,0
-"","""Item-is_clubbed_product""","Item","Check","Is Clubbed Product","is_stock_item","","","","is_clubbed_product",0,0,0,0,"","",0,"eval:doc.is_stock_item=='No'",0,0,0,0,0,0
-"","""Item-raw_material_item""","Item","Table","Raw Material Item","raw_material","","Raw Material Item","","raw_material_item",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Item-raw_material""","Item","Section Break","Raw Material","costing_item","","","","raw_material",0,0,0,0,"","",0,"eval:doc.item_group=='Tailoring' && !doc.__islocal",0,0,0,0,0,0
-"","""Item-costing_item""","Item","Table","Costing Item","process_item","","Costing Item","","costing_item",0,0,0,0,"","",0,"eval:!doc.__islocal && (doc.item_group=='Tailoring')",0,0,0,0,0,0
-"","""Item-fabric_costing""","Item","Table","Merchandise Costing","item_costing","","Fabric Costing","","fabric_costing",0,0,0,0,"","",0,"eval:!doc.__islocal && (doc.item_group=='Fabric' || doc.item_group=='Merchandise' || doc.item_group=='Fabric Swatch Item')",0,0,0,0,0,0
-"","""Item-service""","Item","Link","Service","item_costing","","Service","","service",0,0,0,0,"","",0,"eval:!doc.__islocal && (doc.item_group=='Tailoring')",0,0,0,0,0,0
-"","""Item-item_costing""","Item","Section Break","Item Costing","raw_material_item","","","","item_costing",0,0,0,0,"","",0,"eval:!doc.__islocal",0,0,0,0,0,0
-"","""Item-process_item""","Item","Table","Process Item","style_item","","Process Item","","process_item",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Item-style_item""","Item","Table","Style Item","measurement_item","","Style Item","","style_item",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Item-measurement_item""","Item","Table","Measurement Item","s_","","Measurement Item","","measurement_item",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Item-s_""","Item","Section Break","Measurement","measurement_formula_template","","","","s_",0,0,0,0,"","",0,"eval:doc.item_group=='Tailoring' && !doc.__islocal",0,0,0,0,0,0
-"","""Item-measurement_formula_template""","Item","Link","Measurement Formula Template","c","","Measurement Formula","","measurement_formula_template",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Item-c""","Item","Column Break","c","measurement_template","","","","c",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Item-measurement_template""","Item","Link","Measurement Template","measurement_formula","","Measurement Template","","measurement_template",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Item-measurement_formula""","Item","Section Break","Measurement Formula","size_item","","","","measurement_formula",0,0,0,0,"","",0,"eval:doc.item_group=='Tailoring' && !doc.__islocal",0,0,0,0,0,0
-"","""Item-size_item""","Item","Table","Size Item","more_details","","Size Item","","size_item",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Item-more_details""","Item","Section Break","Size Details","add_image","","","","more_details",0,0,0,0,"","",0,"eval:!doc.__islocal && doc.item_group == 'Tailoring'",0,0,0,0,0,0
 "","""Item-barcode_image""","Item","Text","Barcode Image","late_work_cost","","","","barcode_image",0,0,1,0,"","",0,"",0,1,0,0,0,0
 "","""Item-barcode_description""","Item","Small Text","Barcode Description","barcode_image","","","","barcode_description",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Item-late_work_cost""","Item","Currency","Late Work Cost","items_image","","","cost/min","late_work_cost",0,0,0,0,"","",0,"",0,0,0,0,0,0
@@ -113,12 +130,10 @@ Remove","","authenticated",0,0,1,0,"","",0,"",0,1,0,0,0,0
 "","""Customer-body_measurements""","Customer","Table","Body Measurements","measurement_details","","Measurement Details","","body_measurements",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Customer-measurement_details""","Customer","Section Break","Measurement Details","anniversary_date","","","","measurement_details",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Purchase Invoice Item-invoice_branch""","Purchase Invoice Item","Link","Invoice Branch","description","","Branch","","invoice_branch",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Sales Invoice Item-sales_invoice_branch""","Sales Invoice Item","Link","Sales Invoice Branch","warehouse","","Branches","","sales_invoice_branch",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Sales Invoice-delivery_date""","Sales Invoice","Date","Delivery Date","mode_of_payment","","","","delivery_date",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Item Price-customer_rate""","Item Price","Table","Customer Rate","customer_rate_details","","Customer Rate","","customer_rate",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Item Price-customer_rate_details""","Item Price","Section Break","Customer Rate Details","item_description","","","","customer_rate_details",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Stock Entry-process""","Stock Entry","Link","Process","refer_doctype_name","","Process","","process",0,0,0,0,"","",0,"",0,0,0,0,0,0
-"","""Stock Entry-stock_in""","Stock Entry","Link","Bundle No","purpose","","Stock Entry","","stock_in",0,0,0,0,"","",0,"eval:doc.purpose_type == 'Material In'",0,0,0,1,0,0
 "","""Customer-anniversary_date""","Customer","Date","Anniversary Date","date_of_birth","","","","anniversary_date",0,0,0,0,"","",0,"",0,0,0,0,0,0
 "","""Stock Entry-branch""","Stock Entry","Link","Branch","stock_in","","Branch","","branch",0,0,0,0,"","",0,"",1,1,0,0,0,0
 "","""Stock Entry-purpose_type""","Stock Entry","Select","Purpose Type","naming_series","","
