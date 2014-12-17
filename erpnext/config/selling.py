@@ -14,11 +14,11 @@ def get_data():
 					"link": "sales-dashboard",
 					"description": _("Sales Dashboard"),
 				},
-				# {
-				# 	"type": "doctype",
-				# 	"name": "Lead",
-				# 	"description": _("Database of potential customers."),
-				# },
+				{
+					"type": "doctype",
+					"name": "Trials",
+					"description": _("Trials Dashboard."),
+				},
 				{
 					"type": "doctype",
 					"name": "Customer",

@@ -86,10 +86,10 @@ cur_frm.cscript.process_allocation = function(doc, cdt, cdn){
 		})
 		var fd = dialog.fields_dict;
 		$(this.div).find('myDiv').remove()
-		this.div = $('<div id="myDiv"><table class="table table-bordered" style="background-color: #D8D8D8;height:10px" id="mytable"><thead><tr><td>Process Name</td><td>Process</td><td>Trials</td></tr></thead><tbody></tbody></table></div>').appendTo($(fd.styles_name.wrapper))
+		this.div = $('<div id="myDiv"><table class="table table-bordered" style="background-color: #D8D8D8;height:10px" id="mytable"><thead><tr><td>Process Name</td><td>Process</td><td>Trials</td><td>QC Status</td></tr></thead><tbody></tbody></table></div>').appendTo($(fd.styles_name.wrapper))
 		for(i=0;i<r.message.length;i++){
 			
-				this.table = $(this.div).find('#mytable').append('<tr style="background-color: #FFFFFF;"><td><a href="#Form/Process Allotment/'+r.message[i].process_data+'">'+r.message[i].process_data+'</a></td><td>'+r.message[i].process_name+'</td><td>'+r.message[i].trials+'</td></tr>')			
+				this.table = $(this.div).find('#mytable').append('<tr style="background-color: #FFFFFF;"><td><a href="#Form/Process Allotment/'+r.message[i].process_data+'">'+r.message[i].process_data+'</a></td><td>'+r.message[i].process_name+'</td><td>'+r.message[i].trials+'</td><td>'+r.message[i].qi_status+'</td></tr>')
 			
 		}
 		dialog.show()

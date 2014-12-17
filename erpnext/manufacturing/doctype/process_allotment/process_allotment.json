@@ -477,6 +477,13 @@
    "read_only": 1
   }, 
   {
+   "fieldname": "qi_status", 
+   "fieldtype": "Data", 
+   "label": "QI Status", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "amended_from", 
    "fieldtype": "Link", 
    "label": "Amended From", 
@@ -494,7 +501,7 @@
  "is_submittable": 0, 
  "issingle": 0, 
  "istable": 0, 
- "modified": "2014-12-11 21:40:27.325239", 
+ "modified": "2014-12-16 18:21:49.138222", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "Process Allotment", 

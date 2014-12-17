@@ -91,3 +91,13 @@ cur_frm.cscript.get_finished_list= function(doc){
 	}
 	return process_list
 }
+
+cur_frm.cscript.trial_dates_add = function(doc, cdt, cdn){
+	var d = locals[cdt][cdn]
+	if(doc.trial_serial_no){
+		d.subject = doc.trial_serial_no
+		refresh_field('trial_dates')
+	}else{
+		alert("Select serial no")
+	}
+}

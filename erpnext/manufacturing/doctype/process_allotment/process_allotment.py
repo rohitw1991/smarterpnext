@@ -244,6 +244,10 @@ class ProcessAllotment(Document):
 	# 			parent = frappe.db.get_value('Process Log', {'process_data': self.name}, 'parent')
 	# 			update_serial_no(parent, sn, msg)
 
+	def find_start_time(self):
+		self.start_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+		return "Done"
+
 	def find_to_time(self, date_type=None):
 		import math
 		if not date_type:
@@ -254,6 +258,7 @@ class ProcessAllotment(Document):
 			self.completed_time = cstr(math.floor(((after - before).seconds) / 60))
 		else:
 			frappe.msgprint("Start Date is not mentioned")
+		return "Done"
 
 	# def make_stock_entry(self, t_branch, args):
 	# 	ste = frappe.new_doc('Stock Entry')

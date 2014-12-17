@@ -73,7 +73,10 @@ cur_frm.cscript.emp_status= function(doc, cdt, cdn){
 	doc.process_status = 'Open'
 	cur_frm.cscript.toogle_field(doc)
 	if(doc.emp_status == 'Assigned'){
-		cur_frm.cscript.clear_field(doc)
+		get_server_fields('find_start_time','','', doc, cdt, cdn, 1, function(){
+			cur_frm.cscript.clear_field(doc);
+		})
+		
 	}else if (doc.emp_status == 'Completed'){
 		get_server_fields('find_to_time','','',doc, cdt, cdn, 1, function(){
 			refresh_field(['end_date', 'completed_time'])

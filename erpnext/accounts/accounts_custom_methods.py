@@ -449,7 +449,7 @@ def update_serial_no_with_wo(serial_no_list, work_order):
 @frappe.whitelist()
 def get_process_detail(name):
 	return frappe.db.sql("""select process_data, process_name, 
-		ifnull(trials,'No') as trials, status from `tabProcess Log` 
+		ifnull(trials,'No') as trials, qi_status from `tabProcess Log` 
 		where parent ='%s' and branch = '%s' 
 		order by process_data, trials"""%(name, get_user_branch()),as_dict=1, debug=1)
 
@@ -714,3 +714,18 @@ def get_branch(self, pdlog):
 	if self.trial_no and self.tdd:
 		branch = frappe.db.get_value('Trial Dates', {'parent': self.tdd, 'trial_no': self.trial_no}, 'trial_branch')	
 	return branch
+
+def update_QI_status(doc, method):
+	msg = get_QI_status(doc)
+	frappe.db.sql("""update `tabProduction Dashboard Details` set 
+		qi_status='%s' where name = '%s'"""%(msg, doc.pdd))
+	frappe.db.sql("""update `tabProcess Allotment` set 
+		qi_status='%s' where pdd = '%s' and process = '%s'"""%(msg, doc.pdd, doc.process))
+
+def get_QI_status(self):
+	msg = 'Accepted'
+	for data in self.get('qa_specification_details'):
+		if d.status == 'Rejected':
+			msg = 'Rejected'
+	return msg
+	
